@@ -1,0 +1,187 @@
+\section{Requisiti}
+
+\subsection{Requisiti di business}
+%Requirement di alto livello stabiliscono perché si sta facendo 
+%il sistema e quali siano i suoi vantaggi. 
+\begin{itemize}
+    \item Creazione di un gioco di genere Roguelike
+    \item Possibilità di gioco su browser
+\end{itemize}
+
+\subsection{Requisiti utente}
+%Quando un utente usa il sistema, cosa vuole fare e cosa si aspetta?
+%Raccolgono le aspettative per un utente.
+%Un modo tipico per documentare i requisiti utente sono le user stories.
+
+Matteo Brocca in questo progetto ricopre il ruolo di esperto di dominio e committente. 
+E' un appassionato di giochi Roguelike ma essendo troppo bravo li ha finiti tutti. 
+Da qui l'idea di crearne uno nuovo per lui. 
+
+\begin{enumerate}
+    \item L'utente potrà 
+    \begin{enumerate}
+    \item avviare una nuova partita da un menu contestuale
+    \item controllare il proprio personaggio all'interno della stanza per
+    \begin{enumerate}
+        \item spostarsi e cambiare direzione
+        \item sparare ai nemici
+        \item raccogliere elementi utili all'aumento delle sue caratteristiche
+        \item spostarsi da una stanza all'altra attraverso delle porte
+        \item visualizzare in modo continuo le sue statistiche e i suoi punti vita
+    \end{enumerate}
+    \end{enumerate}
+    \item L'utente dovrà riuscire a 
+    \begin{enumerate}
+    \item distinguere nemici, oggetti e elementi di disturbo
+    \item capire in che direzione si sta muovendo
+    \item capire dove sta sparando
+    \item capire di aver colpito un nemico
+    \item capire di aver raccolto un oggetto
+    \item capire qual'è la stanza del boss
+    \item capire che sta fronteggiando un boss
+    \item capire di aver vinto o perso una partita
+    \end{enumerate}
+\end{enumerate}
+
+\subsection{Requisiti funzionali}
+%Funzionali: statement dettagliati delle funzionalità del sistema indicate
+%in modo chiaro (organizzarli permette uno sviluppo del progetto rigoroso)
+\begin{enumerate}
+    \item Menù di gioco
+    \begin{enumerate}
+        \item presenza di un tasto per avviare una nuova partita
+    \end{enumerate}
+    \item Generazione di una mappa di gioco 2D in maniera casuale
+    \begin{enumerate}
+        \item Una mappa è formata da più stanze quadrate
+        \item Ogni stanza è fisicamente adiacente ad almeno un'altra stanza
+        \item Tra stanze adiacenti è presente una porta che le collega
+        \item Una stanza è di diverse tipologie
+            \begin{enumerate}
+                \item Iniziale
+                    \begin{enumerate}
+                        \item Vuota
+                        \item Una sola nella mappa
+                    \end{enumerate}
+                \item Oggetto
+                    \begin{enumerate}
+                        \item Contiene un singolo oggetto scelto randomicamente
+                    \end{enumerate}
+                \item Combattimento
+                    \begin{enumerate}
+                        \item Il contenuto è generato randomicamente
+                        \item Contiene alcuni nemici di una singola tipologia
+                        \item Contiene alcuni elementi bloccanti
+                        \item Le porte si chiudono quando il giocatore entra nella stanza
+                        \item Le porte si aprono quando il giocatore ha eliminato tutti i nemici
+                    \end{enumerate}
+                \item Boss
+                    \begin{enumerate}
+                        \item Contiene solamente il boss
+                        \item Una sola nella mappa
+                        \item Adiacente ad una ed una sola altra stanza
+                        \item Riconoscibile grazie ad una porta particolare 
+                    \end{enumerate}
+            \end{enumerate}
+        \item A video è visibile solo la stanza dove è presente il personaggio
+        
+    \end{enumerate}
+    
+    \item Personaggio controllabile con caratteristiche e punti vita
+    \begin{enumerate}
+        \item Il personaggio è caratterizzato da
+            \begin{enumerate}
+                \item Punti vita
+                \item Velocità di movimento
+                \item Danno
+                \item Rate di fuoco
+            \end{enumerate}
+        \item Il personaggio è controllato dall'utente con la tastiera
+        \begin{enumerate}
+            \item L'utente può muovere il personaggio nelle quattro direzioni principali (sopra, sotto, destra, sinistra)
+            \item L'utente può eseguire uno o più "shot" verso una delle quattro direzioni principali (sopra, sotto, destra, sinistra)
+            \item Il personaggio è vincolato a stare nei limiti della stanza e può uscire solo dalle porte
+        \end{enumerate}
+        \item Il personaggio infligge danno ai nemici quando uno "shot" colpisce un nemico
+        \item Il personaggio può raccogliere oggetti che modificano le sue caratteristiche
+    \end{enumerate}
+    
+    \item Nemici con diverse caratteristiche
+    \begin{enumerate}
+        \item Un nemico può essere di diverse tipologie
+             \begin{enumerate}
+                \item A (nome del nemico)
+                \item B
+                \item C
+            \end{enumerate}
+        \item Ogni tipologia è caratterizzata da
+            \begin{enumerate}
+                \item Punti vita
+                \item Velocità di movimento
+                \item Danno
+                \item Modalità di movimento
+                 \begin{enumerate}
+                    \item Casuale all'interno di una stanza
+                    \item In direzione del giocatore
+                \end{enumerate}
+            \end{enumerate}
+        \item Un nemico infligge danno al personaggio quando lo tocca
+        \item Un nemico si muove solo all'interno di una stanza
+    \end{enumerate}
+    
+    \item Oggetti con diversi comportamenti
+    \begin{enumerate}
+        \item Un oggetto può essere di diverse tipologie
+             \begin{enumerate}
+                \item A (nome dell'oggetto)
+                \item B
+                \item C
+            \end{enumerate}
+        \item Un oggetto in base alla sua tipologia varia alcune caratteristiche del giocatore 
+    \end{enumerate}
+\end{enumerate}
+
+
+\subsection{Requisiti non funzionali}
+%Non funzionali: statement dettagliati che raccolgono la qualità del 
+%comportamento o sui vincoli del sistema
+
+\begin{enumerate}
+    \item Fluidità di gioco
+    \begin{enumerate}
+        \item Il gioco non deve presentare lag o inestetismi marcati che rendano la user experience non ottimale
+    \end{enumerate}
+    \item Bilanciare numero e caratteristiche dei nemici per ottenere un livello di difficoltà di gioco medio
+    \begin{enumerate}
+        \item Il gioco non deve essere troppo facile 
+        \begin{enumerate}
+            \item Presenza di pochi nemici all'interno di una stanza
+            \item Presenza di oggetti che potenzino le caratteristiche del giocatore rendendo il conflitto giocatore-nemici impari
+        \end{enumerate}
+        \item Il gioco non deve essere troppo difficile
+        \begin{enumerate}
+            \item Presenza di troppi nemici all'interno di una stanza
+            \item Presenza di oggetti che non potenzino o riducano le caratteristiche del giocatore rendendo il conflitto giocatore-nemici impari
+        \end{enumerate}
+    \end{enumerate}
+\end{enumerate}
+
+
+\subsection{Requisiti di implementazione}
+%Implementazione: requirement posti agli sviluppatori. Danno indicazioni 
+%sul lavoro da fare. Possono comprendere: tipi di strumenti utilizzati, 
+%modi di sviluppo, documentazione fornita.
+
+\begin{enumerate}
+\item Utilizzo del game engine Indigo
+\item Implementazione mediante Prolog del movimento dei nemici
+\item Testing mediante ScalaTest
+\item Sviluppo del software in modo da poter aggiungere nuovi componenti o estensioni a quelli gia esistenti in modo semplice
+\begin{enumerate}
+    \item Aggiunta di diversi personaggi con cui giocatore
+    \item Aggiunta di nuovi nemici e boss
+    \item Aggiunta di nuovi elementi bloccanti
+    \item Aggiunta di nuovi oggetti con diverse caratteristiche
+\end{enumerate}
+\item Rilascio del gioco su server tramite GitHub Actions
+\end{enumerate}

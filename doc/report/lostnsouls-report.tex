@@ -1,0 +1,103 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[italian]{babel}
+\usepackage{newlfont}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\definecolor{mygray}{rgb}{0.5,0.5,0.5} 
+
+\lstset{
+	basicstyle=\footnotesize\ttfamily,
+	keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{mygray}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  frame=L,
+	breaklines=true,
+	frameround=ffff,
+	frame=L,
+	tabsize=2,
+	aboveskip=1em,
+	belowskip=1em,
+}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=black,
+  filecolor=black      
+}
+
+
+\renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
+\renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}}
+\renewcommand{\labelenumiv}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.\arabic{enumiv}}
+  
+\graphicspath{ {img/} }
+
+\textwidth=450pt\oddsidemargin=0pt
+
+\title{Lost 'n Souls} 
+\author{Matteo Brocca, Alan Mancini, Federico Mazzini}
+\date{Settembre 2021}\let\Date
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+	{{\Large{\textsc{Alma Mater Studiorum $\cdot$ Universit\`a di Bologna}}}} \rule[0.1cm]{15.8cm}{0.1mm}
+	\rule[0.5cm]{15.8cm}{0.6mm}
+	{\small{\bf Corso di\\Paradigmi di Programmazione e Sviluppo\\Docenti: Mirko Viroli, Roberto Casadei}}
+\end{center}
+\vspace{15mm}
+\begin{center}
+	{\Huge{\bf Lost 'n Souls}}\\
+	\vspace{4mm}
+	{\Huge{\bf Roguelike game}}
+\end{center}
+\vspace{40mm}
+\par
+\noindent
+\begin{center}
+{\large{
+	\textit{Autori}:\\  
+	Matteo Brocca $\cdot$ 1005681\\
+	Alan Mancini $\cdot$ 1005481\\
+	Federico Mazzini $\cdot$ 980559\\
+}}
+\end{center}
+\vspace{40mm}
+\begin{center}
+	\large{Settembre 2021}
+\end{center}
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\include{sections/intro.tex}
+\include{sections/process.tex}
+\include{sections/requires.tex}
+\include{sections/architecture-design.tex}
+\include{sections/detail-design.tex}
+\include{sections/implementation.tex}
+\include{sections/retrospective.tex}
+
+\bibliographystyle{plain}
+
+\end{document}

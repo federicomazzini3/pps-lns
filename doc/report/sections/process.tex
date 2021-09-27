@@ -1,0 +1,73 @@
+\section{Processo di sviluppo adottato}
+
+% (modalità di divisione in itinere dei task, meeting/interazioni pianificate, modalità di revisione in itinere dei task, scelta degli strumenti di test/build/continuous integration)
+
+Il processo di sviluppo adottato dal team è incrementale e iterativo. Si è cercato il più possibile di attenersi al framework \textbf{Scrum}, adattato alle esigenze lavorative e scolastiche dei membri del team. 
+Il team ha effettuato \textbf{sprint} settimanali, in modo tale da massimizzare il numero di cicli iterativi di sviluppo. 
+Inizialmente, gli sprint hanno avuto una parte di \textbf{planning}, mentre al loro termine, una parte di \textbf{review}.
+Di seguito si analizza nel dettaglio il metodo utilizzato.
+
+\subsection{Meeting}
+Ai meeting ha sempre partecipato il team al completo. Al bisogno, Matteo ha svolto il ruolo di esperto di dominio/committente. Ogni scelta all'interno del progetto è comunque sempre stata condivisa da tutto il team. 
+\subsubsection{Sprint planning}
+Lo sprint planning è svolto all'inizio di ogni Sprint ed è di fondamentale importanta in quanto permette di definire nel dettaglio i task da eseguire all'interno dello sprint e i goal per esso.
+Ogni sprint planning si compone di:
+\begin{itemize}
+    \item Raffinamento del product backlog e identificazione dei goal per lo sprint.
+    \item Definizione dei \textbf{Task} come unità di lavoro pratica per soddisfare i \textbf{requisiti};
+    \item Assegnazione dei Task ai membri del team.
+\end{itemize}
+Lo Sprint Planning ha una durata massima di 2 ore.
+
+\subsubsection{Daily Scrum}
+Durante il Daily Scrum ogni sviluppatore espone al team i seguenti punti:
+
+\begin{itemize}
+    \item Quale lavoro ha svolto la giornata precedente;
+    \item Quale lavoro intende svolgere nella giornata corrente;
+    \item Eventuali possibili impedimenti per il lavoro da svolgere, e come gli altri membri del team potrebbero aiutare ad affrontare il problema.
+\end{itemize}
+La durata di questo incontro è al massimo di 15 minuti.
+
+\subsubsection{Sprint review}
+La Sprint review analizza l'iterazione appena avvenuta e si concentra sul prodotto software in sè, in particolare si discute di:
+
+\begin{itemize}
+    \item Ispezione dell'incremento ottenuto in termini di funzionalità e risultati tangibili per il cliente
+    \item Adattamento del Product Backlog;
+    \item Discussione su ciò che potrebbe essere fatto nel prossimo Sprint, utile come pre\-pa\-ra\-zione al prossimo Sprint Planning.
+\end{itemize}
+Durata massima: 1 ora.
+
+\subsubsection{Sprint retrospective}
+La Sprint retrospective analizza l'iterazione appena avvenuta concentrandosi sul processo di sviluppo e il team, in particolare si discute di:
+
+\begin{itemize}
+    \item Come sono stati utilizzati i tool per il team e si analizza l'andamento dei meeting
+    \item Idee per migliorare il processo di sviluppo, in particolare i punti critici individuati al punto sopra
+\end{itemize}
+Durata massima: 45 minuti.
+
+\subsection{Divisione dei Task}
+
+La suddivisione dei task è su base volontaria. Questo significa che tutti i membri del team si offrono volontariamente per svolgere un determinato task, nei limiti ovviamente della totalità dei task e dei goal per lo specifico sprint.
+Durante il daily scrum, può essere rivista qualche decisione, se non troppo radicale.
+
+\subsection{Definition of done}
+
+Il team ha definito, come e in che modo, un task può essere definito come done e di conseguenza concluso
+\begin{enumerate}
+    \item Superamento di tutti gli Scalatest
+    \item Codice documentato con opportuna Scaladoc
+    \item Code review 
+\end{enumerate}
+
+\subsection{Tool}
+
+Il team ha individuato i seguenti strumenti per favorire un processo agile, migliorare l'efficienza e favorire l'automazione durante il processo di sviluppo
+\begin{itemize}
+    \item \textbf{SBT} come strumento di build automation
+    \item \textbf{Scalatest} per la scrittura ed esecuzione dei test automatizzati
+    \item \textbf{GitHub} come strumento per la \textit{continuous integration}
+    \item \textbf{Jira} come strumento a supporto di scrum, gestione del product backlog e delle varie board di sviluppo
+\end{itemize}
