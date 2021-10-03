@@ -20,6 +20,13 @@ I concetti chiave di Indigo che ci guidano nello sviluppo del gioco sono
 Il pattern architetturale \textbf{MVVM} (Model, View, ViewModel) è una variante del famoso \textbf{MVC} (Model, View, Controller). 
 Scopo di questo pattern è quello di separare il modello dei dati dalla sua rappresentazione, tenendo entrambi puri e funzionali al loro scopo, frapponendo tra loro un elemento "ibrido", il ViewModel.
 
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{mvvm.jpg}
+    \caption{\textit{Architettura Model, View, ViewModel}} 
+\end{figure}
+
 \paragraph{Model}
 Rappresenta il modello di gioco puro, indipendentemente dalla sua rappresentazione visuale. 
 Esso contiene lo stato del gioco e la sua logica. 
@@ -51,10 +58,34 @@ Abbiamo identificato quattro scene principali su cui andare a definire Lost 'n S
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.8]{}
-    \caption{} 
+    \includegraphics[scale=0.58]{scenes.jpg}
+    \caption{\textit{Il flusso delle scene}}
 \end{figure}
 
 Il Model è quindi costituito dai singoli modelli delle relative scene.
 
 
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.45]{model.jpg}
+    \caption{\textit{Il model}} 
+\end{figure}
+
+\newpage 
+\subsection{Componenti principali}
+All'interno della scena di gioco, abbiamo identificato i principali componenti:
+
+
+\begin{itemize}
+    \item \textbf{Dungeon} Intera mappa di gioco nel suo complesso
+    \item \textbf{Room} Stanza situata all'interno di una mappa di gioco
+    \item \textbf{Anything} Una qualsiasi entità all'interno di una stanza: nemico, oggetto o elemento bloccante. 
+    \item \textbf{Character} Personaggio controllato dal giocatore
+\end{itemize}
+
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{gamemodel.jpg}
+    \caption{\textit{Diagramma dei componenti principali}} 
+\end{figure}

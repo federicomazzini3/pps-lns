@@ -1,0 +1,11 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Setup ambiente di sviluppo,,2,,,1,0,,,,,
+,Setup repository,,Federico,0.1,0,,,,,,
+,Setup SBT project,,Federico,0.1,0,,,,,,
+,Add Scalatest dependencies,,Federico,0.1,0,,,,,,
+,Add Indigo dependencies,,Federico,0.1,0,,,,,,
+,Setup latex environment and doc,,Federico,0.5,0,,,,,,
+,Setup csv file for product backlog,,Federico,0.5,0.5,0,,,,,
+Studio Engine Indigo,,11,Alan - Federico - Matteo,,11,11,11,9,5,0,
+Design Architetturale,,9,Alan - Federico - Matteo,,9,9,9,9,7,3,0
+Setup CI/CD,,3,Alan,,3,3,3,3,3,3,3
