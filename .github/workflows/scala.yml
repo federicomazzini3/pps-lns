@@ -2,9 +2,9 @@ name: Scala CI
 
 on:
   push:
-    branches: [ master, dev ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, dev ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -18,5 +18,18 @@ jobs:
       with:
         java-version: '16'
         distribution: 'adopt'
+        
     - name: Run tests
       run: sbt test
+      
+    - name: Indigo build
+      run: sbt buildGame
+      
+    - name: Publish game
+      uses: SamKirkland/FTP-Deploy-Action@4.1.0
+      with:
+        server: meblabs.com
+        username: ${{ secrets.ftp_admin }}
+        password: ${{ secrets.ftp_psw }}
+        local-dir: ./target/indigoBuild/
+        dangerous-clean-slate: true
