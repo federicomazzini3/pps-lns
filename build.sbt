@@ -15,6 +15,7 @@ lazy val lns =
       windowStartHeight := 480, // Height of Electron window, used with `indigoRun`.
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "indigo" % "0.9.2",
+        "io.indigoengine" %%% "indigo-extras"     % "0.9.2",
         "io.indigoengine" %%% "indigo-json-circe" % "0.9.2",
         "org.junit.jupiter" % "junit-jupiter" % "5.8.0" % Test, // aggregator of junit-jupiter-api and junit-jupiter-engine (runtime)
         "org.junit.jupiter" % "junit-jupiter-engine" % "5.8.0" % Test, // for org.junit.platform
