@@ -9,8 +9,12 @@ final case class LoadingScene() extends EmptyScene {
   type SceneModel     = LoadingModel
   type SceneViewModel = Unit
 
-  def name: SceneName = SceneName("loading")
+  def name: SceneName = LoadingScene.name
 
   def modelLens: Lens[Model,SceneModel] = Lens(m => m.loading, (m, sm) => m.copy(loading = sm))
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(_ => (), (vm, _) => vm)
+}
+
+object LoadingScene {
+  val name: SceneName = SceneName("demo")
 }
