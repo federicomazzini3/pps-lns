@@ -7,6 +7,7 @@ import indigo.scenes.SceneEvent.JumpTo
 import lns.StartupData
 import lns.core.{Assets, EmptyScene, Model, ViewModel}
 import lns.scenes.game.GameScene
+import lns.scenes.loading.LoadingModel
 
 final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
   type SceneModel = LoadingModel
@@ -21,41 +22,41 @@ final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
 
   override def subSystems: Set[SubSystem] = Set(AssetBundleLoader)
 
-  override def updateModel(context: FrameContext[StartupData], model: SceneModel): GlobalEvent => Outcome[SceneModel] = {
+  override def updateModel(context: FrameContext[StartupData], loading: SceneModel): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
-      model.loadingState match {
-        case LoadingState.NotStarted => {
-          Outcome(LoadingModel.inProgress(0))
+      loading match {
+        case LoadingModel.NotStarted => {
+          Outcome(LoadingModel.InProgress(0))
             .addGlobalEvents(
               AssetBundleLoaderEvent.Load(BindingKey("Loading"), Assets.secondary())
             )
         }
 
         case _ =>
-          Outcome(model)
+          Outcome(loading)
       }
 
     case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
-      Outcome(LoadingModel.inProgress(percent))
+      Outcome(LoadingModel.InProgress(percent))
 
     case AssetBundleLoaderEvent.Success(_) =>
-      Outcome(LoadingModel.complete)
+      Outcome(LoadingModel.Complete)
     //.addGlobalEvents(JumpTo(GameScene.name))
 
     case AssetBundleLoaderEvent.Failure(_, _) =>
-      Outcome(LoadingModel.error)
+      Outcome(LoadingModel.Error)
 
     case _ =>
-      Outcome(model)
+      Outcome(loading)
   }
 
   override def present(
                         context: FrameContext[StartupData],
-                        model: SceneModel,
+                        loading: SceneModel,
                         viewModel: SceneViewModel): Outcome[SceneUpdateFragment] =
   Outcome(
     LoadingView.draw(
-      model.loadingState,
+      loading,
       screenDimensions
     )
   )

@@ -6,22 +6,22 @@ import lns.core.Assets
 object LoadingView {
 
   def draw(
-            loadingState: LoadingState,
+            loadingModel: LoadingModel,
             screenDimensions: Rectangle
           ): SceneUpdateFragment = {
 
     val message: String =
-      loadingState match {
-        case LoadingState.NotStarted =>
+      loadingModel match {
+        case LoadingModel.NotStarted =>
           "Loading..."
 
-        case LoadingState.InProgress(percent) =>
+        case LoadingModel.InProgress(percent) =>
           s"Loading...${percent.toString()}%"
 
-        case LoadingState.Complete =>
+        case LoadingModel.Complete =>
           "Loading...100%"
 
-        case LoadingState.Error =>
+        case LoadingModel.Error =>
           "Loading failed..."
       }
 
