@@ -15,7 +15,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
 /**
  * Game boot data
  */
-final case class BootData()
+final case class BootData(screenDimensions: Rectangle)
 
 /**
  * Game startup data built from boot data
@@ -32,16 +32,18 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
    */
   def scenes(bootData: BootData): NonEmptyList[Scene[StartupData, Model, ViewModel]] = NonEmptyList(
     MenuScene(),
-    LoadingScene(),
+    LoadingScene(bootData.screenDimensions),
     GameScene(),
     EndScene()
   )
 
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] =
+    val config = GameConfig.default
+
     Outcome(
-      BootResult(GameConfig.default, BootData())
-        .withAssets(Assets.initial())
-        .withFonts(Fonts.fontInfo)
+      BootResult(config, BootData(config.screenDimensions))
+        .withAssets(Assets.initialAsset())
+        .withFonts(Assets.initialFont())
     )
 
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =

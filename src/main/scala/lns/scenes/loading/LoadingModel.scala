@@ -1,9 +1,15 @@
 package lns.scenes.loading
 
+/**
+ * A Loading Model
+ */
 sealed trait LoadingModel{
+  
+  /**
+   * @return the [[LoadingState]] of a [[LoadingModel]]
+   */
   def loadingState: LoadingState
 }
-
 
 object LoadingModel {
   val initial: LoadingModel = LoadingModelImpl(LoadingState.NotStarted)

@@ -2,11 +2,16 @@ package lns.core
 
 import indigo._
 
+/**
+ * Factory for Assets
+ */
 object Assets {
 
   val baseUrl: String = "assets/"
 
-  def initial(): Set[AssetType] = Button.assets ++ Dots.assets ++ Fonts.assets
+  def initialAsset(): Set[AssetType] = Button.assets ++ Dots.assets ++ Fonts.assets
+
+  def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] = Isaac.assets
 
