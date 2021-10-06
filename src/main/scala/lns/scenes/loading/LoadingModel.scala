@@ -1,9 +1,26 @@
 package lns.scenes.loading
 
-sealed trait LoadingModel
+sealed trait LoadingModel{
+  def loadingState: LoadingState
+}
+
 
 object LoadingModel {
-  val initial: LoadingModel = LoadingModelImpl()
+  val initial: LoadingModel = LoadingModelImpl(LoadingState.NotStarted)
 
-  private case class LoadingModelImpl() extends LoadingModel
+  def inProgress(percent: Int): LoadingModel = LoadingModelImpl(LoadingState.InProgress(percent))
+
+  val complete: LoadingModel = LoadingModelImpl(LoadingState.Complete)
+
+  val error: LoadingModel = LoadingModelImpl(LoadingState.Error)
+
+  private case class LoadingModelImpl(loadingState: LoadingState) extends LoadingModel
+}
+
+sealed trait LoadingState
+object LoadingState {
+  case object NotStarted                    extends LoadingState
+  final case class InProgress(percent: Int) extends LoadingState
+  case object Complete                      extends LoadingState
+  case object Error                         extends LoadingState
 }

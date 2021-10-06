@@ -1,13 +1,14 @@
 package lns
 
-import indigo.*
-import indigo.scenes.*
+import indigo._
+import indigo.scenes._
 import indigoextras.subsystems.FPSCounter
-import lns.core.{Model, ViewModel}
+import lns.core.{Model, ViewModel, Assets}
 import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
+import lns.core.Assets._
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -37,7 +38,11 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   )
 
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] =
-    Outcome(BootResult(GameConfig.default, BootData()))
+    Outcome(
+      BootResult(GameConfig.default, BootData())
+        .withAssets(Assets.initial())
+        .withFonts(Fonts.fontInfo)
+    )
 
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
     Outcome(Startup.Success(StartupData()))
