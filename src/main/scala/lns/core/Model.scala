@@ -1,6 +1,5 @@
 package lns.core
 
-import lns.scenes.menu.MenuModel
 import lns.scenes.loading.LoadingModel
 import lns.scenes.game.GameModel
 import lns.scenes.end.EndModel
@@ -13,7 +12,6 @@ import lns.scenes.end.EndModel
  * @param end [[EndModel]] for the [[EndScene]]
  */
 final case class Model(
-                        menu: MenuModel,
                         loading: LoadingModel,
                         game: GameModel,
                         end: EndModel
@@ -22,7 +20,6 @@ object Model {
 
   def initial: Model =
     Model(
-      MenuModel.initial,
       LoadingModel.initial,
       GameModel.initial,
       EndModel.initial

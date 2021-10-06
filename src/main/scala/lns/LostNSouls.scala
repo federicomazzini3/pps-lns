@@ -37,7 +37,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   )
 
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] =
-    Outcome(BootResult(GameConfig.default, BootData()))
+    Outcome(BootResult(GameConfig.default, BootData()).withAssets(AssetType.Image(AssetName("startButton"), AssetPath("assets/startButton.png"))))
 
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
     Outcome(Startup.Success(StartupData()))
