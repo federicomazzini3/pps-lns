@@ -13,7 +13,7 @@ final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
   type SceneModel = LoadingModel
   type SceneViewModel = Unit
 
-  def name: SceneName = SceneName("loading")
+  def name: SceneName = LoadingScene.name
 
   def modelLens: Lens[Model, SceneModel] = Lens(
     m => m.loading, (m, sm) => m.copy(loading = sm))
@@ -61,4 +61,8 @@ final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
     )
   )
 
+}
+
+object LoadingScene {
+  val name: SceneName = SceneName("demo")
 }

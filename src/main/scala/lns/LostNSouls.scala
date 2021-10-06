@@ -43,6 +43,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
     Outcome(
       BootResult(config, BootData(config.screenDimensions))
         .withAssets(Assets.initialAsset())
+        .withAssets(AssetType.Image(AssetName("startButton"), AssetPath("assets/startButton.png")))
         .withFonts(Assets.initialFont())
     )
 
