@@ -8,7 +8,7 @@ object Assets {
 
   def initial(): Set[AssetType] = Button.assets ++ Dots.assets ++ Fonts.assets
 
-  def secondary(): Set[AssetType] = Clouds.assets
+  def secondary(): Set[AssetType] = Isaac.assets
 
   object Button{
     val start: AssetName = AssetName("btn_start")
@@ -92,11 +92,11 @@ object Assets {
       )
   }
 
-  object Clouds{
-    val clouds: AssetName = AssetName("clouds")
+  object Isaac{
+    val isaac: AssetName = AssetName("isaac")
 
     val assets: Set[AssetType] = Set(
-      AssetType.Image(clouds, AssetPath(baseUrl + "small_clouds.png"))
+      AssetType.Image(isaac, AssetPath(baseUrl + "Isaac.png"))
     )
   }
 
