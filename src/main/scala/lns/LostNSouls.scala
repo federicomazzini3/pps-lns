@@ -1,20 +1,21 @@
 package lns
 
-import indigo.*
-import indigo.scenes.*
+import indigo._
+import indigo.scenes._
 import indigoextras.subsystems.FPSCounter
-import lns.core.{Model, ViewModel}
+import lns.core.{Model, ViewModel, Assets}
 import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
+import lns.core.Assets._
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
  * Game boot data
  */
-final case class BootData()
+final case class BootData(screenDimensions: Rectangle)
 
 /**
  * Game startup data built from boot data
@@ -31,13 +32,20 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
    */
   def scenes(bootData: BootData): NonEmptyList[Scene[StartupData, Model, ViewModel]] = NonEmptyList(
     MenuScene(),
-    LoadingScene(),
+    LoadingScene(bootData.screenDimensions),
     GameScene(),
     EndScene()
   )
 
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] =
-    Outcome(BootResult(GameConfig.default, BootData()).withAssets(AssetType.Image(AssetName("startButton"), AssetPath("assets/startButton.png"))))
+    val config = GameConfig.default
+
+    Outcome(
+      BootResult(config, BootData(config.screenDimensions))
+        .withAssets(Assets.initialAsset())
+        .withAssets(AssetType.Image(AssetName("startButton"), AssetPath("assets/startButton.png")))
+        .withFonts(Assets.initialFont())
+    )
 
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
     Outcome(Startup.Success(StartupData()))
