@@ -7,6 +7,7 @@ import indigo.shared.events.FrameTick
 import lns.StartupData
 import lns.core.{EmptyScene, Model, ViewModel}
 import lns.scenes.loading.LoadingScene
+import scala.language.implicitConversions
 
 case object StartEvent extends GlobalEvent
 
@@ -30,15 +31,15 @@ final case class MenuScene() extends EmptyScene {
       }
 
     case _ =>
-      Outcome(viewModel)
+      viewModel
   }
 
   override def updateModel(context: FrameContext[StartupData], model: SceneModel): GlobalEvent => Outcome[SceneModel] = {
     case StartEvent =>
-      Outcome(model).addGlobalEvents(JumpTo(LoadingScene.name))
+      model.addGlobalEvents(JumpTo(LoadingScene.name))
 
     case _ =>
-      Outcome(model)
+      model
   }
 
   override def present(
@@ -46,5 +47,5 @@ final case class MenuScene() extends EmptyScene {
     model: SceneModel,
     viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    Outcome(SceneUpdateFragment(viewModel.button.draw))
+    SceneUpdateFragment(viewModel.button.draw)
 }

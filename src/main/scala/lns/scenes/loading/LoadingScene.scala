@@ -8,6 +8,7 @@ import lns.StartupData
 import lns.core.{Assets, EmptyScene, Model, ViewModel}
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingModel
+import scala.language.implicitConversions
 
 final case class LoadingScene() extends EmptyScene {
   type SceneModel     = LoadingModel
@@ -28,28 +29,29 @@ final case class LoadingScene() extends EmptyScene {
     case FrameTick =>
       loading match {
         case LoadingModel.NotStarted => {
-          Outcome(LoadingModel.InProgress(0))
+          LoadingModel
+            .InProgress(0)
             .addGlobalEvents(
               AssetBundleLoaderEvent.Load(BindingKey("Loading"), Assets.secondary())
             )
         }
 
         case _ =>
-          Outcome(loading)
+          loading
       }
 
     case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
-      Outcome(LoadingModel.InProgress(percent))
+      LoadingModel.InProgress(percent)
 
     case AssetBundleLoaderEvent.Success(_) =>
-      Outcome(LoadingModel.Complete)
+      LoadingModel.Complete
     //.addGlobalEvents(JumpTo(GameScene.name))
 
     case AssetBundleLoaderEvent.Failure(_, _) =>
-      Outcome(LoadingModel.Error)
+      LoadingModel.Error
 
     case _ =>
-      Outcome(loading)
+      loading
   }
 
   override def present(
@@ -57,11 +59,9 @@ final case class LoadingScene() extends EmptyScene {
     loading: SceneModel,
     viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    Outcome(
-      LoadingView.draw(
-        loading,
-        context.startUpData.screenDimensions
-      )
+    LoadingView.draw(
+      loading,
+      context.startUpData.screenDimensions
     )
 
 }

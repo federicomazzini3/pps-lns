@@ -4,6 +4,7 @@ import indigo.*
 import indigo.scenes.*
 import lns.StartupData
 import lns.core.{EmptyScene, Model, ViewModel}
+import scala.language.implicitConversions
 
 final case class EndScene() extends EmptyScene {
   type SceneModel     = EndModel
