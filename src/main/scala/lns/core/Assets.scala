@@ -1,6 +1,7 @@
 package lns.core
 
-import indigo._
+import indigo.*
+import indigoextras.ui.ButtonAssets
 
 /**
  * Factory for Assets
@@ -9,21 +10,30 @@ object Assets {
 
   val baseUrl: String = "assets/"
 
-  def initialAsset(): Set[AssetType] = Button.assets ++ Dots.assets ++ Fonts.assets
+  def initialAssets(): Set[AssetType] = Buttons.assets ++ Dots.assets ++ Fonts.assets
 
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] = Isaac.assets
 
-  object Button{
+  object Buttons {
     val start: AssetName = AssetName("btn_start")
+
+    object Graphics {
+      val start: ButtonAssets =
+        ButtonAssets(
+          up = Graphic(0, 0, 221, 70, 2, Material.Bitmap(Buttons.start)).withCrop(0, 0, 221, 70),
+          over = Graphic(0, 0, 221, 70, 2, Material.Bitmap(Buttons.start)).withCrop(0, 0, 221, 70),
+          down = Graphic(0, 0, 221, 70, 2, Material.Bitmap(Buttons.start)).withCrop(0, 0, 221, 70)
+        )
+    }
 
     val assets: Set[AssetType] = Set(
       AssetType.Image(start, AssetPath(baseUrl + "btn_start.png"))
     )
   }
 
-  object Dots{
+  object Dots {
     val dots: AssetName = AssetName("dots")
 
     val assets: Set[AssetType] = Set(
@@ -97,7 +107,7 @@ object Assets {
       )
   }
 
-  object Isaac{
+  object Isaac {
     val isaac: AssetName = AssetName("isaac")
 
     val assets: Set[AssetType] = Set(
