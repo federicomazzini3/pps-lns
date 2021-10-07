@@ -9,7 +9,7 @@ import lns.core.{Assets, EmptyScene, Model, ViewModel}
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingModel
 
-final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
+final case class LoadingScene() extends EmptyScene {
   type SceneModel = LoadingModel
   type SceneViewModel = Unit
 
@@ -57,7 +57,7 @@ final case class LoadingScene(screenDimensions: Rectangle) extends EmptyScene {
   Outcome(
     LoadingView.draw(
       loading,
-      screenDimensions
+      context.startUpData.screenDimensions
     )
   )
 

@@ -6,7 +6,6 @@ import lns.scenes.end.EndModel
 
 /**
  * Main model which stores the whole game state divided by scene
- * @param menu [[MenuModel]] for the [[MenuScene]]
  * @param loading [[LoadingModel]] for the [[LoadingScene]]
  * @param game [[GameModel]] for the [[GameScene]]
  * @param end [[EndModel]] for the [[EndScene]]

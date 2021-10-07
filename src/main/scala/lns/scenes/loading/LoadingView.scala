@@ -33,7 +33,7 @@ object LoadingView {
         1,
         Assets.Fonts.fontKey,
         Assets.Fonts.fontMaterial
-      )
+      ).alignCenter
     )
   }
 
