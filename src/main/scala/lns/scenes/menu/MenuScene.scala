@@ -16,27 +16,35 @@ final case class MenuScene() extends EmptyScene {
 
   def name: SceneName = SceneName("menu")
 
-  def modelLens: Lens[Model,SceneModel] = Lens.unit
+  def modelLens: Lens[Model, SceneModel]             = Lens.unit
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(vm => vm.menu, (vm, svm) => vm.copy(menu = svm))
 
-  override def updateViewModel (context: FrameContext[StartupData], model: SceneModel , viewModel: SceneViewModel): GlobalEvent => Outcome[SceneViewModel] = {
-      case FrameTick =>
-        viewModel.button.update(context.inputState.mouse).map { btn =>
-          viewModel.copy(button = btn)
-        }
+  override def updateViewModel(
+    context: FrameContext[StartupData],
+    model: SceneModel,
+    viewModel: SceneViewModel
+  ): GlobalEvent => Outcome[SceneViewModel] = {
+    case FrameTick =>
+      viewModel.button.update(context.inputState.mouse).map { btn =>
+        viewModel.copy(button = btn)
+      }
 
-      case _ =>
-        Outcome(viewModel)
-    }
+    case _ =>
+      Outcome(viewModel)
+  }
 
-  override def updateModel (context: FrameContext[StartupData], model: SceneModel ): GlobalEvent => Outcome[SceneModel] = {
-      case StartEvent =>
-        Outcome(model).addGlobalEvents(JumpTo(LoadingScene.name))
+  override def updateModel(context: FrameContext[StartupData], model: SceneModel): GlobalEvent => Outcome[SceneModel] = {
+    case StartEvent =>
+      Outcome(model).addGlobalEvents(JumpTo(LoadingScene.name))
 
-      case _ =>
-        Outcome(model)
-    }
+    case _ =>
+      Outcome(model)
+  }
 
-  override def present(context: FrameContext[StartupData], model: SceneModel, viewModel: SceneViewModel): Outcome[SceneUpdateFragment] =
+  override def present(
+    context: FrameContext[StartupData],
+    model: SceneModel,
+    viewModel: SceneViewModel
+  ): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment(viewModel.button.draw))
 }

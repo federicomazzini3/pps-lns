@@ -11,6 +11,6 @@ final case class GameScene() extends EmptyScene {
 
   def name: SceneName = SceneName("game")
 
-  def modelLens: Lens[Model,SceneModel] = Lens(m => m.game, (m, sm) => m.copy(game = sm))
+  def modelLens: Lens[Model, SceneModel]             = Lens(m => m.game, (m, sm) => m.copy(game = sm))
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(_ => (), (vm, _) => vm)
 }

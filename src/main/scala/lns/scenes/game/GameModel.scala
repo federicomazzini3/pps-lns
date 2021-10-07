@@ -7,4 +7,3 @@ object GameModel {
 
   private case class GameModelImpl() extends GameModel
 }
-

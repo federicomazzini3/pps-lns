@@ -4,8 +4,8 @@ import indigo.*
 import indigoextras.ui.ButtonAssets
 
 /**
- * Factory for Assets
- */
+  * Factory for Assets
+  */
 object Assets {
 
   val baseUrl: String = "assets/"
@@ -42,8 +42,8 @@ object Assets {
   }
 
   object Fonts {
-    val smallFontName: AssetName             = AssetName("smallFontName")
-    val fontKey: FontKey                     = FontKey("boxy font")
+    val smallFontName: AssetName            = AssetName("smallFontName")
+    val fontKey: FontKey                    = FontKey("boxy font")
     val fontMaterial: Material.ImageEffects = Material.ImageEffects(smallFontName)
 
     val fontInfo: FontInfo =
