@@ -44,7 +44,7 @@ final case class LoadingScene() extends EmptyScene {
 
     case AssetBundleLoaderEvent.Success(_) =>
       LoadingModel.Complete
-    //.addGlobalEvents(JumpTo(GameScene.name))
+        .addGlobalEvents(JumpTo(GameScene.name))
 
     case AssetBundleLoaderEvent.Failure(_, _) =>
       LoadingModel.Error
@@ -66,5 +66,5 @@ final case class LoadingScene() extends EmptyScene {
 }
 
 object LoadingScene {
-  val name: SceneName = SceneName("demo")
+  val name: SceneName = SceneName("loading")
 }
