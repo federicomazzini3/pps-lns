@@ -5,9 +5,10 @@ import lns.StartupData
 import lns.core.Assets
 
 /**
-  * Scene Menu ViewModel which stores presentation state
-  * @param button data and state
-  */
+ * Scene Menu ViewModel which stores presentation state
+ * @param button
+ *   data and state
+ */
 case class MenuViewModel(button: Button)
 
 object MenuViewModel {

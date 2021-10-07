@@ -5,7 +5,7 @@ import indigo.scenes._
 import indigoextras.subsystems._
 import indigo.scenes.SceneEvent.JumpTo
 import lns.StartupData
-import lns.core.{Assets, EmptyScene, Model, ViewModel}
+import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingModel
 import scala.language.implicitConversions
@@ -23,18 +23,17 @@ final case class LoadingScene() extends EmptyScene {
   override def subSystems: Set[SubSystem] = Set(AssetBundleLoader)
 
   override def updateModel(
-    context: FrameContext[StartupData],
-    loading: SceneModel
+      context: FrameContext[StartupData],
+      loading: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
       loading match {
-        case LoadingModel.NotStarted => {
+        case LoadingModel.NotStarted =>
           LoadingModel
             .InProgress(0)
             .addGlobalEvents(
               AssetBundleLoaderEvent.Load(BindingKey("Loading"), Assets.secondary())
             )
-        }
 
         case _ =>
           loading
@@ -55,9 +54,9 @@ final case class LoadingScene() extends EmptyScene {
   }
 
   override def present(
-    context: FrameContext[StartupData],
-    loading: SceneModel,
-    viewModel: SceneViewModel
+      context: FrameContext[StartupData],
+      loading: SceneModel,
+      viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
     LoadingView.draw(
       loading,

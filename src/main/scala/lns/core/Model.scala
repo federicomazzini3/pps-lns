@@ -5,15 +5,18 @@ import lns.scenes.game.GameModel
 import lns.scenes.end.EndModel
 
 /**
-  * Main model which stores the whole game state divided by scene
-  * @param loading [[LoadingModel]] for the [[LoadingScene]]
-  * @param game [[GameModel]] for the [[GameScene]]
-  * @param end [[EndModel]] for the [[EndScene]]
-  */
+ * Main model which stores the whole game state divided by scene
+ * @param loading
+ *   [[LoadingModel]] for the [[LoadingScene]]
+ * @param game
+ *   [[GameModel]] for the [[GameScene]]
+ * @param end
+ *   [[EndModel]] for the [[EndScene]]
+ */
 final case class Model(
-  loading: LoadingModel,
-  game: GameModel,
-  end: EndModel
+    loading: LoadingModel,
+    game: GameModel,
+    end: EndModel
 )
 object Model {
 

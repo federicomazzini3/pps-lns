@@ -6,8 +6,8 @@ import lns.StartupData
 import scala.language.implicitConversions
 
 /**
-  * An empty scene to be extended
-  */
+ * An empty scene to be extended
+ */
 abstract class EmptyScene() extends Scene[StartupData, Model, ViewModel] {
 
   def eventFilters: EventFilters = EventFilters.Restricted
@@ -25,14 +25,14 @@ abstract class EmptyScene() extends Scene[StartupData, Model, ViewModel] {
   def updateModel(context: FrameContext[StartupData], model: SceneModel): GlobalEvent => Outcome[SceneModel] =
     _ => model
   def updateViewModel(
-    context: FrameContext[StartupData],
-    model: SceneModel,
-    viewModel: SceneViewModel
+      context: FrameContext[StartupData],
+      model: SceneModel,
+      viewModel: SceneViewModel
   ): GlobalEvent => Outcome[SceneViewModel] = _ => viewModel
 
   def present(
-    context: FrameContext[StartupData],
-    model: SceneModel,
-    viewModel: SceneViewModel
+      context: FrameContext[StartupData],
+      model: SceneModel,
+      viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] = SceneUpdateFragment.empty
 }

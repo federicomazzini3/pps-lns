@@ -1,8 +1,8 @@
 package lns.scenes.loading
 
 /**
-  * A Loading Model
-  */
+ * A Loading Model
+ */
 sealed trait LoadingModel
 
 object LoadingModel {

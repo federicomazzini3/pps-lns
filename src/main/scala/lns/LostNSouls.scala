@@ -3,7 +3,7 @@ package lns
 import indigo.*
 import indigo.scenes.*
 import indigoextras.subsystems.FPSCounter
-import lns.core.{Assets, Model, ViewModel}
+import lns.core.{ Assets, Model, ViewModel }
 import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
@@ -12,13 +12,13 @@ import lns.scenes.menu.MenuScene
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
-  * Game boot data
-  */
+ * Game boot data
+ */
 final case class BootData(screenDimensions: Rectangle)
 
 /**
-  * Game startup data built from boot data
-  */
+ * Game startup data built from boot data
+ */
 final case class StartupData(screenDimensions: Rectangle)
 
 @JSExportTopLevel("IndigoGame")
@@ -27,8 +27,8 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def eventFilters: EventFilters = EventFilters.BlockAll
 
   /**
-    * Our scenes list defined in appearance order
-    */
+   * Our scenes list defined in appearance order
+   */
   def scenes(bootData: BootData): NonEmptyList[Scene[StartupData, Model, ViewModel]] = NonEmptyList(
     MenuScene(),
     LoadingScene(),
@@ -68,9 +68,9 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def updateModel(context: FrameContext[StartupData], model: Model): GlobalEvent => Outcome[Model] = _ => Outcome(model)
 
   def updateViewModel(
-    context: FrameContext[StartupData],
-    model: Model,
-    viewModel: ViewModel
+      context: FrameContext[StartupData],
+      model: Model,
+      viewModel: ViewModel
   ): GlobalEvent => Outcome[ViewModel] =
     _ => Outcome(viewModel)
 }

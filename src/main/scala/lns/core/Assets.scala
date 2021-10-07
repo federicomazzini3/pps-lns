@@ -4,8 +4,8 @@ import indigo.*
 import indigoextras.ui.ButtonAssets
 
 /**
-  * Factory for Assets
-  */
+ * Factory for Assets
+ */
 object Assets {
 
   val baseUrl: String = "assets/"
