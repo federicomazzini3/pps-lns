@@ -11,6 +11,6 @@ final case class EndScene() extends EmptyScene {
 
   def name: SceneName = SceneName("end")
 
-  def modelLens: Lens[Model,SceneModel] = Lens(m => m.end, (m, sm) => m.copy(end = sm))
+  def modelLens: Lens[Model, SceneModel]             = Lens(m => m.end, (m, sm) => m.copy(end = sm))
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(_ => (), (vm, _) => vm)
 }

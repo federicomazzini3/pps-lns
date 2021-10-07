@@ -10,19 +10,21 @@ import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingModel
 
 final case class LoadingScene() extends EmptyScene {
-  type SceneModel = LoadingModel
+  type SceneModel     = LoadingModel
   type SceneViewModel = Unit
 
   def name: SceneName = LoadingScene.name
 
-  def modelLens: Lens[Model, SceneModel] = Lens(
-    m => m.loading, (m, sm) => m.copy(loading = sm))
+  def modelLens: Lens[Model, SceneModel] = Lens(m => m.loading, (m, sm) => m.copy(loading = sm))
 
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(_ => (), (vm, _) => vm)
 
   override def subSystems: Set[SubSystem] = Set(AssetBundleLoader)
 
-  override def updateModel(context: FrameContext[StartupData], loading: SceneModel): GlobalEvent => Outcome[SceneModel] = {
+  override def updateModel(
+    context: FrameContext[StartupData],
+    loading: SceneModel
+  ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
       loading match {
         case LoadingModel.NotStarted => {
@@ -51,15 +53,16 @@ final case class LoadingScene() extends EmptyScene {
   }
 
   override def present(
-                        context: FrameContext[StartupData],
-                        loading: SceneModel,
-                        viewModel: SceneViewModel): Outcome[SceneUpdateFragment] =
-  Outcome(
-    LoadingView.draw(
-      loading,
-      context.startUpData.screenDimensions
+    context: FrameContext[StartupData],
+    loading: SceneModel,
+    viewModel: SceneViewModel
+  ): Outcome[SceneUpdateFragment] =
+    Outcome(
+      LoadingView.draw(
+        loading,
+        context.startUpData.screenDimensions
+      )
     )
-  )
 
 }
 
