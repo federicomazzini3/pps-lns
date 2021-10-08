@@ -145,10 +145,14 @@ object Assets {
 
     val specificUrl: String = "rooms/"
 
-    val emptyRoom: AssetName = AssetName("empty-room")
+    object EmptyRoom {
+      val name: AssetName = AssetName("empty-room")
+
+      val size: Int = 2048
+    }
 
     val assets: Set[AssetType] = Set(
-      AssetType.Image(emptyRoom, AssetPath(baseUrl + specificUrl + "room.png"))
+      AssetType.Image(EmptyRoom.name, AssetPath(baseUrl + specificUrl + "room.png"))
     )
   }
 

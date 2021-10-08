@@ -24,10 +24,10 @@ final case class LoadingScene() extends EmptyScene {
 
   override def updateModel(
       context: FrameContext[StartupData],
-      loading: SceneModel
+      model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
-      loading match {
+      model match {
         case LoadingModel.NotStarted =>
           LoadingModel
             .InProgress(0)
@@ -36,7 +36,7 @@ final case class LoadingScene() extends EmptyScene {
             )
 
         case _ =>
-          loading
+          model
       }
 
     case AssetBundleLoaderEvent.LoadProgress(_, percent, _, _) =>
@@ -50,17 +50,17 @@ final case class LoadingScene() extends EmptyScene {
       LoadingModel.Error
 
     case _ =>
-      loading
+      model
   }
 
   override def present(
       context: FrameContext[StartupData],
-      loading: SceneModel,
+      model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
     LoadingView.draw(
-      loading,
-      context.startUpData.screenDimensions
+      context.startUpData.screenDimensions,
+      model
     )
 
 }

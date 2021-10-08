@@ -8,12 +8,23 @@ import scala.language.implicitConversions
 
 final case class GameScene() extends EmptyScene {
   type SceneModel     = GameModel
-  type SceneViewModel = Unit
+  type SceneViewModel = GameViewModel
 
   def name: SceneName = GameScene.name
 
   def modelLens: Lens[Model, SceneModel]             = Lens(m => m.game, (m, sm) => m.copy(game = sm))
-  def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(_ => (), (vm, _) => vm)
+  def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(vm => vm.game, (vm, svm) => vm.copy(game = svm))
+
+  override def present(
+      context: FrameContext[StartupData],
+      model: SceneModel,
+      viewModel: SceneViewModel
+  ): Outcome[SceneUpdateFragment] =
+    GameView.draw(
+      context.startUpData,
+      model,
+      viewModel
+    )
 }
 
 object GameScene {
