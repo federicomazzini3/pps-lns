@@ -74,8 +74,8 @@ case class Character(
 object Character {
   def initial(startupData: StartupData): Character = Character(
     BoundingBox(
-      Vertex(startupData.screenDimensions.horizontalCenter / 2, startupData.screenDimensions.verticalCenter / 2),
-      Vertex(20, 20)
+      Vertex(startupData.screenDimensions.horizontalCenter, startupData.screenDimensions.verticalCenter),
+      Vertex(28, 25)
     ),
     IDLE,
     Some(10)
