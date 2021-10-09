@@ -43,8 +43,7 @@ final case class LoadingScene() extends EmptyScene {
       LoadingModel.InProgress(percent)
 
     case AssetBundleLoaderEvent.Success(_) =>
-      LoadingModel.Complete
-        .addGlobalEvents(JumpTo(GameScene.name))
+      LoadingModel.Complete.addGlobalEvents(JumpTo(GameScene.name))
 
     case AssetBundleLoaderEvent.Failure(_, _) =>
       LoadingModel.Error

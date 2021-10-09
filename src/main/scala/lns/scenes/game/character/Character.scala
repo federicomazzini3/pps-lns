@@ -3,9 +3,11 @@ package lns.scenes.game.character
 import indigo.*
 import indigoextras.geometry.BoundingBox
 import indigoextras.geometry.Vertex
+import lns.StartupData
+import lns.core.Assets
 
 trait Anything {
-  val model: Shape
+  val model: Graphic[Material.Bitmap]
   val boundingBox: BoundingBox
   val life: Option[Int]
 
@@ -21,7 +23,7 @@ object DynamicState extends Enumeration {
 import DynamicState._
 
 trait Dynamic extends Anything {
-  val speed: Double = 1.0
+  val speed: Double = 2.0
   val state: DynamicState
 
   def isMoving(state: DynamicState): Boolean = state match {
@@ -37,11 +39,20 @@ case class Character(
 ) extends Anything
     with Dynamic {
 
-  val model: Shape = Shape.Box(
-    boundingBox.toRectangle,
-    Fill.Color(RGBA.White),
-    Stroke(4, RGBA.Blue)
-  )
+  val model: Graphic[Material.Bitmap] =
+    Graphic(
+      Rectangle(
+        10,
+        25,
+        28,
+        25
+      ),
+      1,
+      Material.Bitmap(Assets.Character.character)
+    )
+      .withRef(28 / 2, 25 / 2)
+      .withScale(Vector2(3, 3))
+      .moveTo(boundingBox.x.toInt, boundingBox.y.toInt)
 
   val inputMappings: InputMapping[Vector2] =
     InputMapping(
@@ -61,5 +72,12 @@ case class Character(
 }
 
 object Character {
-  val initial: Character = Character(BoundingBox(Vertex(30, 30), Vertex(20, 20)), IDLE, Some(10))
+  def initial(startupData: StartupData): Character = Character(
+    BoundingBox(
+      Vertex(startupData.screenDimensions.horizontalCenter / 2, startupData.screenDimensions.verticalCenter / 2),
+      Vertex(20, 20)
+    ),
+    IDLE,
+    Some(10)
+  )
 }
