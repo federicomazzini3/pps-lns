@@ -1,9 +1,10 @@
 package lns.scenes.game
 
-sealed trait GameModel
+import lns.scenes.game.character._
+
+case class GameModel(val character: Character) {}
 
 object GameModel {
-  val initial: GameModel = GameModelImpl()
+  val initial: GameModel = GameModel(Character.initial)
 
-  private case class GameModelImpl() extends GameModel
 }
