@@ -6,8 +6,8 @@ import lns.core.Assets
 object LoadingView {
 
   def draw(
-      loadingModel: LoadingModel,
-      screenDimensions: Rectangle
+      screenDimensions: Rectangle,
+      loadingModel: LoadingModel
   ): SceneUpdateFragment = {
 
     val message: String =

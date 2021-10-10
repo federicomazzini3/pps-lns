@@ -10,11 +10,11 @@ object Assets {
 
   val baseUrl: String = "assets/"
 
-  def initialAssets(): Set[AssetType] = Buttons.assets ++ Dots.assets ++ Fonts.assets
+  def initialAssets(): Set[AssetType] = Buttons.assets ++ Fonts.assets
 
   def initialFont(): FontInfo = Fonts.fontInfo
 
-  def secondary(): Set[AssetType] = Isaac.assets
+  def secondary(): Set[AssetType] = Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -30,14 +30,6 @@ object Assets {
 
     val assets: Set[AssetType] = Set(
       AssetType.Image(start, AssetPath(baseUrl + "btn_start.png"))
-    )
-  }
-
-  object Dots {
-    val dots: AssetName = AssetName("dots")
-
-    val assets: Set[AssetType] = Set(
-      AssetType.Image(dots, AssetPath(baseUrl + "dots.png"))
     )
   }
 
@@ -107,12 +99,95 @@ object Assets {
       )
   }
 
-  object Isaac {
-    val isaac: AssetName = AssetName("isaac")
+  object Character {
+    val specificUrl: String = "characters/"
+
+    val character: AssetName = AssetName("character")
 
     val assets: Set[AssetType] = Set(
-      AssetType.Image(isaac, AssetPath(baseUrl + "Isaac.png"))
+      AssetType.Image(character, AssetPath(baseUrl + specificUrl + "isaac.png"))
     )
+  }
+
+  object Doors {
+    val specificUrl: String = "doors/"
+
+    val doorCloseEast: AssetName  = AssetName("door-close-east")
+    val doorCloseNorth: AssetName = AssetName("door-close-north")
+    val doorCloseWest: AssetName  = AssetName("door-close-south")
+    val doorCloseSouth: AssetName = AssetName("door-close-west")
+    val doorLockEast: AssetName   = AssetName("door-close-east")
+    val doorLockNorth: AssetName  = AssetName("door-close-north")
+    val doorLockWest: AssetName   = AssetName("door-close-south")
+    val doorLockSouth: AssetName  = AssetName("door-close-west")
+    val doorOpenEast: AssetName   = AssetName("door-close-east")
+    val doorOpenNorth: AssetName  = AssetName("door-close-north")
+    val doorOpenWest: AssetName   = AssetName("door-close-south")
+    val doorOpenSouth: AssetName  = AssetName("door-close-west")
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(doorCloseEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
+      AssetType.Image(doorCloseNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
+      AssetType.Image(doorCloseWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
+      AssetType.Image(doorCloseSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png")),
+      AssetType.Image(doorLockEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
+      AssetType.Image(doorLockNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
+      AssetType.Image(doorLockWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
+      AssetType.Image(doorLockSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png")),
+      AssetType.Image(doorOpenEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
+      AssetType.Image(doorOpenNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
+      AssetType.Image(doorOpenWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
+      AssetType.Image(doorOpenSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png"))
+    )
+  }
+
+  object Rooms {
+
+    val specificUrl: String = "rooms/"
+
+    object EmptyRoom {
+      val name: AssetName = AssetName("empty-room")
+
+      val size: Int = 2048
+    }
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(EmptyRoom.name, AssetPath(baseUrl + specificUrl + "room.png"))
+    )
+  }
+
+  object Objects {
+
+    val specificUrl: String = "objects/"
+
+    val barrelCovered: AssetName   = AssetName("barrel-covered")
+    val barrelUncovered: AssetName = AssetName("barrel-uncovered")
+    val barrelBroken: AssetName    = AssetName("barrel-broken")
+    val crateCovered: AssetName    = AssetName("crate-covered")
+    val crateUncovered: AssetName  = AssetName("crate-uncovered")
+    val crateBroken: AssetName     = AssetName("crate-broken")
+    val chestOpen: AssetName       = AssetName("chest-open")
+    val chestClosed: AssetName     = AssetName("chest-closed")
+    val coinGold: AssetName        = AssetName("coin-gold")
+    val coinSilver: AssetName      = AssetName("coin-silver")
+    val key: AssetName             = AssetName("key")
+    val stone: AssetName           = AssetName("stone")
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(barrelUncovered, AssetPath(baseUrl + specificUrl + "barrel-uncovered.png")),
+      AssetType.Image(barrelCovered, AssetPath(baseUrl + specificUrl + "barrel-covered.png")),
+      AssetType.Image(barrelBroken, AssetPath(baseUrl + specificUrl + "barrel-broken.png")),
+      AssetType.Image(chestClosed, AssetPath(baseUrl + specificUrl + "chest-closed.png")),
+      AssetType.Image(chestOpen, AssetPath(baseUrl + specificUrl + "chest-open.png")),
+      AssetType.Image(coinGold, AssetPath(baseUrl + specificUrl + "coin-gold.png")),
+      AssetType.Image(coinSilver, AssetPath(baseUrl + specificUrl + "coin-silver.png")),
+      AssetType.Image(crateBroken, AssetPath(baseUrl + specificUrl + "crate-broken.png")),
+      AssetType.Image(crateCovered, AssetPath(baseUrl + specificUrl + "crate-covered.png")),
+      AssetType.Image(crateUncovered, AssetPath(baseUrl + specificUrl + "crate-uncovered.png")),
+      AssetType.Image(key, AssetPath(baseUrl + specificUrl + "key.png")),
+      AssetType.Image(stone, AssetPath(baseUrl + specificUrl + "stone.png"))
+    )
+
   }
 
 }
