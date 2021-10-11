@@ -7,12 +7,12 @@ import lns.StartupData
 import lns.core.Assets
 
 trait Anything {
-  val model: Graphic[Material.Bitmap]
+  val sprite: Sprite[Material.Bitmap]
   val boundingBox: BoundingBox
   val life: Option[Int]
 
   val position: Vertex            = Vertex(boundingBox.horizontalCenter, boundingBox.bottom)
-  def draw(): SceneUpdateFragment = SceneUpdateFragment(model)
+  def draw(): SceneUpdateFragment = SceneUpdateFragment(sprite)
   def update(gameTime: GameTime, inputState: InputState): Anything
 }
 
@@ -39,17 +39,15 @@ case class Character(
 ) extends Anything
     with Dynamic {
 
-  val model: Graphic[Material.Bitmap] =
-    Graphic(
-      Rectangle(
-        10,
-        25,
-        28,
-        25
-      ),
+  val sprite: Sprite[Material.Bitmap] =
+    Sprite(
+      BindingKey("character_sprite"),
+      0,
+      0,
       1,
+      AnimationKey("character_body"),
       Material.Bitmap(Assets.Character.character)
-    )
+    ).play()
       .withRef(28 / 2, 25 / 2)
       .withScale(Vector2(3, 3))
       .moveTo(boundingBox.x.toInt, boundingBox.y.toInt)
