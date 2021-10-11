@@ -1,5 +1,6 @@
 package lns.core
 
+import lns.StartupData
 import lns.scenes.loading.LoadingModel
 import lns.scenes.game.GameModel
 import lns.scenes.end.EndModel
@@ -20,10 +21,10 @@ final case class Model(
 )
 object Model {
 
-  def initial: Model =
+  def initial(startupData: StartupData): Model =
     Model(
       LoadingModel.initial,
-      GameModel.initial,
+      GameModel.initial(startupData),
       EndModel.initial
     )
 }

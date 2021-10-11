@@ -38,7 +38,7 @@ final case class MenuScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-    case StartEvent =>
+    case StartEvent | KeyboardEvent.KeyUp(Key.SPACE) =>
       model.addGlobalEvents(JumpTo(LoadingScene.name))
 
     case _ =>

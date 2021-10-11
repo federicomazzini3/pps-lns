@@ -15,6 +15,16 @@ final case class GameScene() extends EmptyScene {
   def modelLens: Lens[Model, SceneModel]             = Lens(m => m.game, (m, sm) => m.copy(game = sm))
   def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(vm => vm.game, (vm, svm) => vm.copy(game = svm))
 
+  override def updateModel(
+      context: FrameContext[StartupData],
+      model: SceneModel
+  ): GlobalEvent => Outcome[SceneModel] = {
+    case FrameTick =>
+      Outcome(model.copy(character = model.character.update(context.gameTime, context.inputState)))
+    case _ =>
+      Outcome(model)
+  }
+
   override def present(
       context: FrameContext[StartupData],
       model: SceneModel,
@@ -24,7 +34,7 @@ final case class GameScene() extends EmptyScene {
       context.startUpData,
       model,
       viewModel
-    )
+    ) |+| model.character.draw()
 }
 
 object GameScene {
