@@ -13,6 +13,7 @@ trait Anything {
 
   val position: Vertex = Vertex(boundingBox.horizontalCenter, boundingBox.bottom)
   def draw(): SceneUpdateFragment
+
   def update(gameTime: GameTime, inputState: InputState): Anything
 }
 

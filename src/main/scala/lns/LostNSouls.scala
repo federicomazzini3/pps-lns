@@ -51,9 +51,34 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
         .withFonts(Assets.initialFont())
     )
   }
-
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
-    Outcome(Startup.Success(StartupData(bootData.screenDimensions)))
+    Outcome(
+      Startup
+        .Success(StartupData(bootData.screenDimensions))
+        .addAnimations(
+          Animation
+            .create(
+              AnimationKey("character_body"),
+              Cycle
+                .create(
+                  "walking_left_right",
+                  NonEmptyList(
+                    Frame(Rectangle(10, 25, 28, 25), Millis(500)),
+                    Frame(Rectangle(50, 25, 28, 25), Millis(500))
+                  )
+                )
+            )
+            .addCycle(
+              Cycle.create(
+                "walking_up_down",
+                NonEmptyList(
+                  Frame(Rectangle(10, 25, 28, 25), Millis(500)),
+                  Frame(Rectangle(50, 25, 28, 25), Millis(500))
+                )
+              )
+            )
+        )
+    )
 
   def initialScene(bootData: BootData): Option[SceneName] = None
 
