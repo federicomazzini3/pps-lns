@@ -14,20 +14,24 @@ extension (s: Group) def moveTo(vector: Vector2)       = s.moveTo(vector.x.toInt
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
 
 /*Anything*/
-trait AnythingModel[M] {
+trait AnythingModel {
+  type Model <: AnythingModel
+
   val boundingBox: BoundingBox
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
 
-  def self: M
-  def update(context: FrameContext[StartupData]): Outcome[M] = Outcome(self)
+  def self: Model
+  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(self)
 }
 
-trait AnythingViewModel[VM]
+trait AnythingViewModel {
+  type ViewModel <: AnythingViewModel
+}
 
-trait Anything[M, VM] {
-  type Model <: AnythingModel[M]
-  type ViewModel <: AnythingViewModel[VM] | Unit
+trait Anything {
+  type Model <: AnythingModel
+  type ViewModel <: AnythingViewModel | Unit
   type View <: Group
 
   def view(model: Model, viewModel: ViewModel): View
@@ -44,7 +48,9 @@ enum DynamicState {
 }
 import DynamicState._
 
-trait DynamicModel[M <: DynamicModel[M]] extends AnythingModel[M] {
+trait DynamicModel extends AnythingModel {
+  type Model <: DynamicModel
+
   val speed: Vector2
 
   def isMoving(): Boolean = getState() match {
@@ -61,9 +67,9 @@ trait DynamicModel[M <: DynamicModel[M]] extends AnythingModel[M] {
   }
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2
-  def edit(boundingBox: BoundingBox, speed: Vector2): M
+  def edit(boundingBox: BoundingBox, speed: Vector2): DynamicModel
 
-  override def update(context: FrameContext[StartupData]): Outcome[M] =
+  override def update(context: FrameContext[StartupData]): Outcome[Model] =
     for {
       superObj <- super.update(context)
       newSpeed = computeSpeed(context)
@@ -72,20 +78,22 @@ trait DynamicModel[M <: DynamicModel[M]] extends AnythingModel[M] {
   // superObj.map(newObj => computeSpeed(context).map(newSpeed => newObj.edit(boundingBox.moveBy(newSpeed), newSpeed)))
 }
 
-trait AliveModel[M <: AliveModel[M]] extends AnythingModel[M] {
+trait AliveModel extends AnythingModel {
+  type Model <: AliveModel
+
   val life: Int
   val invincibilityTimer: Double
   val invincibility: Double
 
-  def edit(life: Int, invincibilityTimer: Double): M
+  def edit(life: Int, invincibilityTimer: Double): Model
 
-  def hit(context: FrameContext[StartupData], danno: Int): Outcome[M] = invincibilityTimer match {
+  def hit(context: FrameContext[StartupData], danno: Int): Outcome[Model] = invincibilityTimer match {
     case 0 if life - danno > 0 => Outcome(edit(life - danno, invincibility))
     case 0                     => Outcome(edit(0, invincibility))
     case _                     => Outcome(self)
   }
 
-  override def update(context: FrameContext[StartupData]): Outcome[M] = for {
+  override def update(context: FrameContext[StartupData]): Outcome[Model] = for {
     superObj <- super.update(context)
     newObj = invincibilityTimer match {
       case 0 => superObj
@@ -98,7 +106,11 @@ trait AliveModel[M <: AliveModel[M]] extends AnythingModel[M] {
 }
 
 case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, invincibilityTimer: Double = 0)
-    extends DynamicModel[CharacterModel] {
+    extends AnythingModel
+    with DynamicModel {
+
+  type Model = CharacterModel
+
   val maxSpeed              = 3
   val invincibility: Double = 2.0
 
@@ -114,10 +126,10 @@ case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, i
       Combo.withKeyInputs(Key.DOWN_ARROW)                  -> Vector2(0.0d, maxSpeed)
     )
 
-  def self: CharacterModel = this
-  def edit(life: Int, invincibilityTimer: Double): CharacterModel =
+  def self: Model = this
+  def edit(life: Int, invincibilityTimer: Double): Model =
     copy(life = life, invincibilityTimer = invincibilityTimer)
-  def edit(boundingBox: BoundingBox, speed: Vector2): CharacterModel =
+  def edit(boundingBox: BoundingBox, speed: Vector2): Model =
     copy(boundingBox = boundingBox, speed = speed)
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2 =
@@ -125,7 +137,7 @@ case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, i
 
 }
 
-case class Character() extends Anything[CharacterModel, Unit] with Isaac {
+case class Character() extends Anything with Isaac {
   type Model     = CharacterModel
   type ViewModel = Unit
   type View      = Group
