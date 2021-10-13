@@ -12,35 +12,15 @@ import lns.scenes.menu.MenuScene
 /*Util*/
 extension (s: Group) def moveTo(vector: Vector2)       = s.moveTo(vector.x.toInt, vector.y.toInt)
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
-extension (v: Vector2) def map[B](f: Vector2 => B): B  = f(v)
 
 /*Anything*/
 trait AnythingModel[M] {
   val boundingBox: BoundingBox
-  val life: Option[Int]
-  val invincibilityTimer: Double
-
-  val invincibility: Double = 2.0
-  val damage: Double        = 1
-
-  def edit(life: Option[Int], invincibilityTimer: Double): M
-  def edit(life: Option[Int]): M
-  def edit(invincibilityTimer: Double): M
-
-  def downLife(context: FrameContext[StartupData], danno: Int): Outcome[M] =
-    if (invincibilityTimer == 0) {
-      Outcome(edit(life.flatMap(l => Some(l - danno)), invincibility))
-    } else {
-      Outcome(edit(life))
-    }
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
-  def update(context: FrameContext[StartupData]): Outcome[M] =
-    println("[AnythingModel] UPDATE")
-    if (invincibilityTimer > 0)
-      Outcome(edit(invincibilityTimer - context.gameTime.delta.toDouble))
-    else
-      Outcome(edit(0.0d))
+
+  def self: M
+  def update(context: FrameContext[StartupData]): Outcome[M] = Outcome(self)
 }
 
 trait AnythingViewModel[VM]
@@ -50,9 +30,6 @@ trait Anything[M, VM] {
   type ViewModel <: AnythingViewModel[VM] | Unit
   type View <: Group
 
-  //val model: Model
-  //val viewModel: ViewModel
-
   def view(model: Model, viewModel: ViewModel): View
 
   def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): SceneUpdateFragment =
@@ -61,13 +38,13 @@ trait Anything[M, VM] {
     )
 }
 
-/**/
+/*Dynamic*/
 enum DynamicState {
   case IDLE, MOVE_LEFT, MOVE_RIGHT, MOVE_DOWN, MOVE_UP
 }
 import DynamicState._
 
-trait DynamicModel[M <: AnythingModel[M] with DynamicModel[M]] extends AnythingModel[M] {
+trait DynamicModel[M <: DynamicModel[M]] extends AnythingModel[M] {
   val speed: Vector2
 
   def isMoving(): Boolean = getState() match {
@@ -95,9 +72,35 @@ trait DynamicModel[M <: AnythingModel[M] with DynamicModel[M]] extends AnythingM
   // superObj.map(newObj => computeSpeed(context).map(newSpeed => newObj.edit(boundingBox.moveBy(newSpeed), newSpeed)))
 }
 
-case class CharacterModel(boundingBox: BoundingBox, life: Option[Int], speed: Vector2, invincibilityTimer: Double = 0)
+trait AliveModel[M <: AliveModel[M]] extends AnythingModel[M] {
+  val life: Int
+  val invincibilityTimer: Double
+  val invincibility: Double
+
+  def edit(life: Int, invincibilityTimer: Double): M
+
+  def hit(context: FrameContext[StartupData], danno: Int): Outcome[M] = invincibilityTimer match {
+    case 0 if life - danno > 0 => Outcome(edit(life - danno, invincibility))
+    case 0                     => Outcome(edit(0, invincibility))
+    case _                     => Outcome(self)
+  }
+
+  override def update(context: FrameContext[StartupData]): Outcome[M] = for {
+    superObj <- super.update(context)
+    newObj = invincibilityTimer match {
+      case 0 => superObj
+      case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
+        superObj.edit(life, invincibilityTimer - context.gameTime.delta.toDouble)
+      case _ => superObj.edit(life, 0)
+    }
+  } yield newObj
+
+}
+
+case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, invincibilityTimer: Double = 0)
     extends DynamicModel[CharacterModel] {
-  val maxSpeed = 3
+  val maxSpeed              = 3
+  val invincibility: Double = 2.0
 
   val inputMappings: InputMapping[Vector2] =
     InputMapping(
@@ -111,10 +114,9 @@ case class CharacterModel(boundingBox: BoundingBox, life: Option[Int], speed: Ve
       Combo.withKeyInputs(Key.DOWN_ARROW)                  -> Vector2(0.0d, maxSpeed)
     )
 
-  def edit(life: Option[Int], invincibilityTimer: Double): CharacterModel =
+  def self: CharacterModel = this
+  def edit(life: Int, invincibilityTimer: Double): CharacterModel =
     copy(life = life, invincibilityTimer = invincibilityTimer)
-  def edit(life: Option[Int]): CharacterModel          = copy(life = life)
-  def edit(invincibilityTimer: Double): CharacterModel = copy(invincibilityTimer = invincibilityTimer)
   def edit(boundingBox: BoundingBox, speed: Vector2): CharacterModel =
     copy(boundingBox = boundingBox, speed = speed)
 
@@ -144,7 +146,7 @@ object CharacterModel {
       Vertex(startupData.screenDimensions.horizontalCenter, startupData.screenDimensions.verticalCenter),
       Vertex(28, 33)
     ),
-    Some(10),
+    10,
     Vector2(0, 0)
   )
 }
