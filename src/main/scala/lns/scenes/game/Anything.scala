@@ -7,6 +7,12 @@ import indigoextras.geometry.Vertex
 import lns.StartupData
 import lns.core.Assets
 import indigo.scenes.SceneEvent.JumpTo
+import indigo.shared.*
+import indigo.platform.assets.*
+import indigo.shared.dice.Dice
+import indigo.shared.events.InputState
+import indigo.shared.input.{ Gamepad, Keyboard, Mouse }
+import indigo.shared.time.GameTime
 import lns.scenes.menu.MenuScene
 
 /*Util*/
@@ -15,18 +21,17 @@ extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vect
 
 /*Anything*/
 trait AnythingModel {
-  type Model <: AnythingModel
+  type Model >: this.type <: AnythingModel
 
   val boundingBox: BoundingBox
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
 
-  def self: Model
-  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(self)
+  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(this)
 }
 
 trait AnythingViewModel {
-  type ViewModel <: AnythingViewModel
+  type ViewModel >: this.type <: AnythingViewModel
 }
 
 trait Anything {
@@ -49,7 +54,7 @@ enum DynamicState {
 import DynamicState._
 
 trait DynamicModel extends AnythingModel {
-  type Model <: DynamicModel
+  type Model >: this.type <: DynamicModel
 
   val speed: Vector2
 
@@ -67,19 +72,35 @@ trait DynamicModel extends AnythingModel {
   }
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2
-  def edit(boundingBox: BoundingBox, speed: Vector2): DynamicModel
+  def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
   override def update(context: FrameContext[StartupData]): Outcome[Model] =
     for {
       superObj <- super.update(context)
       newSpeed = computeSpeed(context)
-      newObj   = superObj.edit(boundingBox.moveBy(newSpeed), newSpeed)
+      newObj   = superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
     } yield newObj
-  // superObj.map(newObj => computeSpeed(context).map(newSpeed => newObj.edit(boundingBox.moveBy(newSpeed), newSpeed)))
+
+  /*
+    val superObj: Outcome[Model] = super.update(context);
+    val superModel: Model        = superObj.unsafeGet
+    val newSpeed                 = computeSpeed(context);
+    val up: Model                = superModel.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+
+    Outcome(up)
+   */
+
+  /*
+    superObj.map[Model] { (newObj: Model) =>
+      val newSpeed  = computeSpeed(context);
+      val up: Model = newObj.edit(boundingBox.moveBy(newSpeed), newSpeed);
+    }
+   */
+
 }
 
 trait AliveModel extends AnythingModel {
-  type Model <: AliveModel
+  type Model >: this.type <: AliveModel
 
   val life: Int
   val invincibilityTimer: Double
@@ -90,7 +111,7 @@ trait AliveModel extends AnythingModel {
   def hit(context: FrameContext[StartupData], danno: Int): Outcome[Model] = invincibilityTimer match {
     case 0 if life - danno > 0 => Outcome(edit(life - danno, invincibility))
     case 0                     => Outcome(edit(0, invincibility))
-    case _                     => Outcome(self)
+    case _                     => Outcome(this)
   }
 
   override def update(context: FrameContext[StartupData]): Outcome[Model] = for {
@@ -98,8 +119,8 @@ trait AliveModel extends AnythingModel {
     newObj = invincibilityTimer match {
       case 0 => superObj
       case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
-        superObj.edit(life, invincibilityTimer - context.gameTime.delta.toDouble)
-      case _ => superObj.edit(life, 0)
+        superObj.edit(life, invincibilityTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
+      case _ => superObj.edit(life, 0).asInstanceOf[Model]
     }
   } yield newObj
 
@@ -107,11 +128,12 @@ trait AliveModel extends AnythingModel {
 
 case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, invincibilityTimer: Double = 0)
     extends AnythingModel
+    with AliveModel
     with DynamicModel {
 
   type Model = CharacterModel
 
-  val maxSpeed              = 3
+  val maxSpeed              = 4
   val invincibility: Double = 2.0
 
   val inputMappings: InputMapping[Vector2] =
@@ -126,14 +148,13 @@ case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, i
       Combo.withKeyInputs(Key.DOWN_ARROW)                  -> Vector2(0.0d, maxSpeed)
     )
 
-  def self: Model = this
   def edit(life: Int, invincibilityTimer: Double): Model =
     copy(life = life, invincibilityTimer = invincibilityTimer)
   def edit(boundingBox: BoundingBox, speed: Vector2): Model =
     copy(boundingBox = boundingBox, speed = speed)
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2 =
-    context.inputState.mapInputs(inputMappings, Vector2.zero)
+    context.inputState.mapInputs(inputMappings, Vector2.zero) * context.gameTime.delta.toDouble
 
 }
 
@@ -217,4 +238,52 @@ trait Isaac {
       Rectangle(Point(0, 0), Size(width, height)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
     )
+}
+
+object app extends App {
+  import indigo.shared.constants.Key
+  import indigo.shared.events.KeyboardEvent.KeyDown
+
+  var character = Character()
+
+  var startupData = StartupData(screenDimensions = Rectangle(0, 0, 0, 0))
+  var model       = CharacterModel.initial(startupData)
+
+  val keyboard =
+    Keyboard.calculateNext(
+      Keyboard.default,
+      List(KeyDown(Key.LEFT_ARROW), KeyDown(Key.DOWN_ARROW))
+    )
+
+  val inputState = new InputState(Mouse.default, keyboard, Gamepad.default)
+
+  println("OLD " + model.boundingBox)
+
+  var newModel = model
+    .update(
+      new FrameContext[StartupData](
+        GameTime.zero,
+        Dice.fromSeed(1000),
+        inputState,
+        new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
+        startupData
+      )
+    )
+    .unsafeGet
+  println("OLD NOT EDITED" + model.boundingBox)
+
+  newModel = model
+    .update(
+      new FrameContext[StartupData](
+        GameTime.withDelta(Seconds(1), Seconds(1.5)),
+        Dice.fromSeed(1000),
+        inputState,
+        new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
+        startupData
+      )
+    )
+    .unsafeGet
+
+  println("NEW AFTER EDIT" + newModel.boundingBox)
+
 }
