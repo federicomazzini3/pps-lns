@@ -34,7 +34,7 @@ trait AnythingViewModel {
   type ViewModel >: this.type <: AnythingViewModel
 }
 
-trait Anything {
+trait AnythingView {
   type Model <: AnythingModel
   type ViewModel <: AnythingViewModel | Unit
   type View <: Group
@@ -158,7 +158,7 @@ case class CharacterModel(boundingBox: BoundingBox, life: Int, speed: Vector2, i
 
 }
 
-case class Character() extends Anything with Isaac {
+case class CharacterView() extends AnythingView with Isaac {
   type Model     = CharacterModel
   type ViewModel = Unit
   type View      = Group
@@ -244,7 +244,7 @@ object app extends App {
   import indigo.shared.constants.Key
   import indigo.shared.events.KeyboardEvent.KeyDown
 
-  var character = Character()
+  var character = CharacterView()
 
   var startupData = StartupData(screenDimensions = Rectangle(0, 0, 0, 0))
   var model       = CharacterModel.initial(startupData)

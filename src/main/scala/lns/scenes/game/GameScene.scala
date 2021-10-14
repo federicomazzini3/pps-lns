@@ -41,7 +41,7 @@ final case class GameScene() extends EmptyScene {
       context.startUpData,
       model,
       viewModel
-    ) |+| Character().draw(context, model.character, ())
+    ) |+| CharacterView().draw(context, model.character, ())
 }
 
 object GameScene {
