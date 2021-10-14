@@ -7,7 +7,7 @@ import lns.StartupData
 import lns.core.Assets
 
 trait Anything {
-  val sprite: Sprite[Material.Bitmap]
+  // val sprite: Sprite[Material.Bitmap]
   val model: SceneNode
   val boundingBox: BoundingBox
   val life: Option[Int]
