@@ -5,16 +5,16 @@ import indigoextras.geometry.BoundingBox
 import indigoextras.geometry.Vertex
 import lns.StartupData
 import lns.core.Assets
+import lns.core.Animations
 
 trait Anything {
-  // val sprite: Sprite[Material.Bitmap]
-  val model: SceneNode
+  val model: Group
+
   val boundingBox: BoundingBox
   val life: Option[Int]
 
-  val position: Vertex = Vertex(boundingBox.horizontalCenter, boundingBox.bottom)
-  def draw(): SceneUpdateFragment
-  //  def draw(): SceneUpdateFragment = SceneUpdateFragment(sprite)
+  val position: Vertex            = Vertex(boundingBox.horizontalCenter, boundingBox.bottom)
+  def draw(): SceneUpdateFragment = SceneUpdateFragment(model)
   def update(gameTime: GameTime, inputState: InputState): Anything
 }
 
@@ -24,10 +24,10 @@ enum DynamicState {
 import DynamicState._
 
 trait Dynamic extends Anything {
-  val speed: Double = 2.0
+  val speed: Double = 3.0
   val state: DynamicState
 
-  def isMoving(): Boolean = this.state match {
+  def isMoving: Boolean = state match {
     case IDLE => false
     case _    => true
   }
@@ -48,19 +48,6 @@ case class Character(
 ) extends Anything
     with Dynamic {
 
-  val sprite: Sprite[Material.Bitmap] =
-    Sprite(
-      BindingKey("character_sprite"),
-      0,
-      0,
-      1,
-      AnimationKey("character_body"),
-      Material.Bitmap(Assets.Character.character)
-    ).play()
-      .withRef(28 / 2, 25 / 2)
-      .withScale(Vector2(3, 3))
-      .moveTo(boundingBox.x.toInt, boundingBox.y.toInt)
-
   val width: Int  = 28
   val height: Int = 33
   val scale: Int  = 3
@@ -74,29 +61,39 @@ case class Character(
     case MOVE_UP    => Rectangle(170, 25, headWidth, headHeight)
     case _          => Rectangle(10, 25, headWidth, headHeight)
   }
+
   val headModel: Graphic[Material.Bitmap] =
     Graphic(headCrop, 1, Material.Bitmap(Assets.Character.character))
       .withRef(0, 0)
       .moveTo(0, 0)
 
   /* Body */
-  val bodyWidth: Int  = 18
-  val bodyHeight: Int = 13
-  val bodyCrop: Rectangle = this.state match {
-    case MOVE_LEFT  => Rectangle(15, 123, bodyWidth, bodyHeight)
-    case MOVE_RIGHT => Rectangle(175, 123, bodyWidth, bodyHeight)
-    case MOVE_UP    => Rectangle(15, 80, bodyWidth, bodyHeight)
-    case _          => Rectangle(175, 80, bodyWidth, bodyHeight)
-  }
-  val bodyFlip: Boolean = this.state match {
+  val bodySprite: Sprite[Material.Bitmap] =
+    Sprite(
+      BindingKey("character_body_sprite"),
+      0,
+      0,
+      1,
+      AnimationKey("character_body"),
+      Material.Bitmap(Assets.Character.character)
+    )
+
+  val bodyFlip: Boolean = state match {
     case MOVE_LEFT => true
     case _         => false
   }
-  val bodyModel: Graphic[Material.Bitmap] =
-    Graphic(bodyCrop, 1, Material.Bitmap(Assets.Character.character))
-      .withRef(bodyWidth / 2, 0)
-      .flipHorizontal(bodyFlip)
-      .moveTo(width / 2, 20)
+  val bodyAnimationCycle: CycleLabel = state match {
+    case MOVE_LEFT | MOVE_RIGHT => CycleLabel("walking_left_right")
+    case _                      => CycleLabel("walking_up_down")
+  }
+  val bodyAnimation: Sprite[Material.Bitmap] = isMoving match {
+    case true => bodySprite.changeCycle(bodyAnimationCycle).play()
+    case _    => bodySprite.changeCycle(bodyAnimationCycle).jumpToFirstFrame()
+  }
+  val bodyModel: Sprite[Material.Bitmap] = bodyAnimation
+    .withRef(Animations.Character.bodyWidth / 2, 0)
+    .flipHorizontal(bodyFlip)
+    .moveTo(width / 2, 20)
 
   /*Shadow*/
   val shadowModel: Shape =
@@ -104,7 +101,7 @@ case class Character(
       .Circle(
         center = Point(width / 2, height + width / 4),
         radius = width / 3,
-        Fill.Color(RGBA(0, 0, 0, 0.5))
+        Fill.Color(RGBA(0, 0, 0, 0.4))
       )
       .scaleBy(1, 0.25)
 
@@ -118,17 +115,13 @@ case class Character(
   /* Model */
   val model: Group =
     Group()
-      .addChild(boundingModel)
+      /* .addChild(boundingModel) */
       .addChild(shadowModel)
       .addChild(bodyModel)
       .addChild(headModel)
       .withRef(width / 2, height / 2)
       .withScale(Vector2(scale, scale))
       .moveTo(boundingBox.x.toInt, boundingBox.y.toInt)
-
-  override def draw(): SceneUpdateFragment =
-    SceneUpdateFragment.empty
-      .addLayer(Layer(BindingKey("character"), model))
 
   val inputMappings: InputMapping[Vector2] =
     InputMapping(
