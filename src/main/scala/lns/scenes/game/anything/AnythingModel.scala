@@ -13,7 +13,7 @@ trait AnythingModel {
 
   val boundingBox: BoundingBox
 
-  def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
+  def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
 
   def update(context: FrameContext[StartupData])(enabler: Vertex => Boolean): Outcome[Model] = Outcome(this)
 }

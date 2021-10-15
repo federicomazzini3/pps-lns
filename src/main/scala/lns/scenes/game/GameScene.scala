@@ -5,6 +5,7 @@ import indigo.scenes.*
 import lns.StartupData
 import lns.core.{ EmptyScene, Model, ViewModel }
 import lns.scenes.game.character.*
+import lns.scenes.game.room.RoomView
 
 import scala.language.implicitConversions
 
@@ -39,11 +40,7 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    GameView.draw(
-      context.startUpData,
-      model,
-      viewModel
-    ) |+| CharacterView().draw(context, model.character, ())
+    RoomView.draw(context, model.room, ()) |+| CharacterView().draw(context, model.character, ())
 }
 
 object GameScene {
