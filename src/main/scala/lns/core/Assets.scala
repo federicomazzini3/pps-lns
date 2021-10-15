@@ -110,34 +110,38 @@ object Assets {
   }
 
   object Doors {
+
     val specificUrl: String = "doors/"
+
+    val minSize = 291
+    val maxSize = 326
 
     val doorCloseEast: AssetName  = AssetName("door-close-east")
     val doorCloseNorth: AssetName = AssetName("door-close-north")
     val doorCloseWest: AssetName  = AssetName("door-close-south")
     val doorCloseSouth: AssetName = AssetName("door-close-west")
-    val doorLockEast: AssetName   = AssetName("door-close-east")
-    val doorLockNorth: AssetName  = AssetName("door-close-north")
-    val doorLockWest: AssetName   = AssetName("door-close-south")
-    val doorLockSouth: AssetName  = AssetName("door-close-west")
-    val doorOpenEast: AssetName   = AssetName("door-close-east")
-    val doorOpenNorth: AssetName  = AssetName("door-close-north")
-    val doorOpenWest: AssetName   = AssetName("door-close-south")
-    val doorOpenSouth: AssetName  = AssetName("door-close-west")
+    val doorLockEast: AssetName   = AssetName("door-lock-east")
+    val doorLockNorth: AssetName  = AssetName("door-lock-north")
+    val doorLockWest: AssetName   = AssetName("door-lock-south")
+    val doorLockSouth: AssetName  = AssetName("door-lock-west")
+    val doorOpenEast: AssetName   = AssetName("door-open-east")
+    val doorOpenNorth: AssetName  = AssetName("door-open-north")
+    val doorOpenWest: AssetName   = AssetName("door-open-south")
+    val doorOpenSouth: AssetName  = AssetName("door-open-west")
 
     val assets: Set[AssetType] = Set(
       AssetType.Image(doorCloseEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
       AssetType.Image(doorCloseNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
       AssetType.Image(doorCloseWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
       AssetType.Image(doorCloseSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png")),
-      AssetType.Image(doorLockEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
-      AssetType.Image(doorLockNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
-      AssetType.Image(doorLockWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
-      AssetType.Image(doorLockSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png")),
-      AssetType.Image(doorOpenEast, AssetPath(baseUrl + specificUrl + "door_close_east.png")),
-      AssetType.Image(doorOpenNorth, AssetPath(baseUrl + specificUrl + "door_close_north.png")),
-      AssetType.Image(doorOpenWest, AssetPath(baseUrl + specificUrl + "door_close_west.png")),
-      AssetType.Image(doorOpenSouth, AssetPath(baseUrl + specificUrl + "door_close_south.png"))
+      AssetType.Image(doorLockEast, AssetPath(baseUrl + specificUrl + "door_lock_east.png")),
+      AssetType.Image(doorLockNorth, AssetPath(baseUrl + specificUrl + "door_lock_north.png")),
+      AssetType.Image(doorLockWest, AssetPath(baseUrl + specificUrl + "door_lock_west.png")),
+      AssetType.Image(doorLockSouth, AssetPath(baseUrl + specificUrl + "door_lock_south.png")),
+      AssetType.Image(doorOpenEast, AssetPath(baseUrl + specificUrl + "door_open_east.png")),
+      AssetType.Image(doorOpenNorth, AssetPath(baseUrl + specificUrl + "door_open_north.png")),
+      AssetType.Image(doorOpenWest, AssetPath(baseUrl + specificUrl + "door_open_west.png")),
+      AssetType.Image(doorOpenSouth, AssetPath(baseUrl + specificUrl + "door_open_south.png"))
     )
   }
 
@@ -148,7 +152,8 @@ object Assets {
     object EmptyRoom {
       val name: AssetName = AssetName("empty-room")
 
-      val size: Int = 2048
+      val size: Int      = 2048
+      val floorSize: Int = 1400
     }
 
     val assets: Set[AssetType] = Set(
