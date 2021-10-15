@@ -25,14 +25,15 @@ object AnimationCycle {
  */
 
 object Animations {
+
   def apply(): List[Animation]                                = List(Character.head, Character.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
   object Character {
     /*Character head*/
-    val headWidth: Int  = 18
-    val headHeight: Int = 15
+    val headWidth: Int  = 28
+    val headHeight: Int = 25
 
     def generateHeadFrame(x: Int, y: Int, width: Int, height: Int, time: Millis): NonEmptyList[Frame] =
       generateFramesList(generateFrame(0 until 2)(i => Frame(Rectangle(x + (i * 40), y, width, height), time)))
