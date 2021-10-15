@@ -23,7 +23,7 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
       for {
-        updatedCharacter <- model.character.update(context)
+        updatedCharacter <- model.character.update(context)(model.room.allowMoving)
         updatedGameModel <- model.copy(character = updatedCharacter)
         // updatedRoom       <- model.room.update(context)
         // updatedGameModel <- model.copy(character = updatedCharacter, room = updatedRoom)

@@ -2,7 +2,7 @@ package lns.scenes.game.anything
 
 import indigo.*
 import indigo.shared.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
@@ -15,7 +15,7 @@ trait AnythingModel {
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
 
-  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(this)
+  def update(context: FrameContext[StartupData])(enabler: Vertex => Boolean): Outcome[Model] = Outcome(this)
 }
 
 /*Dynamic*/
@@ -45,11 +45,15 @@ trait DynamicModel extends AnythingModel {
   def computeSpeed(context: FrameContext[StartupData]): Vector2
   def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
-  override def update(context: FrameContext[StartupData]): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(enabler: Vertex => Boolean): Outcome[Model] =
     for {
-      superObj <- super.update(context)
-      newSpeed = computeSpeed(context)
-      newObj   = superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+      superObj <- super.update(context)(enabler)
+      newSpeed    = computeSpeed(context)
+      newLocation = boundingBox.moveBy(newSpeed)
+      newObj =
+        if (enabler(newLocation.position))
+          superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+        else superObj
     } yield newObj
 
   /*
@@ -85,9 +89,9 @@ trait AliveModel extends AnythingModel {
     case _                     => Outcome(this)
   }
 
-  override def update(context: FrameContext[StartupData]): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(moveEnabler: Vertex => Boolean): Outcome[Model] =
     for {
-      superObj <- super.update(context)
+      superObj <- super.update(context)(moveEnabler)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
