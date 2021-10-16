@@ -4,6 +4,7 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.scenes.game.room.RoomModel
 
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
 
@@ -15,7 +16,7 @@ trait AnythingModel {
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
 
-  def update(context: FrameContext[StartupData])(enabler: Vertex => Boolean): Outcome[Model] = Outcome(this)
+  def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = Outcome(this)
 }
 
 /*Dynamic*/
@@ -45,13 +46,13 @@ trait DynamicModel extends AnythingModel {
   def computeSpeed(context: FrameContext[StartupData]): Vector2
   def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
-  override def update(context: FrameContext[StartupData])(enabler: Vertex => Boolean): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)(enabler)
+      superObj <- super.update(context)(room)
       newSpeed    = computeSpeed(context)
       newLocation = boundingBox.moveBy(newSpeed)
       newObj =
-        if (enabler(newLocation.position))
+        if (room.allowMoving(newLocation.position))
           superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
         else superObj
     } yield newObj
@@ -89,9 +90,9 @@ trait AliveModel extends AnythingModel {
     case _                     => Outcome(this)
   }
 
-  override def update(context: FrameContext[StartupData])(moveEnabler: Vertex => Boolean): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)(moveEnabler)
+      superObj <- super.update(context)(room)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
