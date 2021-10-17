@@ -13,7 +13,7 @@ trait Isaac {
 
   val width: Int  = 28
   val height: Int = 33
-  val scale: Int  = 3
+  val scale: Int  = 2
 
   import lns.core.Animations.*
 

@@ -5,6 +5,8 @@ import indigo.scenes.*
 import lns.StartupData
 import lns.core.{ EmptyScene, Model, ViewModel }
 import lns.scenes.game.character.*
+import lns.scenes.game.room.RoomView
+import lns.scenes.game.room.RoomView.*
 
 import scala.language.implicitConversions
 
@@ -23,7 +25,7 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
       for {
-        updatedCharacter <- model.character.update(context)
+        updatedCharacter <- model.character.update(context)(model.room)
         updatedGameModel <- model.copy(character = updatedCharacter)
         // updatedRoom       <- model.room.update(context)
         // updatedGameModel <- model.copy(character = updatedCharacter, room = updatedRoom)
@@ -39,11 +41,8 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    GameView.draw(
-      context.startUpData,
-      model,
-      viewModel
-    ) |+| CharacterView().draw(context, model.character, ())
+    RoomView.draw(context, model.room, ()) |+|
+      CharacterView().draw(context, model.character, ())
 }
 
 object GameScene {

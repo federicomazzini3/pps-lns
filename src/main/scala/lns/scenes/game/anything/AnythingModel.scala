@@ -2,8 +2,9 @@ package lns.scenes.game.anything
 
 import indigo.*
 import indigo.shared.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.scenes.game.room.RoomModel
 
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
 
@@ -13,9 +14,9 @@ trait AnythingModel {
 
   val boundingBox: BoundingBox
 
-  def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.bottom)
+  def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
 
-  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(this)
+  def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = Outcome(this)
 }
 
 /*Dynamic*/
@@ -45,11 +46,15 @@ trait DynamicModel extends AnythingModel {
   def computeSpeed(context: FrameContext[StartupData]): Vector2
   def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
-  override def update(context: FrameContext[StartupData]): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)
-      newSpeed = computeSpeed(context)
-      newObj   = superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+      superObj <- super.update(context)(room)
+      newSpeed    = computeSpeed(context)
+      newLocation = boundingBox.moveBy(newSpeed)
+      newObj =
+        if (room.allowMoving(newLocation.position))
+          superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+        else superObj
     } yield newObj
 
   /*
@@ -85,9 +90,9 @@ trait AliveModel extends AnythingModel {
     case _                     => Outcome(this)
   }
 
-  override def update(context: FrameContext[StartupData]): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)
+      superObj <- super.update(context)(room)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>

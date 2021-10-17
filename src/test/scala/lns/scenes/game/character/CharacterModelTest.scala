@@ -1,10 +1,11 @@
 package lns.scenes.game.character
 
+import indigoextras.geometry.Vertex
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.scalatest.freespec.AnyFreeSpec
-
 import lns.StartupData
 import lns.scenes.game.character.*
+import lns.scenes.game.room.RoomModel
 
 class CharacterModelTest extends AnyFreeSpec {
 
@@ -37,7 +38,7 @@ class CharacterModelTest extends AnyFreeSpec {
         new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
         startupData
       )
-    )
+    )(RoomModel.initial(startupData))
     .unsafeGet
   println("OLD NOT EDITED" + model.boundingBox)
 
@@ -50,7 +51,7 @@ class CharacterModelTest extends AnyFreeSpec {
         new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
         startupData
       )
-    )
+    )(RoomModel.initial(startupData))
     .unsafeGet
 
   println("NEW AFTER EDIT" + newModel.boundingBox)
