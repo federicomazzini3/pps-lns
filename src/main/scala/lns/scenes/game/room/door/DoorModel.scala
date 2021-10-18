@@ -79,5 +79,4 @@ object DoorImplicit {
   }
   extension (door: (DoorPosition, DoorState))
     def :+(toAddDoor: (DoorPosition, DoorState)) = updateWith(Map(door), toAddDoor)
-
 }
