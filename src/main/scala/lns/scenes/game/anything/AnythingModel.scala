@@ -50,7 +50,7 @@ trait DynamicModel extends AnythingModel {
     for {
       superObj <- super.update(context)(room)
       newSpeed    = computeSpeed(context)
-      newLocation = Boundary.positionBounded(room.floor, boundingBox.moveBy(newSpeed).position)
+      newLocation = Boundary.positionBounded(room.floor, boundingBox.moveBy(newSpeed))
       newObj      = superObj.edit(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
     } yield newObj
 

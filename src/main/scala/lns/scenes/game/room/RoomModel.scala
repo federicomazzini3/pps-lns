@@ -121,8 +121,8 @@ object RoomModel {
     val floorHeightScaled: Int    = ((Rooms.EmptyRoom.floorSize - 170) * scale).toInt
     BoundingBox(
       Vertex(
-        screenDimension.horizontalCenter - (floorDimensionScaled / 2),
-        screenDimension.verticalCenter - (floorDimensionScaled / 2)
+        screenDimension.horizontalCenter - (floorWidthScaled / 2),
+        screenDimension.verticalCenter - (floorHeightScaled / 2)
       ),
       Vertex(floorWidthScaled, floorHeightScaled)
     )
