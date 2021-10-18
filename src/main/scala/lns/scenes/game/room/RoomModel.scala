@@ -20,15 +20,13 @@ trait RoomModel {
   val floor: BoundingBox
 
   val doors: Doors
-
-  def allowMoving(position: Vertex): Boolean = floor.contains(position)
 }
 
 trait ItemModel {
   val item: AnythingModel
 }
 
-trait EnemyModel {
+trait ArenaModel {
   val enemies: Set[AnythingModel]
   val elements: Set[AnythingModel]
 }
@@ -45,7 +43,7 @@ case class EnemyRoom(
     val enemies: Set[Enemy],
     val elements: Set[Element]
 ) extends RoomModel
-    with EnemyModel
+    with ArenaModel
 
 case class ItemRoom(val floor: BoundingBox, val doors: Doors, val item: Item) extends RoomModel with ItemModel
 case class BossRoom(val floor: BoundingBox, val doors: Doors, val boss: Boss) extends RoomModel with BossModel

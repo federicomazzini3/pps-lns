@@ -4,7 +4,7 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.scenes.game.room.RoomModel
+import lns.scenes.game.room.{ Boundary, RoomModel }
 
 extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
 
@@ -50,11 +50,8 @@ trait DynamicModel extends AnythingModel {
     for {
       superObj <- super.update(context)(room)
       newSpeed    = computeSpeed(context)
-      newLocation = boundingBox.moveBy(newSpeed)
-      newObj =
-        if (room.allowMoving(newLocation.position))
-          superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
-        else superObj
+      newLocation = Boundary.positionBounded(room.floor, boundingBox.moveBy(newSpeed).position)
+      newObj      = superObj.edit(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
     } yield newObj
 
   /*
