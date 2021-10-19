@@ -107,11 +107,14 @@ case class BossRoom(val floor: BoundingBox, val doors: Doors, val boss: Boss) ex
  * Companion object, debug version for testing
  */
 object RoomModel {
+  import lns.scenes.game.room.door.*
   import lns.scenes.game.room.door.DoorImplicit.*
+  import lns.scenes.game.room.door.DoorState.*
+  import lns.scenes.game.room.door.DoorPosition.*
 
   def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
     internalBoundingBox(startupData.screenDimensions),
-    (Door.left -> Door.close) :+ (Door.right -> Door.close) :+ (Door.above -> Door.open) :+ (Door.below -> Door.lock)
+    (Left -> Close) :+ (Right -> Close) :+ (Above -> Open) :+ (Below -> Lock)
   )
 
   def internalBoundingBox(screenDimension: Rectangle): BoundingBox = {

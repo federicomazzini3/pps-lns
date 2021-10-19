@@ -1,7 +1,9 @@
 package lns.scenes.game.dungeon
 
 import lns.StartupData
-import lns.scenes.game.room.door.{ Above, Below, DoorPosition, DoorState, Left, Right }
+import lns.scenes.game.room.door.DoorPosition
+import lns.scenes.game.room.door.DoorPosition.*
+import lns.scenes.game.room.door.DoorState.*
 import lns.scenes.game.room.{ EmptyRoom, RoomModel }
 
 /**

@@ -1,38 +1,23 @@
 package lns.scenes.game.room.door
 
 import lns.scenes.game.room.door.Door.updateWith
-import lns.scenes.game.room.door.{ DoorPosition, DoorState }
 
 /**
  * A model for the position of the door in a room
  */
-sealed trait DoorPosition
-case object Left  extends DoorPosition
-case object Right extends DoorPosition
-case object Above extends DoorPosition
-case object Below extends DoorPosition
+enum DoorPosition:
+  case Left, Right, Above, Below
 
 /**
  * A model for the state of the door in a room
  */
-sealed trait DoorState
-case object Open  extends DoorState
-case object Close extends DoorState
-case object Lock  extends DoorState
+enum DoorState:
+  case Open, Close, Lock
 
 /**
  * Object that describe a door
  */
 object Door {
-
-  val left: DoorPosition  = Left
-  val right: DoorPosition = Right
-  val above: DoorPosition = Above
-  val below: DoorPosition = Below
-
-  val open: DoorState  = Open
-  val close: DoorState = Close
-  val lock: DoorState  = Lock
 
   /**
    * @param door
@@ -71,6 +56,9 @@ object Door {
  * extension to map and tuple that enable Door method calling
  */
 object DoorImplicit {
+  import lns.scenes.game.room.door.DoorPosition.*
+  import lns.scenes.game.room.door.DoorState.*
+
   extension (doors: Map[DoorPosition, DoorState]) {
     def :+(toAddDoor: (DoorPosition, DoorState)) = updateWith(doors, toAddDoor)
     def open: Map[DoorPosition, DoorState]       = Door.updateState(doors)(Open)

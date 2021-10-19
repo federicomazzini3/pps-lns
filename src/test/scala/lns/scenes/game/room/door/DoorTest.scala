@@ -3,6 +3,8 @@ package lns.scenes.game.room.door
 import org.junit.jupiter.api.Assertions.{ assertEquals, assertFalse }
 import org.scalatest.freespec.AnyFreeSpec
 import DoorImplicit.*
+import DoorState.*
+import DoorPosition.*
 
 class DoorTest extends AnyFreeSpec {
   "A collection of doors" - {
