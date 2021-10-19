@@ -5,36 +5,65 @@ import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
+import scala.language.implicitConversions
 
-extension (b: BoundingBox) def moveBy(vector: Vector2) = b.moveBy(vector.x, vector.y)
+given Conversion[Vector2, Vertex] with
+  def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 
-/*Anything*/
+/**
+ * Base model for every thing placed inside a room
+ */
 trait AnythingModel {
   type Model >: this.type <: AnythingModel
 
+  /**
+   * Represents the position and the box size of the Anything, expressed in pixels
+   */
   val boundingBox: BoundingBox
 
+  /**
+   * @return
+   *   the current position Vector2
+   */
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
 
+  /**
+   * Update request called during game loop on every frame
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @return
+   *   the Outcome of the updated model
+   */
   def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = Outcome(this)
 }
 
-/*Dynamic*/
 enum DynamicState {
   case IDLE, MOVE_LEFT, MOVE_RIGHT, MOVE_DOWN, MOVE_UP
 }
 import DynamicState.*
 
+/**
+ * Base model for every object that can move. It is designed to be extended or mixed with other [[AnythingModel]]
+ * traits.
+ */
 trait DynamicModel extends AnythingModel {
   type Model >: this.type <: DynamicModel
 
   val speed: Vector2
+
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model
 
   def isMoving(): Boolean = getState() match {
     case IDLE => false
     case _    => true
   }
 
+  /**
+   * @return
+   *   the [[DynamicState]] based on the current speed vector
+   */
   def getState(): DynamicState = speed match {
     case Vector2(x, _) if x < 0 => MOVE_LEFT
     case Vector2(x, _) if x > 0 => MOVE_RIGHT
@@ -43,38 +72,41 @@ trait DynamicModel extends AnythingModel {
     case _                      => IDLE
   }
 
+  /**
+   * @param context
+   *   indigo frame context data
+   * @return
+   *   the speed vector
+   */
   def computeSpeed(context: FrameContext[StartupData]): Vector2
-  def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
+  /**
+   * Update request called during game loop on every frame. The Anything movement speed direction and module is first
+   * calculated and then validated by the current room
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @return
+   *   the Outcome of the updated model wich is moved by its speed vector data normalized on gameTime.delta
+   */
   override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)
-      newSpeed    = computeSpeed(context)
+      newSpeed    = computeSpeed(context) * context.gameTime.delta.toDouble
       newLocation = boundingBox.moveBy(newSpeed)
       newObj =
         if (room.allowMoving(newLocation.position))
-          superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
+          superObj.withDynamic(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
         else superObj
     } yield newObj
 
-  /*
-    val superObj: Outcome[Model] = super.update(context);
-    val superModel: Model        = superObj.unsafeGet
-    val newSpeed                 = computeSpeed(context);
-    val up: Model                = superModel.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
-
-    Outcome(up)
-   */
-
-  /*
-    superObj.map[Model] { (newObj: Model) =>
-      val newSpeed  = computeSpeed(context);
-      val up: Model = newObj.edit(boundingBox.moveBy(newSpeed), newSpeed);
-    }
-   */
-
 }
 
+/**
+ * Base model for every object that is alive and can be damaged. It is designed to be extended or mixed with other
+ * [[AnythingModel]] traits.
+ */
 trait AliveModel extends AnythingModel {
   type Model >: this.type <: AliveModel
 
@@ -82,22 +114,42 @@ trait AliveModel extends AnythingModel {
   val invincibilityTimer: Double
   val invincibility: Double
 
-  def edit(life: Int, invincibilityTimer: Double): Model
+  def withAlive(life: Int, invincibilityTimer: Double): Model
 
-  def hit(context: FrameContext[StartupData], danno: Int): Outcome[Model] = invincibilityTimer match {
-    case 0 if life - danno > 0 => Outcome(edit(life - danno, invincibility))
-    case 0                     => Outcome(edit(0, invincibility))
-    case _                     => Outcome(this)
+  /**
+   * Hit the object causing some damage to its life and starting a countdown timer during which it can't be hitted again
+   * @param context
+   *   indigo frame context data
+   * @param damage
+   *   the value of life to be subtracted
+   * @return
+   *   the Outcome of the updated model
+   */
+  def hit(context: FrameContext[StartupData], damage: Int): Outcome[Model] = invincibilityTimer match {
+    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, invincibility))
+    case 0                      => Outcome(withAlive(0, 0))
+    case _                      => Outcome(this)
   }
 
+  /**
+   * Update request called during game loop on every frame. After a hit the Anything life status is protected for the
+   * invincibility time during which the thing can't be damaged. Each frame update we have to check and update the timer
+   * ultil its expiration
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @return
+   *   the Outcome of the updated model
+   */
   override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
-          superObj.edit(life, invincibilityTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
-        case _ => superObj.edit(life, 0).asInstanceOf[Model]
+          superObj.withAlive(life, invincibilityTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
+        case _ => superObj.withAlive(life, 0).asInstanceOf[Model]
       }
     } yield newObj
 
