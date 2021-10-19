@@ -15,47 +15,106 @@ type Enemy   = AnythingModel
 type Item    = AnythingModel
 type Element = AnythingModel
 
+/**
+ * Base model for a room
+ */
 trait RoomModel {
 
+  /**
+   * the area where the elements are placed inside the room
+   */
   val floor: BoundingBox
 
+  /**
+   * all the doors for a room
+   */
   val doors: Doors
-
-  def allowMoving(position: Vertex): Boolean = floor.contains(position)
 }
 
+/**
+ * Extension for room with one item
+ */
 trait ItemModel {
   val item: AnythingModel
 }
 
-trait EnemyModel {
+/**
+ * Extension for room with enemies and other elements
+ */
+trait ArenaModel {
   val enemies: Set[AnythingModel]
   val elements: Set[AnythingModel]
 }
 
+/**
+ * Extension for room with boss
+ */
 trait BossModel {
   val boss: AnythingModel
 }
 
+/**
+ * Base room
+ * @param floor
+ *   the dimension of floor
+ * @param doors
+ *   the set of the door
+ */
 case class EmptyRoom(val floor: BoundingBox, val doors: Doors) extends RoomModel
 
-case class EnemyRoom(
+/**
+ * The room where the character fight against monsters
+ * @param floor
+ *   the dimension of floor
+ * @param doors
+ *   the set of the door
+ * @param enemies
+ *   the set of enemies
+ * @param elements
+ *   the set of elements
+ */
+case class ArenaRoom(
     val floor: BoundingBox,
     val doors: Doors,
     val enemies: Set[Enemy],
     val elements: Set[Element]
 ) extends RoomModel
-    with EnemyModel
+    with ArenaModel
 
+/**
+ * The Room that contains one element to pick up
+ * @param floor
+ *   the dimension of floor
+ * @param doors
+ *   the set of the door
+ * @param item
+ *   the element to pick up
+ */
 case class ItemRoom(val floor: BoundingBox, val doors: Doors, val item: Item) extends RoomModel with ItemModel
+
+/**
+ * The room where the character fights against the boss
+ * @param floor
+ *   the dimension of floor
+ * @param doors
+ *   the set of the door
+ * @param boss
+ *   the boss model
+ */
 case class BossRoom(val floor: BoundingBox, val doors: Doors, val boss: Boss) extends RoomModel with BossModel
 
+/**
+ * Companion object, debug version for testing
+ */
 object RoomModel {
-  import lns.scenes.game.room.door.DoorImplicit
+  import lns.scenes.game.room.door.*
+  import lns.scenes.game.room.door.DoorImplicit.*
+  import lns.scenes.game.room.door.DoorState.*
+  import lns.scenes.game.room.door.DoorPosition.*
 
   def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
     internalBoundingBox(startupData.screenDimensions),
-    Map((Door.left -> Door.close), (Door.right -> Door.close), Door.above -> Door.open, Door.below -> Door.lock)
+    (Left -> Close) :+ (Right -> Close) :+ (Above -> Open) :+ (Below -> Lock)
   )
 
   def internalBoundingBox(screenDimension: Rectangle): BoundingBox = {
@@ -65,8 +124,8 @@ object RoomModel {
     val floorHeightScaled: Int    = ((Rooms.EmptyRoom.floorSize - 170) * scale).toInt
     BoundingBox(
       Vertex(
-        screenDimension.horizontalCenter - (floorDimensionScaled / 2),
-        screenDimension.verticalCenter - (floorDimensionScaled / 2)
+        screenDimension.horizontalCenter - (floorWidthScaled / 2),
+        screenDimension.verticalCenter - (floorHeightScaled / 2)
       ),
       Vertex(floorWidthScaled, floorHeightScaled)
     )

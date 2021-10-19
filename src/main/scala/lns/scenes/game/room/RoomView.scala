@@ -32,7 +32,7 @@ object RoomView {
 
   def anythingView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     model match {
-      case EnemyRoom(_, _, enemies, elements) => Group() //chiamare le rispettive view
+      case ArenaRoom(_, _, enemies, elements) => Group() //chiamare le rispettive view
       case ItemRoom(_, _, item)               => Group()
       case BossRoom(_, _, boss)               => Group()
     }
