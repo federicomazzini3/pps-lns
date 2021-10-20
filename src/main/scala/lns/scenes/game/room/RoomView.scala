@@ -10,7 +10,7 @@ import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Assets.*
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ DoorPosition, DoorState, DoorView }
+import lns.scenes.game.room.door.{ DoorLocation, DoorState, DoorView }
 
 object RoomView {
 
@@ -32,9 +32,9 @@ object RoomView {
 
   def anythingView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     model match {
-      case ArenaRoom(_, _, enemies, elements) => Group() //chiamare le rispettive view
-      case ItemRoom(_, _, item)               => Group()
-      case BossRoom(_, _, boss)               => Group()
+      case ArenaRoom(_, _, _, enemies, elements) => Group() //chiamare le rispettive view
+      case ItemRoom(_, _, _, item)               => Group()
+      case BossRoom(_, _, _, boss)               => Group()
     }
 }
 
