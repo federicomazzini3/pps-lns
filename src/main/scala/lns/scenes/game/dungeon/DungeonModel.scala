@@ -1,8 +1,8 @@
 package lns.scenes.game.dungeon
 
 import lns.StartupData
-import lns.scenes.game.room.door.DoorLocation
-import lns.scenes.game.room.door.DoorLocation.*
+import lns.scenes.game.room.door.Location
+import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
 import lns.scenes.game.room.{ EmptyRoom, RoomModel }
 
@@ -30,24 +30,24 @@ object Grid {
    * @return
    *   a position if it's defined
    */
-  def nearPosition(grid: Grid)(position: Position)(location: DoorLocation) =
+  def nearPosition(grid: Grid)(position: Position)(location: Location) =
     location match {
-      case DoorLocation.Left =>
+      case Location.Left =>
         position % grid.column match {
           case 1 => None
           case _ => Option(position - 1)
         }
-      case DoorLocation.Right =>
+      case Location.Right =>
         position % grid.column match {
           case 0 => None
           case _ => Option(position + 1)
         }
-      case DoorLocation.Above =>
+      case Location.Above =>
         (position - grid.column) match {
           case x if x < 0 => None
           case x          => Option(x)
         }
-      case DoorLocation.Below =>
+      case Location.Below =>
         (position + grid.column) match {
           case x if x > (grid.row * grid.column) => None
           case x                                 => Option(x)
@@ -63,7 +63,7 @@ object Grid {
    * @return
    *   a room if it's defined
    */
-  def near(grid: Grid)(position: Position)(location: DoorLocation): Option[grid.Room] =
+  def near(grid: Grid)(position: Position)(location: Location): Option[grid.Room] =
     for (nearPosition <- nearPosition(grid)(position)(location) if grid.content.contains(nearPosition))
       yield grid.content(nearPosition)
 }
@@ -88,7 +88,7 @@ case class DungeonModel(val row: Int, val column: Int, val content: Map[Int, Roo
 
 extension (dungeon: DungeonModel) {
 
-  def room(position: Position)(location: DoorLocation): Option[RoomModel] = Grid.near(dungeon)(position)(location)
+  def room(position: Position)(location: Location): Option[RoomModel] = Grid.near(dungeon)(position)(location)
 
   /**
    * Retrieve the empty room of the dungeon where the game has to start

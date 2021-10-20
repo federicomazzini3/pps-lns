@@ -10,7 +10,7 @@ import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Assets.*
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ DoorLocation, DoorState, DoorView }
+import lns.scenes.game.room.door.{ Location, DoorState, DoorView }
 
 object RoomView {
 

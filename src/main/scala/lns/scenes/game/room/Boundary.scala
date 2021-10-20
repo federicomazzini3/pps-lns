@@ -1,6 +1,7 @@
 package lns.scenes.game.room
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
+import lns.scenes.game.room.door.Location
 import org.scalajs.dom.raw.Position
 
 object Boundary {
@@ -14,7 +15,7 @@ object Boundary {
    * @return
    *   a new position inside the bounding box, shifted by the minimum necessary on the x and y axis
    */
-  def positionBounded(floor: BoundingBox, thing: BoundingBox): Vertex = {
+  def characterBounded(floor: BoundingBox, thing: BoundingBox): Vertex = {
 
     /**
      * a point is update with the edge coordinate (left or right) of the bounding box if it's beyond
@@ -37,5 +38,13 @@ object Boundary {
       else thing.position.y
 
     Vertex(xBounded, yBounded)
+  }
+
+  def onBound(floor: BoundingBox, thing: BoundingBox)(location: Location): Boolean = location match {
+    case Location.Left  => floor.left == thing.left
+    case Location.Right => floor.right == thing.right
+    case Location.Above => floor.top == thing.top
+    case Location.Below => floor.bottom == thing.bottom
+    case null           => false
   }
 }

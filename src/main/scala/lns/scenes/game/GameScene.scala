@@ -5,7 +5,7 @@ import indigo.scenes.*
 import lns.StartupData
 import lns.core.{ EmptyScene, Model, ViewModel }
 import lns.scenes.game.character.*
-import lns.scenes.game.room.RoomView
+import lns.scenes.game.room.{ Boundary, Passage, RoomView }
 import lns.scenes.game.room.RoomView.*
 
 import scala.language.implicitConversions
@@ -25,12 +25,11 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
       for {
-        updatedCharacter <- model.character.update(context)(model.room)
-        updatedGameModel <- model.copy(character = updatedCharacter)
-        // updatedRoom       <- model.room.update(context)
-        // updatedGameModel <- model.copy(character = updatedCharacter, room = updatedRoom)
-        // updatedGameModel2 <- fun(updatedGameModel.character, updatedGameModel.room.getRobaCheFaMale())
-      } yield updatedGameModel
+        character <- model.character.update(context)
+        boundedCharacterLocation = Boundary.characterBounded(model.room.floor, character.boundingBox)
+        characterBounded         = character.copy(boundingBox = character.boundingBox.moveTo(boundedCharacterLocation))
+        (newRoom, newCharacter)  = Passage.currentRoom(model.dungeon, model.room, characterBounded)
+      } yield model.copy(character = newCharacter, room = newRoom)
 
     case _ =>
       Outcome(model)

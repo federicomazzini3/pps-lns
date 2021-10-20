@@ -6,10 +6,10 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.AnythingModel
-import lns.scenes.game.room.door.{ Door, DoorLocation, DoorState, DoorImplicit }
+import lns.scenes.game.room.door.{ Door, Location, DoorState, DoorImplicit }
 
-type Door     = (DoorLocation, DoorState)
-type Doors    = Map[DoorLocation, DoorState]
+type Door     = (Location, DoorState)
+type Doors    = Map[Location, DoorState]
 type Position = Int
 type Boss     = AnythingModel
 type Enemy    = AnythingModel
@@ -121,7 +121,7 @@ object RoomModel {
   import lns.scenes.game.room.door.*
   import lns.scenes.game.room.door.DoorImplicit.*
   import lns.scenes.game.room.door.DoorState.*
-  import lns.scenes.game.room.door.DoorLocation.*
+  import lns.scenes.game.room.door.Location.*
 
   def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
     1,

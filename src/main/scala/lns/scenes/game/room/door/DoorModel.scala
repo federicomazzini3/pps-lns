@@ -5,7 +5,7 @@ import lns.scenes.game.room.door.Door.updateWith
 /**
  * A model for the position of the door in a room
  */
-enum DoorLocation:
+enum Location:
   case Left, Right, Above, Below
 
 /**
@@ -25,7 +25,7 @@ object Door {
    * @return
    *   a new Map with the door
    */
-  def apply(door: (DoorLocation, DoorState)) = Map(door)
+  def apply(door: (Location, DoorState)) = Map(door)
 
   /**
    * @param doors
@@ -36,9 +36,9 @@ object Door {
    *   a new map with the door added
    */
   def updateWith(
-      doors: Map[DoorLocation, DoorState],
-      toAddDoor: (DoorLocation, DoorState)
-  ): Map[DoorLocation, DoorState] = doors + toAddDoor
+      doors: Map[Location, DoorState],
+      toAddDoor: (Location, DoorState)
+  ): Map[Location, DoorState] = doors + toAddDoor
 
   /**
    * @param doors
@@ -48,7 +48,7 @@ object Door {
    * @return
    *   a new map with the new state
    */
-  def updateState(doors: Map[DoorLocation, DoorState])(state: DoorState): Map[DoorLocation, DoorState] =
+  def updateState(doors: Map[Location, DoorState])(state: DoorState): Map[Location, DoorState] =
     doors.map(d => d._1 -> state)
 }
 
@@ -56,15 +56,14 @@ object Door {
  * extension to map and tuple that enable Door method calling
  */
 object DoorImplicit {
-  import lns.scenes.game.room.door.DoorLocation.*
+  import lns.scenes.game.room.door.Location.*
   import lns.scenes.game.room.door.DoorState.*
 
-  extension (doors: Map[DoorLocation, DoorState]) {
-    def :+(toAddDoor: (DoorLocation, DoorState)) = updateWith(doors, toAddDoor)
-    def open: Map[DoorLocation, DoorState]       = Door.updateState(doors)(Open)
-    def close: Map[DoorLocation, DoorState]      = Door.updateState(doors)(Close)
-    def lock: Map[DoorLocation, DoorState]       = Door.updateState(doors)(Lock)
+  extension (doors: Map[Location, DoorState]) {
+    def :+(toAddDoor: (Location, DoorState)) = updateWith(doors, toAddDoor)
+    def open: Map[Location, DoorState]       = Door.updateState(doors)(Open)
+    def close: Map[Location, DoorState]      = Door.updateState(doors)(Close)
+    def lock: Map[Location, DoorState]       = Door.updateState(doors)(Lock)
   }
-  extension (door: (DoorLocation, DoorState))
-    def :+(toAddDoor: (DoorLocation, DoorState)) = updateWith(Map(door), toAddDoor)
+  extension (door: (Location, DoorState)) def :+(toAddDoor: (Location, DoorState)) = updateWith(Map(door), toAddDoor)
 }

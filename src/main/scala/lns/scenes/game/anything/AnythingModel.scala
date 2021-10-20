@@ -16,7 +16,7 @@ trait AnythingModel {
 
   def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
 
-  def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = Outcome(this)
+  def update(context: FrameContext[StartupData]): Outcome[Model] = Outcome(this)
 }
 
 /*Dynamic*/
@@ -46,12 +46,11 @@ trait DynamicModel extends AnythingModel {
   def computeSpeed(context: FrameContext[StartupData]): Vector2
   def edit(boundingBox: BoundingBox, speed: Vector2): Model
 
-  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData]): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)
-      newSpeed    = computeSpeed(context)
-      newLocation = Boundary.positionBounded(room.floor, boundingBox.moveBy(newSpeed))
-      newObj      = superObj.edit(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
+      superObj <- super.update(context)
+      newSpeed = computeSpeed(context)
+      newObj   = superObj.edit(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
     } yield newObj
 
   /*
@@ -87,9 +86,9 @@ trait AliveModel extends AnythingModel {
     case _                     => Outcome(this)
   }
 
-  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData]): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)
+      superObj <- super.update(context)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>

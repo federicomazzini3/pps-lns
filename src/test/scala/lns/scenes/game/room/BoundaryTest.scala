@@ -10,12 +10,12 @@ class BoundaryTest extends AnyFreeSpec {
     "inside a bounding box" - {
       val inside = BoundingBox(100, 100, 1, 1)
       "should be the same after the Bound" in {
-        assertEquals(Vertex(100, 100), Boundary.positionBounded(container, inside))
+        assertEquals(Vertex(100, 100), Boundary.characterBounded(container, inside))
       }
       "moved beyond the left edge" - {
         "should be constraint on left value" in {
           val newPosition = inside.moveBy(-200, 0)
-          assertEquals(Vertex(container.left, newPosition.y), Boundary.positionBounded(container, newPosition))
+          assertEquals(Vertex(container.left, newPosition.y), Boundary.characterBounded(container, newPosition))
         }
       }
       "moved beyond the right edge" - {
@@ -23,7 +23,7 @@ class BoundaryTest extends AnyFreeSpec {
           val newPosition = inside.moveBy(+200, 0)
           assertEquals(
             Vertex(container.right - newPosition.width, newPosition.y), // the original position is in top left
-            Boundary.positionBounded(container, newPosition)
+            Boundary.characterBounded(container, newPosition)
           )
         }
       }
@@ -32,7 +32,7 @@ class BoundaryTest extends AnyFreeSpec {
           val newPosition = inside.moveBy(0, -200)
           assertEquals(
             Vertex(newPosition.x, container.top - newPosition.height), // the original position is in top left
-            Boundary.positionBounded(container, newPosition)
+            Boundary.characterBounded(container, newPosition)
           )
         }
       }
@@ -41,7 +41,7 @@ class BoundaryTest extends AnyFreeSpec {
           val newPosition = inside.moveBy(0, +200)
           assertEquals(
             Vertex(newPosition.x, container.bottom - newPosition.height), //the original position is in top left
-            Boundary.positionBounded(container, newPosition)
+            Boundary.characterBounded(container, newPosition)
           )
         }
       }

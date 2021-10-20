@@ -9,11 +9,11 @@ import indigoextras.geometry.*
 import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.room.door.*
-import lns.scenes.game.room.door.DoorLocation.*
+import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
 
-type Door  = (DoorLocation, DoorState)
-type Doors = Map[DoorLocation, DoorState]
+type Door  = (Location, DoorState)
+type Doors = Map[Location, DoorState]
 
 object DoorView {
   def view(startupData: StartupData, model: Doors, viewModel: Unit): Group =

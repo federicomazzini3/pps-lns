@@ -38,7 +38,7 @@ class CharacterModelTest extends AnyFreeSpec {
         new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
         startupData
       )
-    )(RoomModel.initial(startupData))
+    )
     .unsafeGet
   println("OLD NOT EDITED" + model.boundingBox)
 
@@ -51,7 +51,7 @@ class CharacterModelTest extends AnyFreeSpec {
         new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText),
         startupData
       )
-    )(RoomModel.initial(startupData))
+    )
     .unsafeGet
 
   println("NEW AFTER EDIT" + newModel.boundingBox)

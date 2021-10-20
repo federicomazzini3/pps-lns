@@ -3,7 +3,7 @@ package lns.scenes.game.dungeon
 import indigo.shared.datatypes.Rectangle
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ DoorLocation, DoorState }
+import lns.scenes.game.room.door.{ Location, DoorState }
 
 object Generator {
 
@@ -27,12 +27,12 @@ object Generator {
         RoomModel.bossRoom(startupData, position, generateDoors(grid, position)(DoorState.Close), null)
     }
 
-  def generateDoors(grid: BasicGrid, position: Position)(doorState: DoorState): Map[DoorLocation, DoorState] =
+  def generateDoors(grid: BasicGrid, position: Position)(doorState: DoorState): Map[Location, DoorState] =
     Map(
-      ((DoorLocation.Left)  -> doorState),
-      ((DoorLocation.Right) -> doorState),
-      ((DoorLocation.Above) -> doorState),
-      ((DoorLocation.Below) -> doorState)
+      ((Location.Left)  -> doorState),
+      ((Location.Right) -> doorState),
+      ((Location.Above) -> doorState),
+      ((Location.Below) -> doorState)
     )
       .filter((location, state) => Grid.near(grid)(position)(location).isDefined)
 }
