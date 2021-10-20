@@ -4,8 +4,9 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.scenes.game.room.RoomModel
+import lns.scenes.game.room.{ Boundary, RoomModel }
 import scala.language.implicitConversions
+
 
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
@@ -94,11 +95,8 @@ trait DynamicModel extends AnythingModel {
     for {
       superObj <- super.update(context)(room)
       newSpeed    = computeSpeed(context) * context.gameTime.delta.toDouble
-      newLocation = boundingBox.moveBy(newSpeed)
-      newObj =
-        if (room.allowMoving(newLocation.position))
-          superObj.withDynamic(boundingBox.moveBy(newSpeed), newSpeed).asInstanceOf[Model]
-        else superObj
+      newLocation = Boundary.positionBounded(room.floor, boundingBox.moveBy(newSpeed))
+      newObj      = superObj.edit(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
     } yield newObj
 
 }

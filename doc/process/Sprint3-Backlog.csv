@@ -1,0 +1,16 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Come utente voglio che il personaggio sia animato e vincolato nella stanza,,12,,,12,10,8,5,3,1,
+,Studio e sperimentazione animazioni,,Alan,1h,,,,,,,
+,Stanza corrente nel dungeon,,Federico,1h,,,,,,,
+,Definizione dei confini della stanza,,Federico,2h,,,,,,,
+,Animazioni contestuali alla direzione,,Matteo,3h,,,,,,,
+,Bounding box,,Federico,1h,,,,,,,
+,Refactor room,,Federico,3h,,,,,,,
+Come utente voglio controllare il mio personaggio nella stanza,,3,,,3,3,2,0,,,
+,Visualizzazione del personaggio con corpo + testa + ombra,,Matteo,3h,,,,,,,
+Design di Anything con la sua gerarchia e refactor generale,,22,,,22,15,10,10,5,2,0
+,Studio modellazione a componenti con Indigo,,Alan - Federico - Matteo,8h,,,,,,,
+,Implementazione interfacce,,Alan - Federico - Matteo,10h,,,,,,,
+,Refactor di Character in componente,,Alan,1h,,,,,,,
+,Macro per edit di Anything,,Alan,4h,,,,,,,
+Indigo test bootstrap,,4,Alan,,4,4,4,4,0,,

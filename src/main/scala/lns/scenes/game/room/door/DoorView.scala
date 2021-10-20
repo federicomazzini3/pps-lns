@@ -9,6 +9,8 @@ import indigoextras.geometry.*
 import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.room.door.*
+import lns.scenes.game.room.door.DoorPosition.*
+import lns.scenes.game.room.door.DoorState.*
 
 type Door  = (DoorPosition, DoorState)
 type Doors = Map[DoorPosition, DoorState]

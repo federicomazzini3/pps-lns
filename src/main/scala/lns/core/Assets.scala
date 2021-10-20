@@ -153,7 +153,7 @@ object Assets {
       val name: AssetName = AssetName("empty-room")
 
       val size: Int      = 2048
-      val floorSize: Int = 1400
+      val floorSize: Int = 1450
     }
 
     val assets: Set[AssetType] = Set(
