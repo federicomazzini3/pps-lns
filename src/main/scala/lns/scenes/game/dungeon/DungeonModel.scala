@@ -95,5 +95,8 @@ extension (dungeon: DungeonModel) {
    * @return
    *   the first room in dungeon
    */
-  def initialRoom: Position = dungeon.content.filter(_._2.getClass == EmptyRoom).map(_._1).head
+  def initialRoom: RoomModel = dungeon.content
+    .collect { case (pos, EmptyRoom(_, _, _)) => pos }
+    .map(pos => dungeon.content(pos))
+    .head
 }

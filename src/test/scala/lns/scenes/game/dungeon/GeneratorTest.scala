@@ -2,6 +2,7 @@ package lns.scenes.game.dungeon
 
 import indigo.shared.datatypes.Rectangle
 import lns.StartupData
+import lns.scenes.game.room.EmptyRoom
 
 object GeneratorTest extends App {
   import RoomType.*
@@ -12,4 +13,11 @@ object GeneratorTest extends App {
 
   println(plan)
   println(dungeon)
+
+  println(
+    dungeon.content
+      .collect { case (pos, EmptyRoom(_, _, _)) => pos }
+      .map(pos => dungeon.content(pos))
+      .head
+  )
 }
