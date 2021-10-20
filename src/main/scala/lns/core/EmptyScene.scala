@@ -24,6 +24,7 @@ abstract class EmptyScene() extends Scene[StartupData, Model, ViewModel] {
 
   def updateModel(context: FrameContext[StartupData], model: SceneModel): GlobalEvent => Outcome[SceneModel] =
     _ => model
+
   def updateViewModel(
       context: FrameContext[StartupData],
       model: SceneModel,
