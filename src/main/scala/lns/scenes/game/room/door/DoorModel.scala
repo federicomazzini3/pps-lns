@@ -1,5 +1,6 @@
 package lns.scenes.game.room.door
 
+import lns.scenes.game.room.door
 import lns.scenes.game.room.door.Door.updateWith
 
 /**
@@ -50,6 +51,9 @@ object Door {
    */
   def updateState(doors: Map[Location, DoorState])(state: DoorState): Map[Location, DoorState] =
     doors.map(d => d._1 -> state)
+
+  def verifyOpen(doors: Map[Location, DoorState])(location: Location): Boolean =
+    doors.foldLeft(false)((`location`, `DoorState.Open`) => true)
 }
 
 /**
@@ -65,5 +69,15 @@ object DoorImplicit {
     def close: Map[Location, DoorState]      = Door.updateState(doors)(Close)
     def lock: Map[Location, DoorState]       = Door.updateState(doors)(Lock)
   }
-  extension (door: (Location, DoorState)) def :+(toAddDoor: (Location, DoorState)) = updateWith(Map(door), toAddDoor)
+  extension (door: (Location, DoorState)) {
+    def :+(toAddDoor: (Location, DoorState)) = updateWith(Map(door), toAddDoor)
+  }
+
+  extension (doorsLocation: Set[Location]) {
+    def :+(toAddDoor: Location): Set[Location] = doorsLocation + toAddDoor
+  }
+
+  extension (doorLocation: Location) {
+    def :+(toAddLocation: Location): Set[Location] = Set(doorLocation, toAddLocation)
+  }
 }

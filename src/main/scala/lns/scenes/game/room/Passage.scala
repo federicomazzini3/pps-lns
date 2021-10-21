@@ -1,7 +1,9 @@
 package lns.scenes.game.room
 
 import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.anything.*
 import lns.scenes.game.dungeon.DungeonModel
+import lns.scenes.game.room.door.Door
 import lns.scenes.game.dungeon.DungeonModel.*
 import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
@@ -10,14 +12,12 @@ import lns.scenes.game.dungeon.room
 object Passage {
 
   def verifyPassage(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): (RoomModel, CharacterModel) =
-    val characterPosition = character.boundingBox
-
     if (
       room.floor.right == character.boundingBox.right &&
-      character.boundingBox.y < 300 &&
-      character.boundingBox.y > 200 &&
-      room.doors.contains(Right) &&
-      room.doors(Right) == Open
+      room.floor.verticalCenter > character.boundingBox.top &&
+      room.floor.verticalCenter < character.boundingBox.bottom &&
+      Door.verifyOpen(room.doors)(Right) &&
+      character.getState() == DynamicState.MOVE_RIGHT
     )
       (
         dungeon.room(room.positionInDungeon)(Right).getOrElse(room),
@@ -25,21 +25,21 @@ object Passage {
       )
     else if (
       room.floor.left == character.boundingBox.left &&
-      character.boundingBox.y < 300 &&
-      character.boundingBox.y > 200 &&
-      room.doors.contains(Left) &&
-      room.doors(Left) == Open
+      room.floor.verticalCenter > character.boundingBox.top &&
+      room.floor.verticalCenter < character.boundingBox.bottom &&
+      Door.verifyOpen(room.doors)(Left) &&
+      character.getState() == DynamicState.MOVE_LEFT
     )
       (
         dungeon.room(room.positionInDungeon)(Left).getOrElse(room),
         character.copy(boundingBox = character.boundingBox.moveBy(room.floor.width - character.boundingBox.width, 0))
       )
     else if (
-      room.floor.top == character.boundingBox.top &&
-      character.boundingBox.x < 300 &&
-      character.boundingBox.x > 200 &&
-      room.doors.contains(Above) &&
-      room.doors(Above) == Open
+      room.floor.top == character.boundingBox.bottom &
+        room.floor.horizontalCenter > character.boundingBox.bottomLeft.x &&
+        room.floor.horizontalCenter < character.boundingBox.bottomRight.x &&
+        Door.verifyOpen(room.doors)(Above) &&
+        character.getState() == DynamicState.MOVE_UP
     )
       (
         dungeon.room(room.positionInDungeon)(Above).getOrElse(room),
@@ -47,10 +47,10 @@ object Passage {
       )
     else if (
       room.floor.bottom == character.boundingBox.bottom &&
-      character.boundingBox.x > 200 &&
-      character.boundingBox.x < 1800 &&
-      room.doors.contains(Below) &&
-      room.doors(Below) == Open
+      room.floor.horizontalCenter > character.boundingBox.bottomLeft.x &&
+      room.floor.horizontalCenter < character.boundingBox.bottomRight.x &&
+      Door.verifyOpen(room.doors)(Below) &&
+      character.getState() == DynamicState.MOVE_DOWN
     )
       (
         dungeon.room(room.positionInDungeon)(Below).getOrElse(room),

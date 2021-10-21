@@ -18,21 +18,16 @@ object Generator {
   def generateRoom(startupData: StartupData)(grid: BasicGrid)(position: Position): RoomModel =
     grid.content(position) match {
       case RoomType.Empty =>
-        RoomModel.emptyRoom(startupData, position, generateDoors(grid, position)(DoorState.Open))
+        RoomModel.emptyRoom(startupData, position, generateDoors(grid, position))
       case RoomType.Item =>
-        RoomModel.itemRoom(startupData, position, generateDoors(grid, position)(DoorState.Open), null)
+        RoomModel.itemRoom(startupData, position, generateDoors(grid, position), null)
       case RoomType.Arena =>
-        RoomModel.arenaRoom(startupData, position, generateDoors(grid, position)(DoorState.Close), null, null)
+        RoomModel.arenaRoom(startupData, position, generateDoors(grid, position), null, null)
       case RoomType.Boss =>
-        RoomModel.bossRoom(startupData, position, generateDoors(grid, position)(DoorState.Close), null)
+        RoomModel.bossRoom(startupData, position, generateDoors(grid, position), null)
     }
 
-  def generateDoors(grid: BasicGrid, position: Position)(doorState: DoorState): Map[Location, DoorState] =
-    Map(
-      ((Location.Left)  -> doorState),
-      ((Location.Right) -> doorState),
-      ((Location.Above) -> doorState),
-      ((Location.Below) -> doorState)
-    )
-      .filter((location, state) => Grid.near(grid)(position)(location).isDefined)
+  def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
+    Set(Location.Left, Location.Right, Location.Above, Location.Below)
+      .filter(location => Grid.near(grid)(position)(location).isDefined)
 }
