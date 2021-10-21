@@ -7,6 +7,7 @@ import lns.scenes.end.EndModel
 
 /**
  * Main model which stores the whole game state divided by scene
+ *
  * @param loading
  *   [[LoadingModel]] for the [[LoadingScene]]
  * @param game
@@ -24,7 +25,7 @@ object Model {
   def initial(startupData: StartupData): Model =
     Model(
       LoadingModel.initial,
-      GameModel.initial(startupData),
+      GameModel.initial,
       EndModel.initial
     )
 }

@@ -9,18 +9,25 @@ import lns.scenes.game.dungeon.room
 
 object Passage {
 
-  def currentRoom(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): (RoomModel, CharacterModel) =
+  def verifyPassage(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): (RoomModel, CharacterModel) =
     val characterPosition = character.boundingBox
 
     if (
-      Boundary.onBound(room.floor, characterPosition)(Right) && room.doors.contains(Right) && room.doors(Right) == Open
+      room.floor.right == character.boundingBox.right &&
+      character.boundingBox.y < 300 &&
+      character.boundingBox.y > 200 &&
+      room.doors.contains(Right) &&
+      room.doors(Right) == Open
     )
       (
         dungeon.room(room.positionInDungeon)(Right).getOrElse(room),
         character.copy(boundingBox = character.boundingBox.moveBy(-room.floor.width + character.boundingBox.width, 0))
       )
     else if (
-      Boundary.onBound(room.floor, characterPosition)(Left) && room.doors.contains(Left) &&
+      room.floor.left == character.boundingBox.left &&
+      character.boundingBox.y < 300 &&
+      character.boundingBox.y > 200 &&
+      room.doors.contains(Left) &&
       room.doors(Left) == Open
     )
       (
@@ -28,7 +35,10 @@ object Passage {
         character.copy(boundingBox = character.boundingBox.moveBy(room.floor.width - character.boundingBox.width, 0))
       )
     else if (
-      Boundary.onBound(room.floor, characterPosition)(Above) && room.doors.contains(Above) &&
+      room.floor.top == character.boundingBox.top &&
+      character.boundingBox.x < 300 &&
+      character.boundingBox.x > 200 &&
+      room.doors.contains(Above) &&
       room.doors(Above) == Open
     )
       (
@@ -36,7 +46,10 @@ object Passage {
         character.copy(boundingBox = character.boundingBox.moveBy(0, room.floor.height - character.boundingBox.height))
       )
     else if (
-      Boundary.onBound(room.floor, characterPosition)(Below) && room.doors.contains(Below) &&
+      room.floor.bottom == character.boundingBox.bottom &&
+      character.boundingBox.x > 200 &&
+      character.boundingBox.x < 1800 &&
+      room.doors.contains(Below) &&
       room.doors(Below) == Open
     )
       (

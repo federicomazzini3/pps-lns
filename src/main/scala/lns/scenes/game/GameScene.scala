@@ -3,10 +3,13 @@ package lns.scenes.game
 import indigo.*
 import indigo.scenes.*
 import lns.StartupData
-import lns.core.{ EmptyScene, Model, ViewModel }
+import lns.core.{ Assets, EmptyScene, Model, ViewModel }
+import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
 import lns.scenes.game.character.*
+import lns.scenes.game.dungeon.DungeonLoadingView
 import lns.scenes.game.room.{ Boundary, Passage, RoomView }
 import lns.scenes.game.room.RoomView.*
+import lns.scenes.game.room.CharacterExtension.boundMovement
 
 import scala.language.implicitConversions
 
@@ -24,12 +27,17 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
     case FrameTick =>
-      for {
-        character <- model.character.update(context)
-        boundedCharacterLocation = Boundary.characterBounded(model.room.floor, character.boundingBox)
-        characterBounded         = character.copy(boundingBox = character.boundingBox.moveTo(boundedCharacterLocation))
-        (newRoom, newCharacter)  = Passage.currentRoom(model.dungeon, model.room, characterBounded)
-      } yield model.copy(character = newCharacter, room = newRoom)
+      model match {
+
+        case model @ GameStarted(dungeon, room, character) =>
+          for {
+            character <- character.update(context)
+            characterBounded        = character.boundMovement(room.floor)
+            (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, characterBounded)
+          } yield model.copy(character = newCharacter, room = newRoom)
+
+        case GameNotStarted => GameModel.start(context.startUpData)
+      }
 
     case _ =>
       Outcome(model)
@@ -40,8 +48,13 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    RoomView.draw(context, model.room, ()) |+|
-      CharacterView().draw(context, model.character, ())
+    model match {
+      case GameStarted(dungeon, room, character) =>
+        RoomView.draw(context, room, ()) |+|
+          CharacterView().draw(context, character, ())
+      case _ => DungeonLoadingView(context.startUpData)
+    }
+
 }
 
 object GameScene {
