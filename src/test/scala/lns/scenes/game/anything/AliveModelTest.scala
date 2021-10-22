@@ -41,7 +41,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
 
   s"An AliveModel with life = $startLife" - {
     "when not hit should" - {
-      "after one frame update" - {
+      "after one frame update should" - {
         "maintain its life" in {
           val updatedModel = model
             .update(getContext(1))(room)
