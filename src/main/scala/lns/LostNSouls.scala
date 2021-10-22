@@ -3,11 +3,14 @@ package lns
 import indigo.*
 import indigo.scenes.*
 import indigoextras.subsystems.FPSCounter
-import lns.core.{ Assets, Model, ViewModel, Animations }
+import lns.core.{ Animations, Assets, Model, ViewModel }
 import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
+import org.scalajs.dom
+import org.scalajs.dom.document
+import org.scalajs.dom.html.Script
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -37,6 +40,10 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   )
 
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] = {
+
+    val prologScript: Script = document.createElement("SCRIPT").asInstanceOf[Script]
+    prologScript.src = "assets/prolog/tau-prolog.js"
+    document.head.appendChild(prologScript)
 
     var currentViewport = for {
       width  <- flags.get("width")
