@@ -53,7 +53,10 @@ object Door {
     doors.map(d => d._1 -> state)
 
   def verifyOpen(doors: Map[Location, DoorState])(location: Location): Boolean =
-    doors.foldLeft(false)((`location`, `DoorState.Open`) => true)
+    doors.get(location) match {
+      case Some(DoorState.Open) => true
+      case _                    => false
+    }
 }
 
 /**
