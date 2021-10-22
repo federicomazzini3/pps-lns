@@ -14,7 +14,7 @@ object Assets {
 
   def initialFont(): FontInfo = Fonts.fontInfo
 
-  def secondary(): Set[AssetType] = Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets
+  def secondary(): Set[AssetType] = Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Prolog.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -97,6 +97,14 @@ object Assets {
       Set(
         AssetType.Image(Fonts.smallFontName, AssetPath(baseUrl + "boxy_font_small.png"))
       )
+  }
+
+  object Prolog {
+    val dungeon: AssetName = AssetName("dungeon")
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Text(dungeon, AssetPath(baseUrl + "dungeon_generator.pl"))
+    )
   }
 
   object Character {
