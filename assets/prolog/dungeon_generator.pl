@@ -1,6 +1,7 @@
 :- use_module(library(lists)).
 :- use_module(library(random)).
 
+% dropFirst(?Elem,?List,?OutList)
 dropFirst(_,[],[]):- !.
 dropFirst(X,[X|T],T):- !.
 dropFirst(X,[H|Xs],[H|L]):- dropFirst(X,Xs,L).
@@ -11,8 +12,8 @@ freePlace(L,RX,Y,X,Y):- X is RX-1, \+(member(room(X,Y,_),L)).
 freePlace(L,X,RY,X,Y):- Y is RY+1, \+(member(room(X,Y,_),L)).
 freePlace(L,X,RY,X,Y):- Y is RY-1, \+(member(room(X,Y,_),L)).
 
-% aggiunge alla lista dei Places liberi, quelli relativi ad una nuova Room
 % addFreePlaces(+L,+P,+RX,+RY,-OP)
+% aggiunge alla lista dei Places liberi, quelli relativi ad una nuova Room
 addFreePlaces(L,P,RX,RY,OP):- findall(p(X,Y),freePlace(L,RX,RY,X,Y),P2), append(P,P2,P3), list_to_set(P3,OP).
 
 % placeRoom(+L,+P,+RX,+RY,+RT,-OL,-OP)
@@ -32,9 +33,10 @@ filterBossPlaces(L,[],[]).
 filterBossPlaces(L,[H|T],[H|BP]) :- isValidBossPlace(L,H), !, filterBossPlaces(L,T,BP).
 filterBossPlaces(L,[_|T],BP) :- filterBossPlaces(L,T,BP).
 
-% placeStart(+L,+P,-OL)
+% placeBoss(+L,+P,-OL)
 placeBoss(L,P,OL):- filterBossPlaces(L,P,BP), autoPlaceRoom(L,BP,b,OL,_).
 
+% randomType(-RT)
 randomType(i):- maybe(0.15), !.
 randomType(a):- maybe(0.55), !.
 randomType(e).

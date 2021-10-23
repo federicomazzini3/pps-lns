@@ -100,10 +100,11 @@ object Assets {
   }
 
   object Prolog {
-    val dungeon: AssetName = AssetName("dungeon")
+    val specificUrl: String = "prolog/"
+    val dungeon: AssetName  = AssetName("dungeon_generator")
 
     val assets: Set[AssetType] = Set(
-      AssetType.Text(dungeon, AssetPath(baseUrl + "dungeon_generator.pl"))
+      AssetType.Text(dungeon, AssetPath(baseUrl + specificUrl + "dungeon_generator.pl"))
     )
   }
 
