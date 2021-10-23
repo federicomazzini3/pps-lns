@@ -44,12 +44,6 @@ final case class GameScene() extends EmptyScene {
       println("GENERAZIONE")
       println(getRooms(sub.links("L")))
 
-      /*
-      for (room: Term <- sub.links("L").args) {
-        println("ROOM:")
-        println(room)
-      }
-       */
       Outcome(model)
     case FrameTick =>
       for {
