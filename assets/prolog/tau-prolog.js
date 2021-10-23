@@ -2663,9 +2663,10 @@
 
 	// Consult a program from a string
 	Session.prototype.consult = function(program, options) {
-		return this.thread.consult(program, options);
+	    return this.thread.consult(program, options);
 	};
 	Thread.prototype.consult = function(program, options) {
+		console.log(typeof options)
 		var string = "", success = false;
 		var opts = {};
 		var callback = typeof options === "function" ? options : function(){};

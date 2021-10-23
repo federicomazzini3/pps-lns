@@ -8,9 +8,6 @@ import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
-import org.scalajs.dom
-import org.scalajs.dom.document
-import org.scalajs.dom.html.Script
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -22,7 +19,7 @@ final case class BootData(screenDimensions: Rectangle)
 /**
  * Game startup data built from boot data
  */
-final case class StartupData(screenDimensions: Rectangle)
+final case class StartupData(screenDimensions: Rectangle, dungeonGenerator: Option[String] = None)
 
 @JSExportTopLevel("IndigoGame")
 object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
@@ -39,11 +36,22 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
     EndScene()
   )
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] = {
+  /**
+   * Loads tau-prolog engine on the client browser using ScalaJS dom extension
+   */
+  def loadProlog(): Unit = {
+    import org.scalajs.dom
+    import org.scalajs.dom.document
+    import org.scalajs.dom.html.Script
 
     val prologScript: Script = document.createElement("SCRIPT").asInstanceOf[Script]
     prologScript.src = "assets/prolog/tau-prolog.js"
     document.head.appendChild(prologScript)
+  }
+
+  def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] = {
+
+    loadProlog()
 
     var currentViewport = for {
       width  <- flags.get("width")
@@ -61,7 +69,9 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
     Outcome(
       Startup
-        .Success(StartupData(bootData.screenDimensions))
+        .Success(
+          StartupData(bootData.screenDimensions, assetCollection.findTextDataByName(AssetName("dungeon_generator")))
+        )
         .addAnimations(Animations())
     )
 
