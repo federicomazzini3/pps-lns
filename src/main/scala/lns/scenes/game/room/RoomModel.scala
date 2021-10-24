@@ -11,7 +11,7 @@ import lns.scenes.game.room.door.{ Door, Location, DoorState, DoorImplicit }
 type Door           = (Location, DoorState)
 type DoorsLocations = Set[Location]
 type Doors          = Map[Location, DoorState]
-type Position       = Int
+type Position       = (Int, Int)
 type Boss           = AnythingModel
 type Enemy          = AnythingModel
 type Item           = AnythingModel
@@ -155,7 +155,7 @@ object RoomModel {
   import lns.scenes.game.room.door.Location.*
 
   def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
-    1,
+    (0, 0),
     internalBoundingBox(startupData.screenDimensions),
     Left :+ Right :+ Above :+ Below
   )

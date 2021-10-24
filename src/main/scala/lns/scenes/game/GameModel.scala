@@ -19,7 +19,11 @@ object GameModel {
   def start(startupData: StartupData): GameModel =
     val dungeonModel: DungeonModel =
       Generator(startupData)(
-        BasicGrid(6, 6, Map(14 -> Arena, 15 -> Empty, 21 -> Arena, 22 -> Item, 23 -> Boss, 27 -> Arena))
+        BasicGrid(
+          6,
+          6,
+          Map((0, 0) -> Arena, (0, 1) -> Empty, (1, 1) -> Arena, (1, 2) -> Item, (1, 3) -> Boss, (2, 1) -> Arena)
+        )
       )
     GameStarted(
       dungeonModel,

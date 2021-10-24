@@ -49,9 +49,11 @@ final case class GameScene() extends EmptyScene {
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
     model match {
+
       case GameStarted(dungeon, room, character) =>
         RoomView.draw(context, room, ()) |+|
           CharacterView().draw(context, character, ())
+
       case _ => DungeonLoadingView(context.startUpData)
     }
 
