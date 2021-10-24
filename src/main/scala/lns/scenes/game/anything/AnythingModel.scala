@@ -5,8 +5,9 @@ import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import scala.language.implicitConversions
+import lns.scenes.game.shot.ShotEvent
 
+import scala.language.implicitConversions
 
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
@@ -151,4 +152,79 @@ trait AliveModel extends AnythingModel {
       }
     } yield newObj
 
+}
+
+/**
+ * Base model for every object that make damage on contact to other model that extends [[AliveModel]] trait. It is
+ * designed to be extended or mixed with other [[AnythingModel]] traits.
+ */
+trait DamageModel extends AnythingModel {
+  type Model >: this.type <: DamageModel
+
+  val damage: Double
+
+  def withDamage(damage: Double): Model
+}
+
+/**
+ * Base model for every object that can fire. It is designed to be extended or mixed with other [[AnythingModel]]
+ * traits.
+ */
+trait FireModel extends AnythingModel {
+  type Model >: this.type <: FireModel
+
+  val fireRate: Double
+  val fireRateTimer: Double
+
+  def withFire(fireRateTimer: Double): Model
+
+  /**
+   * @param context
+   *   indigo frame context data
+   * @return
+   *   Optional direction vector
+   */
+  def computeFire(context: FrameContext[StartupData]): Option[Vector2]
+
+  /**
+   * @param Vector2
+   *   direction vector
+   * @return
+   *   ShotEvent
+   */
+  def createEvent(direction: Vector2): ShotEvent = ShotEvent(Vertex(boundingBox.x, boundingBox.y), direction)
+
+  /**
+   * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer
+   * that limits the firing rate, a global event is created and intercepted by the [[GameView]] Otherwise, if only the
+   * timer is present, it is decreased to 0
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @return
+   *   the Outcome of the updated model
+   */
+  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = {
+    val shot = if (fireRateTimer == 0) computeFire(context) else None
+
+    val retObj = for {
+      superObj <- super.update(context)(room)
+      newObj = fireRateTimer match {
+        case 0 =>
+          shot match {
+            case Some(direction) => superObj.withFire(fireRate).asInstanceOf[Model]
+            case _               => superObj
+          }
+        case _ if fireRateTimer - context.gameTime.delta.toDouble > 0 =>
+          superObj.withFire(fireRateTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
+        case _ => superObj.withFire(0).asInstanceOf[Model]
+      }
+    } yield newObj
+
+    shot match {
+      case Some(direction) => retObj.addGlobalEvents(createEvent(direction))
+      case _               => retObj
+    }
+  }
 }
