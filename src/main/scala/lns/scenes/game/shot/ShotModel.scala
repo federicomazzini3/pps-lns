@@ -5,6 +5,7 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.scenes.game.anything.{ AliveModel, DamageModel, DynamicModel }
+import lns.scenes.game.room.RoomModel
 import org.scalajs.dom.raw.Position
 
 case class ShotModel(

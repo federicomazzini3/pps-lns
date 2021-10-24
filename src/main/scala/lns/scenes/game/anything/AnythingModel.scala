@@ -184,7 +184,7 @@ trait FireModel extends AnythingModel {
    * @return
    *   Optional direction vector
    */
-  def computeFireDirection(context: FrameContext[StartupData]): Option[Vector2]
+  def computeFire(context: FrameContext[StartupData]): Option[Vector2]
 
   /**
    * @param Vector2
@@ -206,9 +206,9 @@ trait FireModel extends AnythingModel {
    *   the Outcome of the updated model
    */
   override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = {
-    val shot = computeFireDirection(context)
+    val shot = if (fireRateTimer == 0) computeFire(context) else None
 
-    val newObj = for {
+    val retObj = for {
       superObj <- super.update(context)(room)
       newObj = fireRateTimer match {
         case 0 =>
@@ -223,8 +223,8 @@ trait FireModel extends AnythingModel {
     } yield newObj
 
     shot match {
-      case Some(direction) if fireRateTimer == 0 => newObj.addGlobalEvents(createEvent(direction))
-      case _                                     => newObj
+      case Some(direction) => retObj.addGlobalEvents(createEvent(direction))
+      case _               => retObj
     }
   }
 }

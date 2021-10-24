@@ -37,14 +37,14 @@ case class CharacterModel(
 
   val moveInputMappings: InputMapping[Vector2] =
     InputMapping(
-      Combo.withKeyInputs(Key.LEFT_ARROW, Key.UP_ARROW)    -> Vector2(-maxSpeed, -maxSpeed),
-      Combo.withKeyInputs(Key.LEFT_ARROW, Key.DOWN_ARROW)  -> Vector2(-maxSpeed, maxSpeed),
-      Combo.withKeyInputs(Key.LEFT_ARROW)                  -> Vector2(-maxSpeed, 0.0d),
-      Combo.withKeyInputs(Key.RIGHT_ARROW, Key.UP_ARROW)   -> Vector2(maxSpeed, -maxSpeed),
-      Combo.withKeyInputs(Key.RIGHT_ARROW, Key.DOWN_ARROW) -> Vector2(maxSpeed, maxSpeed),
-      Combo.withKeyInputs(Key.RIGHT_ARROW)                 -> Vector2(maxSpeed, 0.0d),
-      Combo.withKeyInputs(Key.UP_ARROW)                    -> Vector2(0.0d, -maxSpeed),
-      Combo.withKeyInputs(Key.DOWN_ARROW)                  -> Vector2(0.0d, maxSpeed)
+      Combo.withKeyInputs(Key.KEY_A, Key.KEY_W) -> Vector2(-maxSpeed, -maxSpeed),
+      Combo.withKeyInputs(Key.KEY_A, Key.KEY_S) -> Vector2(-maxSpeed, maxSpeed),
+      Combo.withKeyInputs(Key.KEY_A)            -> Vector2(-maxSpeed, 0.0d),
+      Combo.withKeyInputs(Key.KEY_D, Key.KEY_W) -> Vector2(maxSpeed, -maxSpeed),
+      Combo.withKeyInputs(Key.KEY_D, Key.KEY_S) -> Vector2(maxSpeed, maxSpeed),
+      Combo.withKeyInputs(Key.KEY_D)            -> Vector2(maxSpeed, 0.0d),
+      Combo.withKeyInputs(Key.KEY_W)            -> Vector2(0.0d, -maxSpeed),
+      Combo.withKeyInputs(Key.KEY_S)            -> Vector2(0.0d, maxSpeed)
     )
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
@@ -56,10 +56,13 @@ case class CharacterModel(
 
   val fireInputMappings: InputMapping[Vector2] =
     InputMapping(
-      Combo.withKeyInputs(Key.SPACE) -> Vector2(1, 0)
+      Combo.withKeyInputs(Key.UP_ARROW)    -> Vector2(0, -1),
+      Combo.withKeyInputs(Key.RIGHT_ARROW) -> Vector2(1, 0),
+      Combo.withKeyInputs(Key.DOWN_ARROW)  -> Vector2(0, 1),
+      Combo.withKeyInputs(Key.LEFT_ARROW)  -> Vector2(-1, 0)
     )
 
-  def computeFireDirection(context: FrameContext[StartupData]): Option[Vector2] =
+  def computeFire(context: FrameContext[StartupData]): Option[Vector2] =
     context.inputState.mapInputsOption(fireInputMappings)
 }
 
