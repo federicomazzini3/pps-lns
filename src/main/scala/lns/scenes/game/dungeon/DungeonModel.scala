@@ -12,8 +12,6 @@ import lns.scenes.game.room.{ EmptyRoom, RoomModel }
  */
 trait Grid {
   type Room
-  val row: Int
-  val column: Int
   val content: Map[Position, Room]
 }
 
@@ -32,22 +30,22 @@ object Grid {
    */
   def nearPosition(grid: Grid)(position: Position)(location: Location): Option[Position] =
     location match {
-      case Location.Left => Option(position._1, position._2 - 1)
+      case Location.Left => Option(position._1 - 1, position._2)
       /*position % grid.column match {
           case 1 => None
           case _ => Option(position - 1)
         }*/
-      case Location.Right => Option(position._1, position._2 + 1)
+      case Location.Right => Option(position._1 + 1, position._2)
       /*position % grid.column match {
           case 0 => None
           case _ => Option(position + 1)
         }*/
-      case Location.Above => Option(position._1 - 1, position._2)
+      case Location.Above => Option(position._1, position._2 + 1)
       /*(position - grid.column) match {
           case x if x < 0 => None
           case x          => Option(x)
         }*/
-      case Location.Below => Option(position._1 + 1, position._2)
+      case Location.Below => Option(position._1, position._2 - 1)
       /*(position + grid.column) match {
           case x if x > (grid.row * grid.column) => None
           case x                                 => Option(x)

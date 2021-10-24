@@ -12,11 +12,11 @@ object Generator {
       grid.row,
       grid.column,
       grid.content
-        .map((position, roomType) => (position, generateRoom(startupData: StartupData)(grid)(position)))
+        .map((position, roomType) => (position, generateRoom(startupData: StartupData)(grid, position, roomType)))
     )
 
-  def generateRoom(startupData: StartupData)(grid: BasicGrid)(position: Position): RoomModel =
-    grid.content(position) match {
+  def generateRoom(startupData: StartupData)(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
+    roomType match {
       case RoomType.Empty =>
         RoomModel.emptyRoom(startupData, position, generateDoors(grid, position))
       case RoomType.Item =>
