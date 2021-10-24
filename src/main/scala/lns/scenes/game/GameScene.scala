@@ -3,9 +3,9 @@ package lns.scenes.game
 import indigo.*
 import indigo.scenes.*
 import lns.StartupData
-import lns.core.{ EmptyScene, Model, ViewModel }
+import lns.core.{ EmptyScene, Model, Substitution, Term, ViewModel }
 import lns.scenes.game.character.*
-import lns.scenes.game.room.RoomView
+import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.shot.*
 
@@ -28,6 +28,7 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
+
     case ShotEvent(p, d) =>
       val updatedShots: List[ShotModel] = model.shots :+ ShotModel(p, d)
       Outcome(model.copy(shots = updatedShots))
@@ -44,6 +45,12 @@ final case class GameScene() extends EmptyScene {
         // updatedGameModel <- model.copy(character = updatedCharacter, room = updatedRoom)
         // updatedGameModel2 <- fun(updatedGameModel.character, updatedGameModel.room.getRobaCheFaMale())
       } yield updatedGameModel
+
+    case event @ DungeonGenerationResult(_) =>
+      println("RISULTATO GENERAZIONE")
+      println(event.getResult())
+
+      Outcome(model)
 
     case _ =>
       Outcome(model)
@@ -65,4 +72,26 @@ final case class GameScene() extends EmptyScene {
 
 object GameScene {
   val name: SceneName = SceneName("game")
+}
+
+case class DungeonGenerationResult(sub: Substitution) extends GlobalEvent {
+
+  def getResult() = getRooms(sub.links("L"))
+
+  private def getRooms(baseTerm: Term): List[String] = {
+
+    if (baseTerm.id == "[]")
+      return Nil
+
+    val room: String = baseTerm.args(0).args(2).id match {
+      case "s" => "Start(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
+      case "a" => "Arena(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
+      case "i" => "Item(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
+      case "e" => "Empty(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
+      case "b" => "Boss(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
+      case _   => "no"
+    }
+
+    room :: List.concat(getRooms(baseTerm.args(1)))
+  }
 }
