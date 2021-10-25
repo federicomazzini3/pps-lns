@@ -10,7 +10,7 @@ object GeneratorTest extends App {
     Map((0, 0) -> Arena, (0, 1) -> Empty, (1, 1) -> Arena, (1, 2) -> Item, (1, 3) -> Boss, (2, 1) -> Arena)
 
   var startupData = StartupData(screenDimensions = Rectangle(0, 0, 0, 0))
-  val dungeon     = Generator(startupData)(BasicGrid(5, 6, plan))
+  val dungeon     = Generator(startupData)(BasicGrid(plan))
 
   println(plan)
   println(dungeon)

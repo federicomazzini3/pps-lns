@@ -36,6 +36,15 @@ trait RoomModel {
    * all the doors for a room
    */
   val doors: Doors
+
+  /**
+   * Confine the character inside the limit of the room
+   * @param anything
+   *   the character bounding box
+   * @return
+   *   the bounded character's position
+   */
+  def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
 }
 
 /**

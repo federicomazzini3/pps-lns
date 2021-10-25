@@ -23,8 +23,6 @@ object GameModel {
     val dungeonModel: DungeonModel =
       Generator(startupData)(
         BasicGrid(
-          6,
-          6,
           Map((0, 0) -> Arena, (1, 0) -> Empty, (1, 1) -> Arena, (2, 1) -> Item, (3, 1) -> Boss, (1, 2) -> Arena)
         )
       )

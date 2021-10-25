@@ -30,26 +30,10 @@ object Grid {
    */
   def nearPosition(grid: Grid)(position: Position)(location: Location): Option[Position] =
     location match {
-      case Location.Left => Option(position._1 - 1, position._2)
-      /*position % grid.column match {
-          case 1 => None
-          case _ => Option(position - 1)
-        }*/
+      case Location.Left  => Option(position._1 - 1, position._2)
       case Location.Right => Option(position._1 + 1, position._2)
-      /*position % grid.column match {
-          case 0 => None
-          case _ => Option(position + 1)
-        }*/
       case Location.Above => Option(position._1, position._2 + 1)
-      /*(position - grid.column) match {
-          case x if x < 0 => None
-          case x          => Option(x)
-        }*/
       case Location.Below => Option(position._1, position._2 - 1)
-      /*(position + grid.column) match {
-          case x if x > (grid.row * grid.column) => None
-          case x                                 => Option(x)
-        }*/
     }
 
   /**
@@ -73,14 +57,14 @@ enum RoomType:
  * Case class for the abstract dungeon developed by prolog. It stores a Map that contains all the room type and their
  * position
  */
-case class BasicGrid(val row: Int, val column: Int, val content: Map[Position, RoomType]) extends Grid {
+case class BasicGrid(val content: Map[Position, RoomType]) extends Grid {
   override type Room = RoomType
 }
 
 /**
  * Case class of the entire Dungeon. It stores a Map that contains all the room and their position
  */
-case class DungeonModel(val row: Int, val column: Int, val content: Map[Position, RoomModel]) extends Grid {
+case class DungeonModel(val content: Map[Position, RoomModel]) extends Grid {
   override type Room = RoomModel
 }
 

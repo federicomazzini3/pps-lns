@@ -9,8 +9,6 @@ object Generator {
 
   def apply(startupData: StartupData)(grid: BasicGrid): DungeonModel =
     DungeonModel(
-      grid.row,
-      grid.column,
       grid.content
         .map((position, roomType) => (position, generateRoom(startupData: StartupData)(grid, position, roomType)))
     )

@@ -17,7 +17,7 @@ object Boundary {
    * @return
    *   a new position inside the bounding box, shifted by the minimum necessary on the x and y axis
    */
-  def characterBounded(container: BoundingBox, thing: BoundingBox): Vertex = {
+  def bound(container: BoundingBox, thing: BoundingBox): Vertex = {
 
     /**
      * a point is update with the edge coordinate (left or right) of the bounding box if it's beyond
@@ -61,7 +61,7 @@ object CharacterExtension {
   extension (character: CharacterModel) {
     def boundMovement(floor: BoundingBox): CharacterModel =
       character.copy(
-        boundingBox = character.boundingBox.moveTo(Boundary.characterBounded(floor, character.boundingBox))
+        boundingBox = character.boundingBox.moveTo(Boundary.bound(floor, character.boundingBox))
       )
   }
 }
