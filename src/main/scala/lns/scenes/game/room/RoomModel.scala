@@ -6,19 +6,26 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.AnythingModel
-import lns.scenes.game.room.door.{ Door, DoorPosition, DoorState, DoorImplicit }
+import lns.scenes.game.room.door.{ Door, Location, DoorState, DoorImplicit }
 
-type Door    = (DoorPosition, DoorState)
-type Doors   = Map[DoorPosition, DoorState]
-type Boss    = AnythingModel
-type Enemy   = AnythingModel
-type Item    = AnythingModel
-type Element = AnythingModel
+type Door           = (Location, DoorState)
+type DoorsLocations = Set[Location]
+type Doors          = Map[Location, DoorState]
+type Position       = (Int, Int)
+type Boss           = AnythingModel
+type Enemy          = AnythingModel
+type Item           = AnythingModel
+type Element        = AnythingModel
 
 /**
  * Base model for a room
  */
 trait RoomModel {
+
+  /**
+   * the position of the room inside the whole dungeon
+   */
+  val positionInDungeon: Position
 
   /**
    * the area where the elements are placed inside the room
@@ -29,6 +36,15 @@ trait RoomModel {
    * all the doors for a room
    */
   val doors: Doors
+
+  /**
+   * Confine the character inside the limit of the room
+   * @param anything
+   *   the character bounding box
+   * @return
+   *   the bounded character's position
+   */
+  def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
 }
 
 /**
@@ -60,7 +76,10 @@ trait BossModel {
  * @param doors
  *   the set of the door
  */
-case class EmptyRoom(val floor: BoundingBox, val doors: Doors) extends RoomModel
+case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, val locations: DoorsLocations)
+    extends RoomModel {
+  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+}
 
 /**
  * The room where the character fight against monsters
@@ -74,12 +93,26 @@ case class EmptyRoom(val floor: BoundingBox, val doors: Doors) extends RoomModel
  *   the set of elements
  */
 case class ArenaRoom(
+    val positionInDungeon: Position,
     val floor: BoundingBox,
-    val doors: Doors,
+    val locations: DoorsLocations,
     val enemies: Set[Enemy],
     val elements: Set[Element]
 ) extends RoomModel
-    with ArenaModel
+    with ArenaModel {
+
+  /**
+   * da modificare, quando implementerememo qualcosa con anything model non ci sarà più bisogno di controllare il null
+   */
+  val doors: Doors = enemies match {
+    case null => locations.map(loc => loc -> DoorState.Open).toMap
+    case _ =>
+      enemies.size match {
+        case 0 => locations.map(loc => loc -> DoorState.Open).toMap
+        case _ => locations.map(loc => loc -> DoorState.Close).toMap
+      }
+  }
+}
 
 /**
  * The Room that contains one element to pick up
@@ -90,7 +123,16 @@ case class ArenaRoom(
  * @param item
  *   the element to pick up
  */
-case class ItemRoom(val floor: BoundingBox, val doors: Doors, val item: Item) extends RoomModel with ItemModel
+case class ItemRoom(
+    val positionInDungeon: Position,
+    val floor: BoundingBox,
+    val locations: DoorsLocations,
+    val item: Item
+) extends RoomModel
+    with ItemModel {
+
+  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+}
 
 /**
  * The room where the character fights against the boss
@@ -101,7 +143,16 @@ case class ItemRoom(val floor: BoundingBox, val doors: Doors, val item: Item) ex
  * @param boss
  *   the boss model
  */
-case class BossRoom(val floor: BoundingBox, val doors: Doors, val boss: Boss) extends RoomModel with BossModel
+case class BossRoom(
+    val positionInDungeon: Position,
+    val floor: BoundingBox,
+    val locations: DoorsLocations,
+    val boss: Boss
+) extends RoomModel
+    with BossModel {
+
+  val doors: Doors = locations.map(loc => loc -> DoorState.Close).toMap
+}
 
 /**
  * Companion object, debug version for testing
@@ -110,24 +161,59 @@ object RoomModel {
   import lns.scenes.game.room.door.*
   import lns.scenes.game.room.door.DoorImplicit.*
   import lns.scenes.game.room.door.DoorState.*
-  import lns.scenes.game.room.door.DoorPosition.*
+  import lns.scenes.game.room.door.Location.*
 
   def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
+    (0, 0),
     internalBoundingBox(startupData.screenDimensions),
-    (Left -> Close) :+ (Right -> Close) :+ (Above -> Open) :+ (Below -> Lock)
+    Left :+ Right :+ Above :+ Below
   )
+
+  def emptyRoom(startupData: StartupData, position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
+    position,
+    internalBoundingBox(startupData.screenDimensions),
+    locations
+  )
+
+  def arenaRoom(
+      startupData: StartupData,
+      position: Position,
+      locations: DoorsLocations,
+      enemies: Set[AnythingModel],
+      elements: Set[AnythingModel]
+  ): ArenaRoom = ArenaRoom(
+    position,
+    internalBoundingBox(startupData.screenDimensions),
+    locations,
+    enemies,
+    elements
+  )
+
+  def itemRoom(startupData: StartupData, position: Position, locations: DoorsLocations, item: Item): ItemRoom =
+    ItemRoom(
+      position,
+      internalBoundingBox(startupData.screenDimensions),
+      locations,
+      item
+    )
+
+  def bossRoom(startupData: StartupData, position: Position, locations: DoorsLocations, boss: Item): BossRoom =
+    BossRoom(
+      position,
+      internalBoundingBox(startupData.screenDimensions),
+      locations,
+      boss
+    )
 
   def internalBoundingBox(screenDimension: Rectangle): BoundingBox = {
     val scale: Double             = RoomGraphic.getScale(screenDimension, Assets.Rooms.EmptyRoom.size)
     val floorDimensionScaled: Int = (Rooms.EmptyRoom.floorSize * scale).toInt
-    val floorWidthScaled: Int     = ((Rooms.EmptyRoom.floorSize - 135) * scale).toInt
-    val floorHeightScaled: Int    = ((Rooms.EmptyRoom.floorSize - 170) * scale).toInt
     BoundingBox(
       Vertex(
-        screenDimension.horizontalCenter - (floorWidthScaled / 2),
-        screenDimension.verticalCenter - (floorHeightScaled / 2)
+        screenDimension.horizontalCenter - (floorDimensionScaled / 2),
+        screenDimension.verticalCenter - (floorDimensionScaled / 2)
       ),
-      Vertex(floorWidthScaled, floorHeightScaled)
+      Vertex(floorDimensionScaled, floorDimensionScaled)
     )
   }
 

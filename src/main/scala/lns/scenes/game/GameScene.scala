@@ -3,6 +3,13 @@ package lns.scenes.game
 import indigo.*
 import indigo.scenes.*
 import lns.StartupData
+import lns.core.{ Assets, EmptyScene, Model, ViewModel }
+import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
+import lns.scenes.game.character.*
+import lns.scenes.game.dungeon.DungeonLoadingView
+import lns.scenes.game.room.{ Boundary, Passage, RoomView }
+import lns.scenes.game.room.RoomView.*
+import lns.scenes.game.room.CharacterExtension.boundMovement
 import lns.core.{ EmptyScene, Model, Substitution, Term, ViewModel }
 import lns.scenes.game.character.*
 import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
@@ -30,21 +37,27 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneModel] = {
 
     case ShotEvent(p, d) =>
-      val updatedShots: List[ShotModel] = model.shots :+ ShotModel(p, d)
-      Outcome(model.copy(shots = updatedShots))
+      model match {
+        case model @ GameStarted(_, _, _, shots) =>
+          val updatedShots: List[ShotModel] = shots :+ ShotModel(p, d)
+          Outcome(model.copy(shots = updatedShots))
+      }
 
     case FrameTick =>
-      for {
-        updatedCharacter <- model.character.update(context)(model.room)
-        updatedShots = for {
-          shot <- model.shots
-          updatedShot = shot.update(context)(model.room).unsafeGet
-        } yield updatedShot
-        updatedGameModel <- model.copy(character = updatedCharacter, shots = updatedShots)
-        // updatedRoom       <- model.room.update(context)
-        // updatedGameModel <- model.copy(character = updatedCharacter, room = updatedRoom)
-        // updatedGameModel2 <- fun(updatedGameModel.character, updatedGameModel.room.getRobaCheFaMale())
-      } yield updatedGameModel
+      model match {
+
+        case model @ GameStarted(dungeon, room, character, shots) =>
+          for {
+            character <- character.update(context)(room)
+            (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
+            updatedShots = for {
+              shot <- shots
+              updatedShot = shot.update(context)(room).unsafeGet
+            } yield updatedShot
+          } yield model.copy(character = newCharacter, room = newRoom, shots = updatedShots)
+
+        case GameNotStarted => GameModel.start(context.startUpData)
+      }
 
     case event @ DungeonGenerationResult(_) =>
       println("RISULTATO GENERAZIONE")
@@ -61,13 +74,19 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    var scene = RoomView.draw(context, model.room, ()) |+|
-      CharacterView().draw(context, model.character, ())
+    model match {
 
-    model.shots.map { s =>
-      scene = scene |+| ShotView().draw(context, s, ())
+      case GameStarted(dungeon, room, character, shots) =>
+        var scene = RoomView.draw(context, room, ()) |+|
+          CharacterView().draw(context, character, ())
+
+        shots.map { s =>
+          scene = scene |+| ShotView().draw(context, s, ())
+        }
+        scene
+
+      case _ => DungeonLoadingView(context.startUpData)
     }
-    scene
 }
 
 object GameScene {
