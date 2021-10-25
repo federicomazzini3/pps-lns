@@ -1,14 +1,16 @@
 package lns.scenes.loading
 
-import indigo._
-import indigo.scenes._
-import indigoextras.subsystems._
+import indigo.*
+import indigo.scenes.*
+import indigoextras.subsystems.*
 import indigo.scenes.SceneEvent.JumpTo
 import lns.StartupData
-import lns.core.{ Assets, EmptyScene, Model, ViewModel }
-import lns.scenes.game.GameScene
+import lns.core.{ Assets, EmptyScene, Model, ScalaPrologSession, ViewModel }
+import lns.scenes.game.{ DungeonGenerationResult, GameScene }
 import lns.scenes.loading.LoadingModel
+
 import scala.language.implicitConversions
+import scala.scalajs.js
 
 final case class LoadingScene() extends EmptyScene {
   type SceneModel     = LoadingModel
@@ -35,6 +37,24 @@ final case class LoadingScene() extends EmptyScene {
               AssetBundleLoaderEvent.Load(BindingKey("Loading"), Assets.secondary())
             )
 
+        case LoadingModel.AwaitPrologConsult(session) =>
+          session.consultResult match {
+            case Some(true) => session.query("generateDungeon(30,L)."); LoadingModel.AwaitPrologQuery(session)
+            case _          => model
+          }
+        case LoadingModel.AwaitPrologQuery(session) =>
+          session.queryResult match {
+            case Some(true) => session.answer(); LoadingModel.AwaitPrologAnswer(session)
+            case _          => model
+          }
+
+        case LoadingModel.AwaitPrologAnswer(session) =>
+          session.answerResult match {
+            case Some(substitution) =>
+              LoadingModel.Complete
+                .addGlobalEvents(JumpTo(GameScene.name), DungeonGenerationResult(substitution))
+            case _ => model
+          }
         case _ =>
           model
       }
@@ -43,7 +63,10 @@ final case class LoadingScene() extends EmptyScene {
       LoadingModel.InProgress(percent)
 
     case AssetBundleLoaderEvent.Success(_) =>
-      LoadingModel.Complete.addGlobalEvents(JumpTo(GameScene.name))
+      val session = ScalaPrologSession()
+      session.consult(context.startUpData.dungeonGenerator.get)
+
+      LoadingModel.AwaitPrologConsult(session)
 
     case AssetBundleLoaderEvent.Failure(_, _) =>
       LoadingModel.Error

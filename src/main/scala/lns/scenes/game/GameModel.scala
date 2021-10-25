@@ -1,11 +1,15 @@
 package lns.scenes.game
 
+import indigo.*
+import indigoextras.geometry.Vertex
 import lns.StartupData
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.dungeon.{ DungeonModel, Generator }
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.RoomType.*
+import lns.scenes.game.room.*
+import lns.scenes.game.shot.*
 
 sealed trait GameModel
 
@@ -13,8 +17,12 @@ object GameModel {
 
   case object GameNotStarted extends GameModel
 
-  case class GameStarted(val dungeon: DungeonModel, val room: RoomModel, val character: CharacterModel)
-      extends GameModel
+  case class GameStarted(
+      val dungeon: DungeonModel,
+      val room: RoomModel,
+      val character: CharacterModel,
+      val shots: List[ShotModel] = Nil
+  ) extends GameModel
 
   def initial: GameModel = GameNotStarted
 
