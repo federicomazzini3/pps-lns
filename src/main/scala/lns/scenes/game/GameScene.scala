@@ -2,20 +2,21 @@ package lns.scenes.game
 
 import indigo.*
 import indigo.scenes.*
+import indigo.shared.datatypes.Vector2
+import indigo.shared.scenegraph.Group
 import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.DungeonLoadingView
-import lns.scenes.game.room.{ Boundary, Passage, RoomView }
+import lns.scenes.game.room.{ ArenaRoom, Boundary, Passage, RoomGraphic, RoomModel, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.room.CharacterExtension.boundMovement
 import lns.core.{ EmptyScene, Model, Substitution, Term, ViewModel }
 import lns.scenes.game.character.*
-import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.shot.*
-
+import lns.scenes.game.anything.given_Conversion_Vector2_Point
 import scala.language.implicitConversions
 
 case object MyEvent extends GlobalEvent
@@ -41,6 +42,7 @@ final case class GameScene() extends EmptyScene {
         case model @ GameStarted(_, _, _, shots) =>
           val updatedShots: List[ShotModel] = shots :+ ShotModel(p, d)
           Outcome(model.copy(shots = updatedShots))
+        case _ => Outcome(model)
       }
 
     case FrameTick =>
@@ -77,13 +79,47 @@ final case class GameScene() extends EmptyScene {
     model match {
 
       case GameStarted(dungeon, room, character, shots) =>
-        var scene = RoomView.draw(context, room, ()) |+|
+        /*var scene = RoomView.draw(context, room, ()) |+|
           CharacterView().draw(context, character, ())
 
         shots.map { s =>
           scene = scene |+| ShotView().draw(context, s, ())
         }
-        scene
+        scene*/
+        println("character: " + character.boundingBox)
+        /*SceneUpdateFragment(
+          Group()
+            .addChild(
+              Group()
+                .addChild(RoomGraphic.roomGraphic(context.startUpData))
+                .addChild(doorView(context.startUpData, room, viewModel))
+            )
+            .addChild(
+              Group()
+                /* .addChild(boundingModel) */
+                .addChild(CharacterView().shadowModel)
+                .addChild(CharacterView().bodyView(character))
+                .addChild(CharacterView().headView(character))
+                .withScale(Vector2(5, 5))
+                .moveTo(character.boundingBox.left.toInt, character.boundingBox.top.toInt)
+                .moveBy(
+                  (Assets.Rooms.EmptyRoom.size - Assets.Rooms.EmptyRoom.floorSize) / 2,
+                  (Assets.Rooms.EmptyRoom.size - Assets.Rooms.EmptyRoom.floorSize) / 2
+                )
+            )
+            .withScale(
+              Vector2(RoomGraphic.getScale(context.startUpData.screenDimensions, Assets.Rooms.EmptyRoom.size))
+            )
+            .withRef(Assets.Rooms.EmptyRoom.size / 2, Assets.Rooms.EmptyRoom.size / 2)
+            .moveTo(context.startUpData.screenDimensions.center)
+        )*/
+
+        SceneUpdateFragment(
+          RoomView.draw(context, room, ()) |+|
+            CharacterView().draw(context, character, ()) |+|
+            shots.foldLeft(Group())((s1, s2) => s1 |+| ShotView().draw(context, s2, ()))
+            globalAdjustement context
+        )
 
       case _ => DungeonLoadingView(context.startUpData)
     }
@@ -113,4 +149,14 @@ case class DungeonGenerationResult(sub: Substitution) extends GlobalEvent {
 
     room :: List.concat(getRooms(baseTerm.args(1)))
   }
+}
+
+extension (group: Group) {
+  def |+|(child: Group): Group = group.addChild(child)
+  def globalAdjustement(context: FrameContext[StartupData]): Group =
+    group
+      .withScale(Vector2(context.startUpData.globalScale))
+      .withRef(Assets.Rooms.roomSize / 2, Assets.Rooms.roomSize / 2)
+      .moveTo(context.startUpData.screenDimensions.center)
+
 }

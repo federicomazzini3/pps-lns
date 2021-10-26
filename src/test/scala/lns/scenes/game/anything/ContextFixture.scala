@@ -20,7 +20,7 @@ trait ContextFixture {
   val startupData     = StartupData(screenDimensions = Rectangle(0, 0, width, height))
   val dice            = Dice.fromSeed(1000)
   val boundaryLocator = new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText)
-  val room            = RoomModel.initial(startupData)
+  val room            = RoomModel.initial()
 
   def getContext(timeDelta: Double, inputState: InputState = InputState.default): FrameContext[StartupData] =
     new FrameContext[StartupData](

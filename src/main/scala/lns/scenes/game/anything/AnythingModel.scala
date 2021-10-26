@@ -27,7 +27,7 @@ trait AnythingModel {
    * @return
    *   the current position Vector2
    */
-  def getPosition(): Vector2 = Vector2(boundingBox.horizontalCenter, boundingBox.top)
+  def getPosition(): Vector2 = Vector2(boundingBox.left, boundingBox.top)
 
   /**
    * Update request called during game loop on every frame
@@ -192,7 +192,8 @@ trait FireModel extends AnythingModel {
    * @return
    *   ShotEvent
    */
-  def createEvent(direction: Vector2): ShotEvent = ShotEvent(Vertex(boundingBox.x, boundingBox.y), direction)
+  def createEvent(direction: Vector2): ShotEvent =
+    ShotEvent(Vertex(boundingBox.horizontalCenter, boundingBox.verticalCenter), direction)
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer

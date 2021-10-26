@@ -3,6 +3,7 @@ package lns.scenes.game.character
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.anything.*
@@ -31,7 +32,7 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
-  val maxSpeed              = 120
+  val maxSpeed              = 500
   val invincibility: Double = 1.5
   val fireRate: Double      = 0.5
 
@@ -72,8 +73,8 @@ case class CharacterModel(
 object CharacterModel {
   def initial(startupData: StartupData): CharacterModel = CharacterModel(
     BoundingBox(
-      Vertex(startupData.screenDimensions.horizontalCenter, startupData.screenDimensions.verticalCenter),
-      Vertex(28, 33)
+      Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
+      Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))
     ),
     Vector2(0, 0),
     10

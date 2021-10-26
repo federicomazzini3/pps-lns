@@ -14,18 +14,16 @@ import lns.scenes.game.room.door.{ Location, DoorState, DoorView }
 
 object RoomView {
 
-  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): SceneUpdateFragment =
-    SceneUpdateFragment(
-      view(context.startUpData, model, viewModel)
-    )
+  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+    view(context.startUpData, model, viewModel)
 
   def view(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     Group()
       .addChild(RoomGraphic.roomGraphic(startupData))
       .addChild(doorView(startupData, model, viewModel))
-      .withScale(Vector2(RoomGraphic.getScale(startupData.screenDimensions, Assets.Rooms.EmptyRoom.size)))
+  /*.withScale(Vector2(RoomGraphic.getScale(startupData.screenDimensions, Assets.Rooms.EmptyRoom.size)))
       .withRef(Assets.Rooms.EmptyRoom.size / 2, Assets.Rooms.EmptyRoom.size / 2)
-      .moveTo(startupData.screenDimensions.center)
+      .moveTo(startupData.screenDimensions.center)*/
 
   def doorView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     DoorView.view(startupData, model.doors, ())
@@ -40,16 +38,13 @@ object RoomView {
 
 object RoomGraphic {
 
-  def getScale(screenDimension: Rectangle, imageDimensions: Int): Double =
-    Math.min(1.0 / imageDimensions * screenDimension.width, 1.0 / imageDimensions * screenDimension.height)
-
   def roomGraphic(startupData: StartupData): Graphic[Material.Bitmap] =
     Graphic(
       Rectangle(
         0,
         0,
-        Rooms.EmptyRoom.size,
-        Rooms.EmptyRoom.size
+        Rooms.roomSize,
+        Rooms.roomSize
       ),
       1,
       Material.Bitmap(Rooms.EmptyRoom.name)

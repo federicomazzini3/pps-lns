@@ -44,10 +44,12 @@ object Boundary {
 
   def beyond(container: BoundingBox, thing: BoundingBox)(location: Location): Boolean =
     location match {
-      case Location.Left  => container.left >= thing.left
-      case Location.Right => container.right <= thing.right
-      case Location.Above => container.top >= thing.bottom
-      case Location.Below => container.bottom <= thing.bottom
+      case Location.Left => println("Left: " + container.left + " " + thing.left); container.left >= thing.left
+      case Location.Right =>
+        println("Right: " + container.right + " " + thing.right); container.right <= thing.right
+      case Location.Above => println("Above: " + container.top + " " + thing.bottom); container.top >= thing.bottom
+      case Location.Below =>
+        println("Below: " + container.bottom + " " + thing.bottom); container.bottom <= thing.bottom
     }
 
   def centerAligned(container: BoundingBox, thing: BoundingBox)(location: Location): Boolean =

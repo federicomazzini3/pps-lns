@@ -2,6 +2,7 @@ package lns
 
 import indigo.*
 import indigo.scenes.*
+import indigo.shared.datatypes.Rectangle
 import indigoextras.subsystems.FPSCounter
 import lns.core.{ Animations, Assets, Model, ViewModel }
 import lns.scenes.end.EndScene
@@ -19,7 +20,13 @@ final case class BootData(screenDimensions: Rectangle)
 /**
  * Game startup data built from boot data
  */
-final case class StartupData(screenDimensions: Rectangle, dungeonGenerator: Option[String] = None)
+final case class StartupData(screenDimensions: Rectangle, dungeonGenerator: Option[String] = None) {
+  val globalScale: Double =
+    Math.min(
+      1.0 / Assets.Rooms.roomSize * screenDimensions.width,
+      1.0 / Assets.Rooms.roomSize * screenDimensions.height
+    )
+}
 
 @JSExportTopLevel("IndigoGame")
 object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {

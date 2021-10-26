@@ -51,6 +51,8 @@ trait RoomModel {
  * Extension for room with one item
  */
 trait ItemModel {
+  room =>
+  RoomModel
   val item: AnythingModel
 }
 
@@ -58,6 +60,8 @@ trait ItemModel {
  * Extension for room with enemies and other elements
  */
 trait ArenaModel {
+  room =>
+  RoomModel
   val enemies: Set[AnythingModel]
   val elements: Set[AnythingModel]
 }
@@ -66,6 +70,8 @@ trait ArenaModel {
  * Extension for room with boss
  */
 trait BossModel {
+  room =>
+  RoomModel
   val boss: AnythingModel
 }
 
@@ -163,58 +169,54 @@ object RoomModel {
   import lns.scenes.game.room.door.DoorState.*
   import lns.scenes.game.room.door.Location.*
 
-  def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
+  def initial(): EmptyRoom = EmptyRoom(
     (0, 0),
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     Left :+ Right :+ Above :+ Below
   )
 
-  def emptyRoom(startupData: StartupData, position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
+  def emptyRoom(position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
     position,
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     locations
   )
 
   def arenaRoom(
-      startupData: StartupData,
       position: Position,
       locations: DoorsLocations,
       enemies: Set[AnythingModel],
       elements: Set[AnythingModel]
   ): ArenaRoom = ArenaRoom(
     position,
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     locations,
     enemies,
     elements
   )
 
-  def itemRoom(startupData: StartupData, position: Position, locations: DoorsLocations, item: Item): ItemRoom =
+  def itemRoom(position: Position, locations: DoorsLocations, item: Item): ItemRoom =
     ItemRoom(
       position,
-      internalBoundingBox(startupData.screenDimensions),
+      defaultFloor,
       locations,
       item
     )
 
-  def bossRoom(startupData: StartupData, position: Position, locations: DoorsLocations, boss: Item): BossRoom =
+  def bossRoom(position: Position, locations: DoorsLocations, boss: Item): BossRoom =
     BossRoom(
       position,
-      internalBoundingBox(startupData.screenDimensions),
+      defaultFloor,
       locations,
       boss
     )
 
-  def internalBoundingBox(screenDimension: Rectangle): BoundingBox = {
-    val scale: Double             = RoomGraphic.getScale(screenDimension, Assets.Rooms.EmptyRoom.size)
-    val floorDimensionScaled: Int = (Rooms.EmptyRoom.floorSize * scale).toInt
+  val defaultFloor: BoundingBox =
     BoundingBox(
+      Vertex(0, 0),
       Vertex(
-        screenDimension.horizontalCenter - (floorDimensionScaled / 2),
-        screenDimension.verticalCenter - (floorDimensionScaled / 2)
-      ),
-      Vertex(floorDimensionScaled, floorDimensionScaled)
+        Assets.Rooms.floorSize,
+        Assets.Rooms.floorSize
+      )
     )
-  }
 
 }

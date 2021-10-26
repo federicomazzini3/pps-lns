@@ -111,6 +111,10 @@ object Assets {
   object Character {
     val specificUrl: String = "characters/"
 
+    val width                 = 28
+    val height                = 33
+    val withScale: Int => Int = (size: Int) => size * 5
+
     val character: AssetName = AssetName("character")
 
     val assets: Set[AssetType] = Set(
@@ -158,11 +162,12 @@ object Assets {
 
     val specificUrl: String = "rooms/"
 
+    val roomSize: Int  = 2048
+    val floorSize: Int = 1325
+    val wallSize: Int  = (roomSize - floorSize) / 2
+
     object EmptyRoom {
       val name: AssetName = AssetName("empty-room")
-
-      val size: Int      = 2048
-      val floorSize: Int = 1325
     }
 
     val assets: Set[AssetType] = Set(
