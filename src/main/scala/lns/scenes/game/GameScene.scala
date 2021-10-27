@@ -11,7 +11,6 @@ import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.DungeonLoadingView
 import lns.scenes.game.room.{ ArenaRoom, Boundary, Passage, RoomGraphic, RoomModel, RoomView }
 import lns.scenes.game.room.RoomView.*
-import lns.scenes.game.room.CharacterExtension.boundMovement
 import lns.core.{ EmptyScene, Model, Substitution, Term, ViewModel }
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomView.*
@@ -79,41 +78,6 @@ final case class GameScene() extends EmptyScene {
     model match {
 
       case GameStarted(dungeon, room, character, shots) =>
-        /*var scene = RoomView.draw(context, room, ()) |+|
-          CharacterView().draw(context, character, ())
-
-        shots.map { s =>
-          scene = scene |+| ShotView().draw(context, s, ())
-        }
-        scene*/
-        println("character: " + character.boundingBox)
-        /*SceneUpdateFragment(
-          Group()
-            .addChild(
-              Group()
-                .addChild(RoomGraphic.roomGraphic(context.startUpData))
-                .addChild(doorView(context.startUpData, room, viewModel))
-            )
-            .addChild(
-              Group()
-                /* .addChild(boundingModel) */
-                .addChild(CharacterView().shadowModel)
-                .addChild(CharacterView().bodyView(character))
-                .addChild(CharacterView().headView(character))
-                .withScale(Vector2(5, 5))
-                .moveTo(character.boundingBox.left.toInt, character.boundingBox.top.toInt)
-                .moveBy(
-                  (Assets.Rooms.EmptyRoom.size - Assets.Rooms.EmptyRoom.floorSize) / 2,
-                  (Assets.Rooms.EmptyRoom.size - Assets.Rooms.EmptyRoom.floorSize) / 2
-                )
-            )
-            .withScale(
-              Vector2(RoomGraphic.getScale(context.startUpData.screenDimensions, Assets.Rooms.EmptyRoom.size))
-            )
-            .withRef(Assets.Rooms.EmptyRoom.size / 2, Assets.Rooms.EmptyRoom.size / 2)
-            .moveTo(context.startUpData.screenDimensions.center)
-        )*/
-
         SceneUpdateFragment(
           RoomView.draw(context, room, ()) |+|
             CharacterView().draw(context, character, ()) |+|

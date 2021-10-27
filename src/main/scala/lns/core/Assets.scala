@@ -164,6 +164,7 @@ object Assets {
 
     val roomSize: Int  = 2048
     val floorSize: Int = 1325
+    val offset: Int    = 15
     val wallSize: Int  = (roomSize - floorSize) / 2
 
     object EmptyRoom {
