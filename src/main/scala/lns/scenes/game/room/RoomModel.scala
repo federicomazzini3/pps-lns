@@ -82,9 +82,8 @@ trait BossModel {
  * @param doors
  *   the set of the door
  */
-case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, val locations: DoorsLocations)
-    extends RoomModel {
-  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, val doors: Doors) extends RoomModel {
+  //val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
 }
 
 /**
@@ -101,7 +100,7 @@ case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, va
 case class ArenaRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
+    val doors: Doors,
     val enemies: Set[Enemy],
     val elements: Set[Element]
 ) extends RoomModel
@@ -110,14 +109,11 @@ case class ArenaRoom(
   /**
    * da modificare, quando implementerememo qualcosa con anything model non ci sarà più bisogno di controllare il null
    */
-  val doors: Doors = enemies match {
-    case null => locations.map(loc => loc -> DoorState.Open).toMap
-    case _ =>
-      enemies.size match {
-        case 0 => locations.map(loc => loc -> DoorState.Open).toMap
-        case _ => locations.map(loc => loc -> DoorState.Close).toMap
-      }
-  }
+  /*val doors: Doors =
+    enemies.size match {
+      case 0 => locations.map(loc => loc -> DoorState.Open).toMap
+      case _ => locations.map(loc => loc -> DoorState.Close).toMap
+    }*/
 }
 
 /**
@@ -132,12 +128,12 @@ case class ArenaRoom(
 case class ItemRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
+    val doors: Doors,
     val item: Item
 ) extends RoomModel
     with ItemModel {
 
-  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+  //val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
 }
 
 /**
@@ -152,12 +148,12 @@ case class ItemRoom(
 case class BossRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
+    val doors: Doors,
     val boss: Boss
 ) extends RoomModel
     with BossModel {
 
-  val doors: Doors = locations.map(loc => loc -> DoorState.Close).toMap
+  //val doors: Doors = locations.map(loc => loc -> DoorState.Close).toMap
 }
 
 /**
@@ -172,13 +168,13 @@ object RoomModel {
   def initial(): EmptyRoom = EmptyRoom(
     (0, 0),
     defaultFloor,
-    Left :+ Right :+ Above :+ Below
+    (Left -> Open) :+ (Right -> Close) :+ (Above -> Lock) :+ (Below -> Open)
   )
 
   def emptyRoom(position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
     position,
     defaultFloor,
-    locations
+    InitialDoorSetup.empty(locations)
   )
 
   def arenaRoom(
@@ -189,7 +185,7 @@ object RoomModel {
   ): ArenaRoom = ArenaRoom(
     position,
     defaultFloor,
-    locations,
+    InitialDoorSetup.arena(locations)(enemies),
     enemies,
     elements
   )
@@ -198,7 +194,7 @@ object RoomModel {
     ItemRoom(
       position,
       defaultFloor,
-      locations,
+      InitialDoorSetup.item(locations),
       item
     )
 
@@ -206,7 +202,7 @@ object RoomModel {
     BossRoom(
       position,
       defaultFloor,
-      locations,
+      InitialDoorSetup.boss(locations),
       boss
     )
 
@@ -219,4 +215,19 @@ object RoomModel {
       )
     )
 
+  object InitialDoorSetup {
+    private def open(locations: DoorsLocations): Doors  = locations.map(loc => loc -> DoorState.Open).toMap
+    private def close(locations: DoorsLocations): Doors = locations.map(loc => loc -> DoorState.Close).toMap
+
+    def empty(locations: DoorsLocations): Doors = open(locations)
+
+    def item(locations: DoorsLocations): Doors = open(locations)
+
+    def arena(locations: DoorsLocations)(enemies: Set[AnythingModel]): Doors = enemies.size match {
+      case 0 => open(locations)
+      case _ => close(locations)
+    }
+
+    def boss(locations: DoorsLocations): Doors = close(locations)
+  }
 }

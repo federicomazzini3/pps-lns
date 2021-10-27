@@ -2,8 +2,9 @@ package lns.scenes.game.dungeon
 
 import indigo.shared.datatypes.Rectangle
 import lns.StartupData
+import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ Location, DoorState }
+import lns.scenes.game.room.door.{ DoorState, Location }
 
 object Generator {
 
@@ -20,7 +21,7 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), null)
       case RoomType.Arena =>
-        RoomModel.arenaRoom(position, generateDoors(grid, position), null, null)
+        RoomModel.arenaRoom(position, generateDoors(grid, position), Set.empty[AnythingModel], Set.empty[AnythingModel])
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), null)
     }
