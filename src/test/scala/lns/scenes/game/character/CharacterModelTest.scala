@@ -7,8 +7,8 @@ import indigo.shared.events.KeyboardEvent.KeyDown
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import indigo.shared.datatypes.Vector2
 import lns.StartupData
+import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.ContextFixture
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
 import org.scalatest.freespec.AnyFreeSpec

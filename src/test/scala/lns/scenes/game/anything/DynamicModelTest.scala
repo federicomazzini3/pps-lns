@@ -5,6 +5,7 @@ import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
+import lns.core.ContextFixture
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 
