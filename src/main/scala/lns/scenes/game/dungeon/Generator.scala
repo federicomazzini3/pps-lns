@@ -3,7 +3,10 @@ package lns.scenes.game.dungeon
 import indigo.shared.datatypes.Rectangle
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ Location, DoorState }
+import lns.scenes.game.room.door.{ DoorState, Location }
+import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
+
+import scala.collection.immutable.HashMap
 
 object Generator {
 
@@ -28,4 +31,28 @@ object Generator {
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
+
+  /**
+   * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)
+   * @param sub
+   * @return
+   */
+  def getDungeon(sub: Substitution) = getRooms(sub.links("L"))
+
+  private def getRoomType(roomType: String): RoomType = roomType match {
+    case "s" => RoomType.Empty
+    case "a" => RoomType.Arena
+    case "i" => RoomType.Item
+    case "e" => RoomType.Empty
+    case "b" => RoomType.Boss
+    case _   => RoomType.Empty
+  }
+
+  private def getRooms(term: Term): Map[Position, RoomType] =
+    term match {
+      case Atom("[]") => HashMap[Position, RoomType]()
+      case Compound(a, Compound(Atom("room"), Num(x, false), Num(y, false), Atom(roomType)), next) =>
+        getRooms(next) + ((x.toInt, y.toInt) -> getRoomType(roomType))
+      case _ => HashMap[Position, RoomType]()
+    }
 }

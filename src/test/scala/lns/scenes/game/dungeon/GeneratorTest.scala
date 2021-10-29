@@ -4,6 +4,10 @@ import indigo.shared.datatypes.Rectangle
 import lns.StartupData
 import lns.scenes.game.room.EmptyRoom
 
+// TODO: test getDungeon()
+// val test: Term =
+//     Compound(Atom("."), Compound(Atom("room"), Num(0, false), Num(0, false), Atom("s")), Compound(Atom(".")))
+
 object GeneratorTest extends App {
   import RoomType.*
   val plan: Map[Position, RoomType] =

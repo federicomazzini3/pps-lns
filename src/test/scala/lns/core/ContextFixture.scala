@@ -1,14 +1,15 @@
-package lns.scenes.game.anything
+package lns.core
 
 import indigo.platform.assets.DynamicText
-import indigo.shared.{ AnimationsRegister, BoundaryLocator, FontRegister, FrameContext }
 import indigo.shared.datatypes.Rectangle
 import indigo.shared.dice.Dice
 import indigo.shared.events.InputState
+import indigo.shared.subsystems.SubSystemFrameContext
 import indigo.shared.time.{ GameTime, Seconds }
+import indigo.shared.{ AnimationsRegister, BoundaryLocator, FontRegister, FrameContext }
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
-import org.scalatest.{ BeforeAndAfterEach, Suite }
+import org.scalatest.Suite
 
 trait ContextFixture {
   this: Suite =>
@@ -29,5 +30,13 @@ trait ContextFixture {
       inputState,
       boundaryLocator,
       startupData
+    )
+
+  def getSubSytemContext(timeDelta: Double, inputState: InputState = InputState.default): SubSystemFrameContext =
+    new SubSystemFrameContext(
+      GameTime.withDelta(Seconds(10 + timeDelta), Seconds(timeDelta)),
+      dice,
+      inputState,
+      boundaryLocator
     )
 }

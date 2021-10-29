@@ -2666,7 +2666,6 @@
 	    return this.thread.consult(program, options);
 	};
 	Thread.prototype.consult = function(program, options) {
-		console.log(typeof options)
 		var string = "", success = false;
 		var opts = {};
 		var callback = typeof options === "function" ? options : function(){};
@@ -3131,6 +3130,8 @@
 				var answer = this.format_success(this.points.pop());
 				(function(answer) {
 					return setTimeout(function() {
+					    // console.log('ANSWER');
+					    // console.log(answer);
 						options.success(answer);
 					}, 0);
 				})(answer);

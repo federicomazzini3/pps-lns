@@ -23,10 +23,6 @@ object LoadingView {
 
         case LoadingModel.Error =>
           "Loading failed..."
-
-        case LoadingModel.AwaitPrologConsult(_) | LoadingModel.AwaitPrologQuery(_) |
-            LoadingModel.AwaitPrologAnswer(_) =>
-          "Generating dungeon..."
       }
 
     SceneUpdateFragment(

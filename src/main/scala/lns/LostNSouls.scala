@@ -8,6 +8,7 @@ import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
+import lns.subsystems.prolog.{ loadTauProlog, PrologService, TauClientFactory }
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -36,22 +37,9 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
     EndScene()
   )
 
-  /**
-   * Loads tau-prolog engine on the client browser using ScalaJS dom extension
-   */
-  def loadProlog(): Unit = {
-    import org.scalajs.dom
-    import org.scalajs.dom.document
-    import org.scalajs.dom.html.Script
-
-    val prologScript: Script = document.createElement("SCRIPT").asInstanceOf[Script]
-    prologScript.src = "assets/prolog/tau-prolog.js"
-    document.head.appendChild(prologScript)
-  }
-
   def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] = {
 
-    loadProlog()
+    loadTauProlog()
 
     var currentViewport = for {
       width  <- flags.get("width")
@@ -64,6 +52,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
       BootResult(config, BootData(config.screenDimensions))
         .withAssets(Assets.initialAssets())
         .withFonts(Assets.initialFont())
+        .withSubSystems(PrologService(TauClientFactory))
     )
   }
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
