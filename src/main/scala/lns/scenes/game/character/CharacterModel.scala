@@ -32,7 +32,7 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
-  val maxSpeed              = 500
+  val maxSpeed              = 300
   val invincibility: Double = 1.5
   val fireRate: Double      = 0.5
 

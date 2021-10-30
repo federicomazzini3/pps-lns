@@ -1,12 +1,14 @@
 package lns.scenes.game.room
 
+import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Rectangle
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.AnythingModel
-import lns.scenes.game.room.door.{ Door, Location, DoorState, DoorImplicit }
+import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
+import lns.scenes.game.shot.ShotModel
 
 type Door           = (Location, DoorState)
 type DoorsLocations = Set[Location]
@@ -45,6 +47,33 @@ trait RoomModel {
    *   the bounded character's position
    */
   def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
+
+  /**
+   * the shot explode in a room
+   */
+  val shots: List[ShotModel]
+
+  /**
+   * Add a shot to the shot list
+   * @param shot
+   *   the shot to add
+   * @return
+   *   a new room with the new shot added
+   */
+  def addShot(shot: ShotModel): RoomModel =
+    RoomCopy(this)(shots :+ shot)
+
+  /**
+   * Update the shot based on FrameContext
+   * @param context
+   *   the game context
+   * @return
+   *   a new room with the shot updated
+   */
+  def update(context: FrameContext[StartupData]): Outcome[RoomModel] =
+    Outcome(
+      RoomCopy(this)(ShotModel.updateShots(shots)(context)(this))
+    )
 }
 
 /**
@@ -82,9 +111,12 @@ trait BossModel {
  * @param doors
  *   the set of the door
  */
-case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, val doors: Doors) extends RoomModel {
-  //val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
-}
+case class EmptyRoom(
+    val positionInDungeon: Position,
+    val floor: BoundingBox,
+    val doors: Doors,
+    val shots: List[ShotModel] = List.empty
+) extends RoomModel
 
 /**
  * The room where the character fight against monsters
@@ -102,19 +134,10 @@ case class ArenaRoom(
     val floor: BoundingBox,
     val doors: Doors,
     val enemies: Set[Enemy],
-    val elements: Set[Element]
+    val elements: Set[Element],
+    val shots: List[ShotModel] = List.empty
 ) extends RoomModel
-    with ArenaModel {
-
-  /**
-   * da modificare, quando implementerememo qualcosa con anything model non ci sarà più bisogno di controllare il null
-   */
-  /*val doors: Doors =
-    enemies.size match {
-      case 0 => locations.map(loc => loc -> DoorState.Open).toMap
-      case _ => locations.map(loc => loc -> DoorState.Close).toMap
-    }*/
-}
+    with ArenaModel
 
 /**
  * The Room that contains one element to pick up
@@ -129,12 +152,10 @@ case class ItemRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doors: Doors,
-    val item: Item
+    val item: Item,
+    val shots: List[ShotModel] = List.empty
 ) extends RoomModel
-    with ItemModel {
-
-  //val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
-}
+    with ItemModel
 
 /**
  * The room where the character fights against the boss
@@ -149,12 +170,10 @@ case class BossRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doors: Doors,
-    val boss: Boss
+    val boss: Boss,
+    val shots: List[ShotModel] = List.empty
 ) extends RoomModel
-    with BossModel {
-
-  //val doors: Doors = locations.map(loc => loc -> DoorState.Close).toMap
-}
+    with BossModel
 
 /**
  * Companion object, debug version for testing
@@ -230,4 +249,18 @@ object RoomModel {
 
     def boss(locations: DoorsLocations): Doors = close(locations)
   }
+}
+
+object RoomCopy {
+  def apply(roomModel: RoomModel)(newShots: List[ShotModel]): RoomModel =
+    roomModel match {
+      case room: ArenaRoom =>
+        room.copy(shots = newShots)
+      case room: BossRoom =>
+        room.copy(shots = newShots)
+      case room: EmptyRoom =>
+        room.copy(shots = newShots)
+      case room: ItemRoom =>
+        room.copy(shots = newShots)
+    }
 }

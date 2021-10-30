@@ -41,9 +41,12 @@ object ShotModel {
       Vertex(5, 5)
     ),
     Vector2(0, 0),
-    Vector2(480, 480),
+    Vector2(800, 800),
     direction,
     10,
     500
   )
+
+  def updateShots(shots: List[ShotModel])(context: FrameContext[StartupData])(room: RoomModel): List[ShotModel] =
+    shots.map(shot => shot.update(context)(room).unsafeGet)
 }

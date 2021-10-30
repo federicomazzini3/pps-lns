@@ -16,6 +16,7 @@ import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.shot.*
 import lns.scenes.game.anything.given_Conversion_Vector2_Point
+
 import scala.language.implicitConversions
 
 case object MyEvent extends GlobalEvent
@@ -38,24 +39,20 @@ final case class GameScene() extends EmptyScene {
 
     case ShotEvent(p, d) =>
       model match {
-        case model @ GameStarted(_, _, _, shots) =>
-          val updatedShots: List[ShotModel] = shots :+ ShotModel(p, d)
-          Outcome(model.copy(shots = updatedShots))
+        case model @ GameStarted(_, room, _) =>
+          Outcome(model.copy(room = room.addShot(ShotModel(p, d))))
         case _ => Outcome(model)
       }
 
     case FrameTick =>
       model match {
 
-        case model @ GameStarted(dungeon, room, character, shots) =>
+        case model @ GameStarted(dungeon, room, character) =>
           for {
             character <- character.update(context)(room)
+            room      <- room.update(context)
             (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
-            updatedShots = for {
-              shot <- shots
-              updatedShot = shot.update(context)(room).unsafeGet
-            } yield updatedShot
-          } yield model.copy(character = newCharacter, room = newRoom, shots = updatedShots)
+          } yield model.copy(character = newCharacter, room = newRoom)
 
         case GameNotStarted => GameModel.start(context.startUpData)
       }
@@ -77,11 +74,10 @@ final case class GameScene() extends EmptyScene {
   ): Outcome[SceneUpdateFragment] =
     model match {
 
-      case GameStarted(dungeon, room, character, shots) =>
+      case GameStarted(dungeon, room, character) =>
         SceneUpdateFragment(
           RoomView.draw(context, room, ()) |+|
-            CharacterView().draw(context, character, ()) |+|
-            shots.foldLeft(Group())((s1, s2) => s1 |+| ShotView().draw(context, s2, ()))
+            CharacterView().draw(context, character, ())
             globalAdjustement context
         )
 

@@ -20,8 +20,7 @@ object GameModel {
   case class GameStarted(
       val dungeon: DungeonModel,
       val room: RoomModel,
-      val character: CharacterModel,
-      val shots: List[ShotModel] = Nil
+      val character: CharacterModel
   ) extends GameModel
 
   def initial: GameModel = GameNotStarted

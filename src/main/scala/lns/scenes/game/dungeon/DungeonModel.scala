@@ -78,7 +78,7 @@ extension (dungeon: DungeonModel) {
    *   the first room in dungeon
    */
   def initialRoom: RoomModel = dungeon.content
-    .collect { case (pos, EmptyRoom(_, _, _)) => pos }
+    .collect { case (pos, EmptyRoom(_, _, _, _)) => pos }
     .map(pos => dungeon.content(pos))
     .head
 }
