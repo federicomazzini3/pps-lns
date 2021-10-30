@@ -3,10 +3,10 @@ package lns.scenes.game
 import indigo.*
 import indigoextras.geometry.Vertex
 import lns.StartupData
+import lns.core.PrologClient
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.dungeon.{ DungeonModel, Generator }
-import lns.scenes.game.dungeon.*
+import lns.scenes.game.dungeon.{ DungeonModel, Generator, RoomType, * }
 import lns.scenes.game.dungeon.RoomType.*
 import lns.scenes.game.room.*
 import lns.scenes.game.shot.*
@@ -15,7 +15,7 @@ sealed trait GameModel
 
 object GameModel {
 
-  case object GameNotStarted extends GameModel
+  case class GameNotStarted(val prologClient: PrologClient) extends GameModel
 
   case class GameStarted(
       val dungeon: DungeonModel,
@@ -23,14 +23,14 @@ object GameModel {
       val character: CharacterModel
   ) extends GameModel
 
-  def initial: GameModel = GameNotStarted
+  def initial: GameModel = GameNotStarted(PrologClient())
 
-  def start(startupData: StartupData): GameModel =
+  def start(startupData: StartupData, rooms: Map[Position, RoomType]): GameModel =
     /** Generation here */
     val dungeonModel: DungeonModel =
       Generator(
         BasicGrid(
-          Map((0, 0) -> Arena, (1, 0) -> Empty, (1, 1) -> Arena, (2, 1) -> Item, (3, 1) -> Boss, (1, 2) -> Arena)
+          rooms //Map((0, 0) -> Arena, (1, 0) -> Empty, (1, 1) -> Arena, (2, 1) -> Item, (3, 1) -> Boss, (1, 2) -> Arena)
         )
       )
 

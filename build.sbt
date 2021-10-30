@@ -19,8 +19,8 @@ lazy val lns =
         "io.indigoengine" %%% "indigo-json-circe" % "0.9.2",
         "org.junit.jupiter" % "junit-jupiter" % "5.8.0" % Test, // aggregator of junit-jupiter-api and junit-jupiter-engine (runtime)
         "org.junit.jupiter" % "junit-jupiter-engine" % "5.8.0" % Test, // for org.junit.platform
-        "org.scalatest" %% "scalatest" % "3.2.9" % Test
-
+        "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+        "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % Test
       )
     )
 
