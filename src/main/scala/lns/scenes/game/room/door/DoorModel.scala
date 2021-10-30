@@ -1,5 +1,6 @@
 package lns.scenes.game.room.door
 
+import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.room.door
 import lns.scenes.game.room.door.Door.updateWith
 
@@ -83,4 +84,20 @@ object DoorImplicit {
   extension (doorLocation: Location) {
     def :+(toAddLocation: Location): Set[Location] = Set(doorLocation, toAddLocation)
   }
+}
+
+object InitialDoorSetup {
+  private def open(locations: Set[Location]): Doors  = locations.map(loc => loc -> DoorState.Open).toMap
+  private def close(locations: Set[Location]): Doors = locations.map(loc => loc -> DoorState.Close).toMap
+
+  def empty(locations: Set[Location]): Doors = open(locations)
+
+  def item(locations: Set[Location]): Doors = open(locations)
+
+  def arena(locations: Set[Location])(enemies: Set[AnythingModel]): Doors = enemies.size match {
+    case 0 => open(locations)
+    case _ => close(locations)
+  }
+
+  def boss(locations: Set[Location]): Doors = close(locations)
 }

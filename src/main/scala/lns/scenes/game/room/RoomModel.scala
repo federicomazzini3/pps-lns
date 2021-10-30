@@ -233,22 +233,6 @@ object RoomModel {
         Assets.Rooms.floorSize
       )
     )
-
-  object InitialDoorSetup {
-    private def open(locations: DoorsLocations): Doors  = locations.map(loc => loc -> DoorState.Open).toMap
-    private def close(locations: DoorsLocations): Doors = locations.map(loc => loc -> DoorState.Close).toMap
-
-    def empty(locations: DoorsLocations): Doors = open(locations)
-
-    def item(locations: DoorsLocations): Doors = open(locations)
-
-    def arena(locations: DoorsLocations)(enemies: Set[AnythingModel]): Doors = enemies.size match {
-      case 0 => open(locations)
-      case _ => close(locations)
-    }
-
-    def boss(locations: DoorsLocations): Doors = close(locations)
-  }
 }
 
 object RoomCopy {
