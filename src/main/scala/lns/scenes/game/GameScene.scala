@@ -28,8 +28,10 @@ final case class GameScene() extends EmptyScene {
 
   override def eventFilters: EventFilters = EventFilters.Permissive
 
-  def modelLens: Lens[Model, SceneModel]             = Lens(m => m.game, (m, sm) => m.copy(game = sm))
-  def viewModelLens: Lens[ViewModel, SceneViewModel] = Lens(vm => vm.game, (vm, svm) => vm.copy(game = svm))
+  def modelLens: Lens[Model, SceneModel] =
+    Lens(m => m.game, (m, sm) => m.copy(game = sm))
+  def viewModelLens: Lens[ViewModel, SceneViewModel] =
+    Lens(vm => vm.game, (vm, svm) => vm.copy(game = svm))
 
   override def updateModel(
       context: FrameContext[StartupData],
@@ -55,7 +57,10 @@ final case class GameScene() extends EmptyScene {
 
         case model @ GameNotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
-            .consult(context.startUpData.dungeonGenerator.get, "generateDungeon(30,L).")
+            .consult(
+              context.startUpData.dungeonGenerator.get,
+              "generateDungeon(30,L)."
+            )
             .map(pi => model.copy(prologClient = pi))
         case _ => model
       }
@@ -63,7 +68,10 @@ final case class GameScene() extends EmptyScene {
     case PrologEvent.Answer(queryId, substitution) =>
       model match {
         case model @ GameNotStarted(prologClient) if prologClient.hasQuery(queryId) =>
-          GameModel.start(context.startUpData, Generator.getDungeon(substitution))
+          GameModel.start(
+            context.startUpData,
+            Generator.getDungeon(substitution)
+          )
         case _ => model
       }
 
@@ -80,9 +88,9 @@ final case class GameScene() extends EmptyScene {
 
       case GameStarted(dungeon, room, character) =>
         SceneUpdateFragment(
-          RoomView.draw(context, room, ()) |+|
-            CharacterView().draw(context, character, ())
-            globalAdjustement context
+          (RoomView.draw(context, room, ()) |+|
+            CharacterView().draw(context, character, ()))
+            .fitToScreen(context)(Assets.Rooms.roomSize)
         )
 
       case _ => DungeonLoadingView(context.startUpData)
@@ -95,10 +103,9 @@ object GameScene {
 
 extension (group: Group) {
   def |+|(child: Group): Group = group.addChild(child)
-  def globalAdjustement(context: FrameContext[StartupData]): Group =
+  def fitToScreen(context: FrameContext[StartupData])(edge: Int): Group =
     group
-      .withScale(Vector2(context.startUpData.globalScale))
-      .withRef(Assets.Rooms.roomSize / 2, Assets.Rooms.roomSize / 2)
+      .withScale(Vector2(context.startUpData.scale(edge)))
+      .withRef(edge / 2, edge / 2)
       .moveTo(context.startUpData.screenDimensions.center)
-
 }

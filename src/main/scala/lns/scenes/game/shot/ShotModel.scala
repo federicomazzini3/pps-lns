@@ -46,7 +46,4 @@ object ShotModel {
     10,
     500
   )
-
-  def updateShots(shots: List[ShotModel])(context: FrameContext[StartupData])(room: RoomModel): List[ShotModel] =
-    shots.map(shot => shot.update(context)(room).unsafeGet)
 }

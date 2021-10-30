@@ -72,7 +72,7 @@ trait RoomModel {
    */
   def update(context: FrameContext[StartupData]): Outcome[RoomModel] =
     Outcome(
-      RoomCopy(this)(ShotModel.updateShots(shots)(context)(this))
+      RoomCopy(this)(shots.map(shot => shot.update(context)(this).unsafeGet))
     )
 }
 

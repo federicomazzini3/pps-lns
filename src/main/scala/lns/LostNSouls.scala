@@ -22,10 +22,10 @@ final case class BootData(screenDimensions: Rectangle)
  * Game startup data built from boot data
  */
 final case class StartupData(screenDimensions: Rectangle, dungeonGenerator: Option[String] = None) {
-  val globalScale: Double =
+  def scale(edge: Int): Double =
     Math.min(
-      1.0 / Assets.Rooms.roomSize * screenDimensions.width,
-      1.0 / Assets.Rooms.roomSize * screenDimensions.height
+      1.0 / edge * screenDimensions.width,
+      1.0 / edge * screenDimensions.height
     )
 }
 
