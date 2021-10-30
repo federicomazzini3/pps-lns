@@ -14,11 +14,4 @@ object GeneratorTest extends App {
 
   println(plan)
   println(dungeon)
-
-  println(
-    dungeon.content
-      .collect { case (pos, EmptyRoom(_, _, _)) => pos }
-      .map(pos => dungeon.content(pos))
-      .head
-  )
 }
