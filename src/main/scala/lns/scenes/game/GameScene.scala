@@ -8,18 +8,17 @@ import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
 import lns.scenes.game.character.*
-import lns.scenes.game.dungeon.DungeonLoadingView
-import lns.scenes.game.room.{ ArenaRoom, Boundary, Passage, RoomGraphic, RoomModel, RoomView }
+import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
+import lns.scenes.game.room.{ Boundary, Passage, RoomView }
 import lns.scenes.game.room.RoomView.*
-import lns.core.{ EmptyScene, Model, Substitution, Term, ViewModel }
 import lns.scenes.game.character.*
+import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.shot.*
-import lns.scenes.game.anything.given_Conversion_Vector2_Point
+import lns.subsystems.prolog.PrologEvent
 
+import scala.collection.immutable.HashMap
 import scala.language.implicitConversions
-
-case object MyEvent extends GlobalEvent
 
 final case class GameScene() extends EmptyScene {
   type SceneModel     = GameModel
@@ -54,17 +53,22 @@ final case class GameScene() extends EmptyScene {
             (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
           } yield model.copy(character = newCharacter, room = newRoom)
 
-        case GameNotStarted => GameModel.start(context.startUpData)
+        case model @ GameNotStarted(prologClient) if !prologClient.consultDone =>
+          prologClient
+            .consult(context.startUpData.dungeonGenerator.get, "generateDungeon(30,L).")
+            .map(pi => model.copy(prologClient = pi))
+        case _ => model
       }
 
-    case event @ DungeonGenerationResult(_) =>
-      println("RISULTATO GENERAZIONE")
-      println(event.getResult())
-
-      Outcome(model)
+    case PrologEvent.Answer(queryId, substitution) =>
+      model match {
+        case model @ GameNotStarted(prologClient) if prologClient.hasQuery(queryId) =>
+          GameModel.start(context.startUpData, Generator.getDungeon(substitution))
+        case _ => model
+      }
 
     case _ =>
-      Outcome(model)
+      model
   }
 
   override def present(
@@ -87,28 +91,6 @@ final case class GameScene() extends EmptyScene {
 
 object GameScene {
   val name: SceneName = SceneName("game")
-}
-
-case class DungeonGenerationResult(sub: Substitution) extends GlobalEvent {
-
-  def getResult() = getRooms(sub.links("L"))
-
-  private def getRooms(baseTerm: Term): List[String] = {
-
-    if (baseTerm.id == "[]")
-      return Nil
-
-    val room: String = baseTerm.args(0).args(2).id match {
-      case "s" => "Start(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
-      case "a" => "Arena(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
-      case "i" => "Item(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
-      case "e" => "Empty(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
-      case "b" => "Boss(" + baseTerm.args(0).args(0) + "," + baseTerm.args(0).args(1) + ")"
-      case _   => "no"
-    }
-
-    room :: List.concat(getRooms(baseTerm.args(1)))
-  }
 }
 
 extension (group: Group) {
