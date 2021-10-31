@@ -11,7 +11,7 @@ import lns.core.Assets.Rooms
 import lns.core.Assets.*
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
-import lns.scenes.game.shot.ShotView
+import lns.scenes.game.shot.{ ShotModel, ShotView }
 
 object RoomView {
 
@@ -22,20 +22,20 @@ object RoomView {
     Group()
       .addChild(RoomGraphic.roomGraphic(context.startUpData))
       .addChild(doorView(context.startUpData, model, viewModel))
-      .addChild(shotView(context, model, viewModel))
+      .addChild(anythingView(context, model, viewModel))
 
   def doorView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     DoorView.view(startupData, model.doors, ())
 
-  def shotView(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
-    model.shots.foldLeft(Group())((s1, s2) => s1.addChild(ShotView().draw(context, s2, ())))
-
-  def anythingView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
-    model match {
-      case ArenaRoom(_, _, _, enemies, elements, _) => Group() //chiamare le rispettive view
-      case ItemRoom(_, _, _, item, _)               => Group()
-      case BossRoom(_, _, _, boss, _)               => Group()
-    }
+  def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+    model.anythings.foldLeft(Group())((s1, s2) =>
+      s1.addChild(
+        s2 match {
+          case shot: ShotModel => ShotView().draw(context, shot, ())
+          case _               => Group()
+        }
+      )
+    )
 }
 
 object RoomGraphic {

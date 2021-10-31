@@ -77,27 +77,14 @@ object DoorImplicit {
     def :+(toAddDoor: (Location, DoorState)) = updateWith(Map(door), toAddDoor)
   }
 
-  extension (doorsLocation: Set[Location]) {
-    def :+(toAddDoor: Location): Set[Location] = doorsLocation + toAddDoor
+  extension (doorsLocations: Set[Location]) {
+    def :+(toAddDoor: Location): Set[Location] = doorsLocations + toAddDoor
+    def open: Map[Location, DoorState]         = doorsLocations.map(loc => loc -> DoorState.Open).toMap
+    def close: Map[Location, DoorState]        = doorsLocations.map(loc => loc -> DoorState.Close).toMap
+    def lock: Map[Location, DoorState]         = doorsLocations.map(loc => loc -> DoorState.Lock).toMap
   }
 
   extension (doorLocation: Location) {
     def :+(toAddLocation: Location): Set[Location] = Set(doorLocation, toAddLocation)
   }
-}
-
-object InitialDoorSetup {
-  private def open(locations: Set[Location]): Doors  = locations.map(loc => loc -> DoorState.Open).toMap
-  private def close(locations: Set[Location]): Doors = locations.map(loc => loc -> DoorState.Close).toMap
-
-  def empty(locations: Set[Location]): Doors = open(locations)
-
-  def item(locations: Set[Location]): Doors = open(locations)
-
-  def arena(locations: Set[Location])(enemies: Set[AnythingModel]): Doors = enemies.size match {
-    case 0 => open(locations)
-    case _ => close(locations)
-  }
-
-  def boss(locations: Set[Location]): Doors = close(locations)
 }

@@ -23,11 +23,11 @@ object Generator {
       case RoomType.Empty =>
         RoomModel.emptyRoom(position, generateDoors(grid, position))
       case RoomType.Item =>
-        RoomModel.itemRoom(position, generateDoors(grid, position), null)
+        RoomModel.itemRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Arena =>
-        RoomModel.arenaRoom(position, generateDoors(grid, position), Set.empty[AnythingModel], Set.empty[AnythingModel])
+        RoomModel.arenaRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Boss =>
-        RoomModel.bossRoom(position, generateDoors(grid, position), null)
+        RoomModel.bossRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
