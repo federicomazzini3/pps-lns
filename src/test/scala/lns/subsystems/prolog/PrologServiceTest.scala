@@ -6,30 +6,50 @@ import lns.StartupData
 import lns.core.ContextFixture
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
-import org.mockito.Mockito.*
-import org.mockito.{ InjectMocks, Mock, MockitoAnnotations, Spy }
 import lns.subsystems.prolog.AsyncSession
-import org.mockito.ArgumentMatchers.any
 
 import scala.collection.immutable.HashMap
+
+case class MockClient(
+    val theory: String,
+    val query: Option[Query],
+    val results: List[(QueryId, Substitution)] = List[(QueryId, Substitution)]()
+) extends AsyncSession {
+
+  def withResults(results: List[(QueryId, Substitution)]) = copy(results = results)
+
+  override def doQuery(query: Query): Unit = ()
+
+  override def askAnswer(queryId: QueryId): Unit = ()
+
+  override def getAnswerResult(queryId: QueryId): Option[Substitution] = None
+
+  override def getAllAnswersResults: List[(QueryId, Substitution)] = results
+
+}
 
 trait PrologSystemFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
 
   val queryId: QueryId     = "query_test"
   val sessionId: SessionId = "sess_test"
+  val substitution         = Substitution(HashMap())
 
-  var mockClient: AsyncSession = _
-  var system: PrologService    = _
+  var system: PrologService            = _
+  var systemWithResults: PrologService = _
+
+  object MockClientFactory extends AsyncSessionFactory {
+    def create(theory: String, query: Option[Query] = None): AsyncSession = new MockClient(theory, query)
+  }
+
+  object MockClientWithResultsFactory extends AsyncSessionFactory {
+    def create(theory: String, query: Option[Query] = None): AsyncSession =
+      new MockClient(theory, query).withResults(List((queryId, substitution)))
+  }
 
   override def beforeEach() = {
 
-    mockClient = mock(classOf[AsyncSession])
-
-    object MockClientFactory extends AsyncSessionFactory {
-      def create(theory: String, query: Option[Query] = None): AsyncSession = mockClient
-    }
-
     system = new PrologService(MockClientFactory)
+    systemWithResults = new PrologService(MockClientWithResultsFactory)
 
     super.beforeEach()
   }
@@ -41,7 +61,6 @@ class PrologServiceTest extends AnyFreeSpec with PrologSystemFixture {
     "after the event PrologCommand.Consult" - {
       "if session doesn't already exists should" - {
         "create a new session in the model" in {
-
           val updatedModel = system
             .update(getSubSytemContext(1), system.initialModel.unsafeGet)(
               PrologCommand.Consult(sessionId, "test(X).\n", Some(Query(queryId, "test(1).")))
@@ -87,8 +106,6 @@ class PrologServiceTest extends AnyFreeSpec with PrologSystemFixture {
       }
       "if a consult done but no answers received should" - {
         "return no events" in {
-          doReturn(List[(QueryId, Substitution)]()).when(mockClient).getAllAnswersResults;
-
           val updatedModel = system
             .update(getSubSytemContext(1), system.initialModel.unsafeGet)(
               PrologCommand.Consult(sessionId, "test(X).\n", Some(Query(queryId, "test(1).")))
@@ -103,19 +120,16 @@ class PrologServiceTest extends AnyFreeSpec with PrologSystemFixture {
       }
       "if a consult done and answer result ready" - {
         "return an PrologEvent.Answer event" in {
-          val sub = Substitution(HashMap())
-          doReturn(List((queryId, sub))).when(mockClient).getAllAnswersResults;
-
-          val updatedModel = system
-            .update(getSubSytemContext(1), system.initialModel.unsafeGet)(
+          val updatedModel = systemWithResults
+            .update(getSubSytemContext(1), systemWithResults.initialModel.unsafeGet)(
               PrologCommand.Consult(sessionId, "test(X).\n", Some(Query(queryId, "test(1).")))
             )
             .unsafeGet
 
-          val events = system
+          val events = systemWithResults
             .update(getSubSytemContext(1), updatedModel)(FrameTick)
 
-          assert(events.globalEventsOrNil == List(PrologEvent.Answer(queryId, sub)))
+          assert(events.globalEventsOrNil == List(PrologEvent.Answer(queryId, substitution)))
         }
       }
     }

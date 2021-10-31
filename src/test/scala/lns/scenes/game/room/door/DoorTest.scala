@@ -1,6 +1,5 @@
 package lns.scenes.game.room.door
 
-import org.junit.jupiter.api.Assertions.{ assertEquals, assertFalse }
 import org.scalatest.freespec.AnyFreeSpec
 import DoorImplicit.*
 import DoorState.*
@@ -23,7 +22,7 @@ class DoorTest extends AnyFreeSpec {
         assert(Door.updateWith(doors2, (Right -> Close)).size == 2)
       }
       "should allow to add the right door" in {
-        assertEquals(Door.updateWith(doors2, (Right -> Close)), Door.updateWith(Door(Left -> Close), Right -> Close))
+        assert(Door.updateWith(doors2, (Right -> Close)) == Door.updateWith(Door(Left -> Close), Right -> Close))
       }
       "should allow to close all door" in {
         val doors: Map[Location, DoorState] = (Left -> Open) :+ (Right -> Open) :+ (Above -> Lock)
@@ -67,9 +66,9 @@ class DoorTest extends AnyFreeSpec {
     }
     "when a door is added" - {
       "should replace the already defined door" in {
-        assertEquals(
-          (Left          -> Close) :+ (Left -> Open),
-          Map() :+ (Left -> Open)
+        assert(
+          (Left            -> Close) :+ (Left -> Open) ==
+            Map() :+ (Left -> Open)
         )
       }
     }
