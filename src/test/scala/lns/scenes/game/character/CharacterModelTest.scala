@@ -8,8 +8,9 @@ import indigo.shared.events.KeyboardEvent.KeyDown
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
+import lns.scenes.game.anything.ContextFixture
+import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.shot.ShotEvent
@@ -39,10 +40,10 @@ trait CharacterModelFixture extends ContextFixture with BeforeAndAfterEach { thi
     super.beforeEach()
   }
 
-  def checkNewBoundingBox(updatedModel: CharacterModel, x: Int, y: Int): Unit = assert(true)
-  //assert(
-  //  updatedModel.boundingBox.x == centerWidth + x && updatedModel.boundingBox.y == centerHeight + y
-  //)
+  def checkNewBoundingBox(updatedModel: CharacterModel, x: Int, y: Int): Unit =
+    assert(
+      updatedModel.boundingBox.x == centerWidth + x && updatedModel.boundingBox.y == centerHeight + y
+    )
 }
 
 class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
@@ -59,11 +60,12 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
           assert(
             updatedModel.boundingBox.x == centerWidth && updatedModel.boundingBox.y == centerHeight
           )
+          assert(updatedModel.isMoving() == false)
         }
       }
     }
 
-    "if the direction  keys are pressed " - {
+    "if the direction keys are pressed " - {
       List(1, 2).map(second =>
         s"after one frame update with time delta = ${second}s" - {
           Map(
@@ -84,21 +86,31 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
               keys._1 match {
                 case "Left + Up" =>
                   checkNewBoundingBox(updatedModel, -model.maxSpeed * second, -model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_LEFT)
                 case "Left + Down" =>
                   checkNewBoundingBox(updatedModel, -model.maxSpeed * second, model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_LEFT)
                 case "Left" =>
                   checkNewBoundingBox(updatedModel, -model.maxSpeed * second, 0)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_LEFT)
                 case "Right + Up" =>
                   checkNewBoundingBox(updatedModel, model.maxSpeed * second, -model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_RIGHT)
                 case "Right + Down" =>
                   checkNewBoundingBox(updatedModel, model.maxSpeed * second, model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_RIGHT)
                 case "Right" =>
                   checkNewBoundingBox(updatedModel, model.maxSpeed * second, 0)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_RIGHT)
                 case "Up" =>
                   checkNewBoundingBox(updatedModel, 0, -model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_UP)
                 case "Down" =>
                   checkNewBoundingBox(updatedModel, 0, model.maxSpeed * second)
+                  assert(updatedModel.getDynamicState() == DynamicState.MOVE_DOWN)
               }
+
+              assert(updatedModel.isMoving() == true)
             }
           }
         }

@@ -22,7 +22,7 @@ trait Isaac {
    * @return
    *   head image crop coordinates based on current dynamic state
    */
-  def headCrop(model: CharacterModel): Rectangle = model.getState() match {
+  def headCrop(model: CharacterModel): Rectangle = model.getDynamicState() match {
     case MOVE_LEFT  => Rectangle(250, 25, Character.headWidth, Character.headHeight)
     case MOVE_RIGHT => Rectangle(90, 25, Character.headWidth, Character.headHeight)
     case MOVE_UP    => Rectangle(170, 25, Character.headWidth, Character.headHeight)
@@ -57,7 +57,7 @@ trait Isaac {
    * @return
    *   true if body image need to be flipped to represent current dynamic state
    */
-  def bodyFlip(model: CharacterModel): Boolean = model.getState() match {
+  def bodyFlip(model: CharacterModel): Boolean = model.getDynamicState() match {
     case MOVE_LEFT => true
     case _         => false
   }
@@ -68,7 +68,7 @@ trait Isaac {
    * @return
    *   the animation CycleLabel to be played based on current dynamic state
    */
-  def bodyAnimationCycle(model: CharacterModel): CycleLabel = model.getState() match {
+  def bodyAnimationCycle(model: CharacterModel): CycleLabel = model.getDynamicState() match {
     case MOVE_LEFT | MOVE_RIGHT => CycleLabel("walking_left_right")
     case _                      => CycleLabel("walking_up_down")
   }

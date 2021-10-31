@@ -42,32 +42,36 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
         "null speed should dont move" in {
           val updatedModel = model
             .update(getContext(1))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == centerWidth && updatedModel.boundingBox.y == centerHeight)
+          assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by 2,2" in {
           val updatedModel = movingModel
             .update(getContext(1))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == centerWidth + 2 && updatedModel.boundingBox.y == centerHeight + 2)
+          assert(updatedModel.isMoving() == true)
         }
       }
       "time delta 2s having" - {
         "null speed should dont move" in {
           val updatedModel = model
             .update(getContext(2))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == centerWidth && updatedModel.boundingBox.y == centerHeight)
+          assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by (4,4)" in {
           val updatedModel = movingModel
             .update(getContext(2))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == centerWidth + 4 && updatedModel.boundingBox.y == centerHeight + 4)
+          assert(updatedModel.isMoving() == true)
         }
       }
     }
@@ -76,20 +80,22 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
         "null speed should dont move" in {
           val updatedModel: MyDynamicModel = model
             .update(getContext(1))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           val updatedModel2 = updatedModel.update(getContext(1))(room).unsafeGet
 
           assert(updatedModel2.boundingBox.x == centerWidth && updatedModel2.boundingBox.y == centerHeight)
+          assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by (4,4)" in {
           val updatedModel: MyDynamicModel = movingModel
             .update(getContext(1))(room)
-            .unsafeGet
+            .getOrElse(fail("Undefined Model"))
 
           val updatedModel2 = updatedModel.update(getContext(1))(room).unsafeGet
 
           assert(updatedModel2.boundingBox.x == centerWidth + 4 && updatedModel2.boundingBox.y == centerHeight + 4)
+          assert(updatedModel.isMoving() == true)
         }
       }
     }

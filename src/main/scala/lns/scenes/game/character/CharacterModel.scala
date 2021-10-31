@@ -25,7 +25,8 @@ case class CharacterModel(
     speed: Vector2,
     life: Int,
     invincibilityTimer: Double = 0,
-    fireRateTimer: Double = 0
+    fireRateTimer: Double = 0,
+    shot: Option[Vector2] = None
 ) extends AliveModel
     with DynamicModel
     with FireModel {
@@ -48,9 +49,9 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.KEY_S)            -> Vector2(0.0d, maxSpeed)
     )
 
-  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withFire(fireRateTimer: Double): Model                       = copyMacro
+  def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)

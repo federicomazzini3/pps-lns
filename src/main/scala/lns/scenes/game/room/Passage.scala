@@ -65,7 +65,7 @@ object Passage {
           )
       }
 
-    character.getState() match {
+    character.getDynamicState() match {
       case DynamicState.MOVE_RIGHT
           if Boundary.beyond(room.floor, character.boundingBox)(Right) &&
             Boundary.centerAligned(room.floor, character.boundingBox)(Right) &&

@@ -13,11 +13,12 @@ case class MyFireModel(
     fireRate: Double,
     fireDirection: Option[Vector2],
     boundingBox: BoundingBox,
-    fireRateTimer: Double = 0
+    fireRateTimer: Double = 0,
+    shot: Option[Vector2] = None
 ) extends FireModel {
   type Model = MyFireModel
 
-  override def withFire(fireRateTimer: Double): MyFireModel = copyMacro
+  override def withFire(fireRateTimer: Double, shot: Option[Vector2]): MyFireModel = copyMacro
 
   def computeFire(context: FrameContext[StartupData]) = fireDirection
 }
@@ -54,6 +55,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.fireRateTimer == 0)
+          assert(updatedModel.isFiring() == false)
         }
       }
     }
@@ -72,6 +74,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.fireRateTimer == fireRate)
+            assert(updatedModel.isFiring() == true)
           }
         }
       }
@@ -85,7 +88,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
 
             assert(updatedModelOutcome.globalEventsOrNil == List())
           }
-          "have fireRateTimer countdown" in {
+          "have fireRateTimer countdown active" in {
             val updatedModel = ShootingModel
               .update(getContext(1))(room)
               .getOrElse(fail("Undefined Model"))
@@ -93,6 +96,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.fireRateTimer == fireRate - 1)
+            assert(updatedModel.isFiring() == false)
           }
         }
       }
@@ -108,7 +112,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
 
             assert(updatedModelOutcome.globalEventsOrNil == List(ShotEvent(position, fireDirection)))
           }
-          "start fireRateTimer countdown" in {
+          "start new fireRateTimer countdown" in {
             val updatedModel = ShootingModel
               .update(getContext(1))(room)
               .getOrElse(fail("Undefined Model"))
@@ -118,7 +122,31 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.fireRateTimer == fireRate)
+            assert(updatedModel.isFiring() == true)
           }
+        }
+      }
+    }
+    "when shooting in following direction" - {
+      Map(
+        "Up"    -> Vector2(0, -1),
+        "Right" -> Vector2(1, 0),
+        "Down"  -> Vector2(0, 1),
+        "Left"  -> Vector2(-1, 0)
+      ).foreach { keys =>
+        s"${keys._1} have correct FireState" in {
+          val updatedModel = new MyFireModel(fireRate, Some(keys._2), BoundingBox(position.x, position.y, 10, 10))
+            .update(getContext(1))(room)
+            .getOrElse(fail("Undefined Model"))
+
+          keys._1 match {
+            case "Up"    => assert(updatedModel.getFireState() == FireState.FIRE_UP)
+            case "Right" => assert(updatedModel.getFireState() == FireState.FIRE_RIGHT)
+            case "Down"  => assert(updatedModel.getFireState() == FireState.FIRE_DOWN)
+            case "Left"  => assert(updatedModel.getFireState() == FireState.FIRE_LEFT)
+          }
+
+          assert(updatedModel.isFiring() == true)
         }
       }
     }
