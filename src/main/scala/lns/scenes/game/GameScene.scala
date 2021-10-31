@@ -37,7 +37,6 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-
     case ShotEvent(p, d) =>
       model match {
         case model @ GameStarted(_, room, _) =>
@@ -79,6 +78,30 @@ final case class GameScene() extends EmptyScene {
       model
   }
 
+  override def updateViewModel(
+      context: FrameContext[StartupData],
+      model: SceneModel,
+      viewModel: SceneViewModel
+  ): GlobalEvent => Outcome[SceneViewModel] = {
+
+    case FrameTick =>
+      model match {
+        case model @ GameStarted(_, _, character, _) =>
+          for {
+            updatedCharacter <- viewModel.character.update(context)
+            newCharacter = character.isFiring() match {
+              case true => updatedCharacter.fire(context, character).unsafeGet
+              case _    => updatedCharacter
+            }
+          } yield viewModel.copy(character = newCharacter)
+
+        case _ => Outcome(viewModel)
+      }
+
+    case _ =>
+      Outcome(viewModel)
+  }
+
   override def present(
       context: FrameContext[StartupData],
       model: SceneModel,
@@ -89,7 +112,7 @@ final case class GameScene() extends EmptyScene {
       case GameStarted(dungeon, room, character) =>
         SceneUpdateFragment(
           (RoomView.draw(context, room, ()) |+|
-            CharacterView().draw(context, character, ()))
+            CharacterView().draw(context, character, viewModel.character)
             .fitToScreen(context)(Assets.Rooms.roomSize)
         )
 

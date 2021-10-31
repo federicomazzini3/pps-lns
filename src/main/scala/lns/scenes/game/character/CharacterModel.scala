@@ -35,7 +35,7 @@ case class CharacterModel(
 
   val maxSpeed              = 300
   val invincibility: Double = 1.5
-  val fireRate: Double      = 0.5
+  val fireRate: Double      = 0.4
 
   val moveInputMappings: InputMapping[Vector2] =
     InputMapping(

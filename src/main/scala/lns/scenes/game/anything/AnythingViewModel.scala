@@ -20,5 +20,33 @@ trait AnythingViewModel {
    * @return
    *   the Outcome of the updated viewModel
    */
-  def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[ViewModel] = Outcome(this)
+  def update(context: FrameContext[StartupData]): Outcome[ViewModel] = Outcome(this)
+}
+
+trait FireViewModel extends AnythingViewModel {
+  type ViewModel >: this.type <: FireViewModel
+
+  val fireState: FireState
+  val fireAnimationTimer: Double
+
+  def withFireTimer(fireAnimationTimer: Double, fireState: FireState): ViewModel
+
+  def fire(context: FrameContext[StartupData], model: FireModel): Outcome[ViewModel] = fireAnimationTimer match {
+    case 0 => Outcome(withFireTimer(model.fireRate, model.getFireState()))
+    case _ => Outcome(this)
+  }
+
+  override def update(context: FrameContext[StartupData]): Outcome[ViewModel] =
+    println
+    for {
+      superObj <- super.update(context)
+      newObj = fireAnimationTimer match {
+        case 0 => superObj
+        case _ if fireAnimationTimer - context.gameTime.delta.toDouble > 0 =>
+          superObj
+            .withFireTimer(fireAnimationTimer - context.gameTime.delta.toDouble, fireState)
+            .asInstanceOf[ViewModel]
+        case _ => superObj.withFireTimer(0, FireState.NO_FIRE).asInstanceOf[ViewModel]
+      }
+    } yield newObj
 }
