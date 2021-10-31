@@ -41,7 +41,7 @@ object ShotModel {
       Vertex(5, 5)
     ),
     Vector2(0, 0),
-    Vector2(480, 480),
+    Vector2(800, 800),
     direction,
     10,
     500

@@ -1,6 +1,7 @@
 package lns.scenes.game.character
 
 import indigo.*
+import indigo.shared.datatypes.Vector2
 import lns.StartupData
 import lns.scenes.game.anything.AnythingView
 
@@ -19,6 +20,7 @@ case class CharacterView() extends AnythingView with Isaac {
       .addChild(shadowModel)
       .addChild(bodyView(model))
       .addChild(headView(model))
-      .withRef(width / 2, height / 2)
-      .withScale(Vector2(scale, scale))
+      .withScale(Vector2(5, 5))
+  //.withRef(width / 2, height / 2)
+  //.withScale(Vector2(scale, scale))
 }

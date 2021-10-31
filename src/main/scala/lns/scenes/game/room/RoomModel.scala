@@ -1,12 +1,15 @@
 package lns.scenes.game.room
 
+import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Rectangle
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.AnythingModel
-import lns.scenes.game.room.door.{ Door, Location, DoorState, DoorImplicit }
+import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
+import lns.scenes.game.shot.ShotModel
+import lns.scenes.game.room.door.DoorImplicit.*
 
 type Door           = (Location, DoorState)
 type DoorsLocations = Set[Location]
@@ -38,6 +41,11 @@ trait RoomModel {
   val doors: Doors
 
   /**
+   * the shots fired in a room
+   */
+  val anythings: Set[AnythingModel]
+
+  /**
    * Confine the character inside the limit of the room
    * @param anything
    *   the character bounding box
@@ -45,28 +53,58 @@ trait RoomModel {
    *   the bounded character's position
    */
   def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
-}
 
-/**
- * Extension for room with one item
- */
-trait ItemModel {
-  val item: AnythingModel
-}
+  /**
+   * Call the method update in all of anythings in a room. Can be override from subclasses for more specific behavior
+   * @param context
+   * @return
+   *   a new updated set of anything model
+   */
+  def updateAnythings(context: FrameContext[StartupData]): Set[AnythingModel] =
+    anythings.map(any => any.update(context)(this).unsafeGet)
 
-/**
- * Extension for room with enemies and other elements
- */
-trait ArenaModel {
-  val enemies: Set[AnythingModel]
-  val elements: Set[AnythingModel]
-}
+  /**
+   * Add a shot to the shot list
+   * @param shot
+   *   the shot to add
+   * @return
+   *   a new room with the new shot added
+   */
+  def addShot(shot: ShotModel): RoomModel =
+    val updatedAnythings = anythings + shot
+    this match {
+      case room: EmptyRoom =>
+        room.copy(anythings = updatedAnythings)
+      case room: ItemRoom =>
+        room.copy(anythings = updatedAnythings)
+      case room: ArenaRoom =>
+        room.copy(anythings = updatedAnythings)
+      case room: BossRoom =>
+        room.copy(anythings = updatedAnythings)
+      case _ => this
+    }
 
-/**
- * Extension for room with boss
- */
-trait BossModel {
-  val boss: AnythingModel
+  /**
+   * Update the shot based on FrameContext
+   * @param context
+   *   the game context
+   * @return
+   *   a new room with the shot updated
+   */
+  def update(context: FrameContext[StartupData]): Outcome[RoomModel] =
+    Outcome(
+      this match {
+        case room: EmptyRoom =>
+          room.copy(anythings = room.updateAnythings(context))
+        case room: ItemRoom =>
+          room.copy(anythings = room.updateAnythings(context))
+        case room: ArenaRoom =>
+          room.copy(anythings = room.updateAnythings(context))
+        case room: BossRoom =>
+          room.copy(anythings = room.updateAnythings(context))
+        case _ => this
+      }
+    )
 }
 
 /**
@@ -76,9 +114,13 @@ trait BossModel {
  * @param doors
  *   the set of the door
  */
-case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, val locations: DoorsLocations)
-    extends RoomModel {
-  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+case class EmptyRoom(
+    val positionInDungeon: Position,
+    val floor: BoundingBox,
+    val doorsLocations: DoorsLocations,
+    val anythings: Set[AnythingModel] = Set.empty
+) extends RoomModel {
+  val doors = doorsLocations.open
 }
 
 /**
@@ -87,30 +129,20 @@ case class EmptyRoom(val positionInDungeon: Position, val floor: BoundingBox, va
  *   the dimension of floor
  * @param doors
  *   the set of the door
- * @param enemies
- *   the set of enemies
- * @param elements
- *   the set of elements
+ * @param anythings
+ *   the set of anythings inside a room
  */
 case class ArenaRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
-    val enemies: Set[Enemy],
-    val elements: Set[Element]
-) extends RoomModel
-    with ArenaModel {
+    val doorsLocations: DoorsLocations,
+    val anythings: Set[AnythingModel] = Set.empty
+) extends RoomModel {
 
-  /**
-   * da modificare, quando implementerememo qualcosa con anything model non ci sarà più bisogno di controllare il null
-   */
-  val doors: Doors = enemies match {
-    case null => locations.map(loc => loc -> DoorState.Open).toMap
-    case _ =>
-      enemies.size match {
-        case 0 => locations.map(loc => loc -> DoorState.Open).toMap
-        case _ => locations.map(loc => loc -> DoorState.Close).toMap
-      }
+  //da filtrare con i nemici (quando ci saranno)
+  val doors = anythings.size match {
+    case 0 => doorsLocations.open
+    case _ => doorsLocations.open //close
   }
 }
 
@@ -120,18 +152,17 @@ case class ArenaRoom(
  *   the dimension of floor
  * @param doors
  *   the set of the door
- * @param item
- *   the element to pick up
+ * @param anythings
+ *   the set of anythings inside a room
  */
 case class ItemRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
-    val item: Item
-) extends RoomModel
-    with ItemModel {
+    val doorsLocations: DoorsLocations,
+    val anythings: Set[AnythingModel] = Set.empty
+) extends RoomModel {
 
-  val doors: Doors = locations.map(loc => loc -> DoorState.Open).toMap
+  val doors = doorsLocations.open
 }
 
 /**
@@ -140,18 +171,17 @@ case class ItemRoom(
  *   the dimension of floor
  * @param doors
  *   the set of the door
- * @param boss
- *   the boss model
+ * @param anythings
+ *   the set of anythings inside a room
  */
 case class BossRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
-    val locations: DoorsLocations,
-    val boss: Boss
-) extends RoomModel
-    with BossModel {
+    val doorsLocations: DoorsLocations,
+    val anythings: Set[AnythingModel] = Set.empty
+) extends RoomModel {
 
-  val doors: Doors = locations.map(loc => loc -> DoorState.Close).toMap
+  val doors = doorsLocations.close
 }
 
 /**
@@ -163,58 +193,51 @@ object RoomModel {
   import lns.scenes.game.room.door.DoorState.*
   import lns.scenes.game.room.door.Location.*
 
-  def initial(startupData: StartupData): EmptyRoom = EmptyRoom(
+  def initial(): EmptyRoom = EmptyRoom(
     (0, 0),
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     Left :+ Right :+ Above :+ Below
   )
 
-  def emptyRoom(startupData: StartupData, position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
+  def emptyRoom(position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
     position,
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     locations
   )
 
   def arenaRoom(
-      startupData: StartupData,
       position: Position,
       locations: DoorsLocations,
-      enemies: Set[AnythingModel],
-      elements: Set[AnythingModel]
+      anythings: Set[AnythingModel]
   ): ArenaRoom = ArenaRoom(
     position,
-    internalBoundingBox(startupData.screenDimensions),
+    defaultFloor,
     locations,
-    enemies,
-    elements
+    anythings
   )
 
-  def itemRoom(startupData: StartupData, position: Position, locations: DoorsLocations, item: Item): ItemRoom =
+  def itemRoom(position: Position, locations: DoorsLocations, anythings: Set[AnythingModel]): ItemRoom =
     ItemRoom(
       position,
-      internalBoundingBox(startupData.screenDimensions),
+      defaultFloor,
       locations,
-      item
+      anythings
     )
 
-  def bossRoom(startupData: StartupData, position: Position, locations: DoorsLocations, boss: Item): BossRoom =
+  def bossRoom(position: Position, locations: DoorsLocations, anythings: Set[AnythingModel]): BossRoom =
     BossRoom(
       position,
-      internalBoundingBox(startupData.screenDimensions),
+      defaultFloor,
       locations,
-      boss
+      anythings
     )
 
-  def internalBoundingBox(screenDimension: Rectangle): BoundingBox = {
-    val scale: Double             = RoomGraphic.getScale(screenDimension, Assets.Rooms.EmptyRoom.size)
-    val floorDimensionScaled: Int = (Rooms.EmptyRoom.floorSize * scale).toInt
+  val defaultFloor: BoundingBox =
     BoundingBox(
+      Vertex(0, 0),
       Vertex(
-        screenDimension.horizontalCenter - (floorDimensionScaled / 2),
-        screenDimension.verticalCenter - (floorDimensionScaled / 2)
-      ),
-      Vertex(floorDimensionScaled, floorDimensionScaled)
+        Assets.Rooms.floorSize,
+        Assets.Rooms.floorSize
+      )
     )
-  }
-
 }

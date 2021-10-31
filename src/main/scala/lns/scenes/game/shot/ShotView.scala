@@ -14,14 +14,14 @@ case class ShotView() extends AnythingView {
   type ViewModel = Unit
   type View      = Group
 
-  val scale: Int = 2
+  val scale: Int = 4
 
   def shot(model: Model): Shape =
     Shape
       .Circle(
         center = Point(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt),
         radius = model.boundingBox.width.toInt,
-        fill = Fill.Color(RGBA(1, 0, 0, 1)),
+        fill = Fill.Color(RGBA(1, 1, 0, 1)),
         stroke = Stroke(2, RGBA.Black)
       )
 

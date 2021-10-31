@@ -50,8 +50,11 @@ trait AnythingView {
    * @return
    *   a SceneUpdateFragment with the view of the Anything to be drawn placed at its current position
    */
-  def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): SceneUpdateFragment =
-    SceneUpdateFragment(
-      view(contex, model, viewModel).moveTo(model.getPosition())
-    )
+  def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
+    view(contex, model, viewModel)
+      .moveTo(model.getPosition())
+      .moveBy(
+        Assets.Rooms.wallSize,
+        Assets.Rooms.wallSize
+      )
 }

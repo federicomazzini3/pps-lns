@@ -2,30 +2,32 @@ package lns.scenes.game.dungeon
 
 import indigo.shared.datatypes.Rectangle
 import lns.StartupData
+import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
 
 import scala.collection.immutable.HashMap
+import lns.scenes.game.room.door.{ DoorState, Location }
 
 object Generator {
 
-  def apply(startupData: StartupData)(grid: BasicGrid): DungeonModel =
+  def apply(grid: BasicGrid): DungeonModel =
     DungeonModel(
       grid.content
-        .map((position, roomType) => (position, generateRoom(startupData: StartupData)(grid, position, roomType)))
+        .map((position, roomType) => (position, generateRoom(grid, position, roomType)))
     )
 
-  def generateRoom(startupData: StartupData)(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
+  def generateRoom(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
     roomType match {
       case RoomType.Empty =>
-        RoomModel.emptyRoom(startupData, position, generateDoors(grid, position))
+        RoomModel.emptyRoom(position, generateDoors(grid, position))
       case RoomType.Item =>
-        RoomModel.itemRoom(startupData, position, generateDoors(grid, position), null)
+        RoomModel.itemRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Arena =>
-        RoomModel.arenaRoom(startupData, position, generateDoors(grid, position), null, null)
+        RoomModel.arenaRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Boss =>
-        RoomModel.bossRoom(startupData, position, generateDoors(grid, position), null)
+        RoomModel.bossRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =

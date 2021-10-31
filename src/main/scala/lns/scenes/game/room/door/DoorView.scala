@@ -33,6 +33,11 @@ object DoorGraphics {
 
   val leftRigthDoorCrop: Rectangle = Rectangle(0, 0, Doors.minSize, Doors.maxSize)
 
+  val left: Point   = Point(Rooms.wallSize - Doors.minSize - Rooms.offset, Rooms.roomSize / 2 - Doors.maxSize / 2)
+  val right: Point  = Point(Rooms.roomSize - Rooms.wallSize + Rooms.offset, Rooms.roomSize / 2 - Doors.maxSize / 2)
+  val top: Point    = Point(Rooms.roomSize / 2 - Doors.maxSize / 2, Rooms.wallSize - Doors.minSize - Rooms.offset)
+  val bottom: Point = Point(Rooms.roomSize / 2 - Doors.maxSize / 2, Rooms.roomSize - Rooms.wallSize + Rooms.offset)
+
   def apply(door: Door): Group =
     Group().addChild(selectDoorGraphic(door))
 
@@ -40,40 +45,40 @@ object DoorGraphics {
     door match {
       case (Left, Open) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorOpenWest)
-          .moveTo(50, 861)
+          .moveTo(left)
       case (Left, Close) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorCloseWest)
-          .moveTo(50, 861)
+          .moveTo(left)
       case (Left, Lock) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorLockWest)
-          .moveTo(50, 861)
+          .moveTo(left)
       case (Right, Open) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorOpenEast)
-          .moveTo(1700, 861)
+          .moveTo(right)
       case (Right, Close) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorCloseEast)
-          .moveTo(1700, 861)
+          .moveTo(right)
       case (Right, Lock) =>
         makeDoorGraphic(leftRigthDoorCrop)(Doors.doorLockEast)
-          .moveTo(1700, 861)
+          .moveTo(right)
       case (Above, Open) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorOpenNorth)
-          .moveTo(861, 50)
+          .moveTo(top)
       case (Above, Close) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorCloseNorth)
-          .moveTo(861, 50)
+          .moveTo(top)
       case (Above, Lock) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorLockNorth)
-          .moveTo(861, 50)
+          .moveTo(top)
       case (Below, Open) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorOpenSouth)
-          .moveTo(861, 1700)
+          .moveTo(bottom)
       case (Below, Close) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorCloseSouth)
-          .moveTo(861, 1700)
+          .moveTo(bottom)
       case (Below, Lock) =>
         makeDoorGraphic(aboveBelowDoorCrop)(Doors.doorLockSouth)
-          .moveTo(861, 1700)
+          .moveTo(bottom)
     }
 
   def makeDoorGraphic(shape: Rectangle)(assetName: AssetName) =

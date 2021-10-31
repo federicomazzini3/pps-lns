@@ -50,9 +50,7 @@ object Passage {
     def moveCharacter(character: CharacterModel)(floor: BoundingBox)(doorDestination: Location): CharacterModel =
       doorDestination match {
         case Left =>
-          character.copy(boundingBox =
-            character.boundingBox.moveTo(floor.left + character.boundingBox.width, character.boundingBox.y)
-          )
+          character.copy(boundingBox = character.boundingBox.moveTo(floor.left, character.boundingBox.y))
         case Right =>
           character.copy(boundingBox =
             character.boundingBox.moveTo(floor.right - character.boundingBox.width, character.boundingBox.y)

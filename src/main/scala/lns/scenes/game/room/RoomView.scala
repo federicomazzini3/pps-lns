@@ -10,46 +10,43 @@ import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Assets.*
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.room.door.{ Location, DoorState, DoorView }
+import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
+import lns.scenes.game.shot.{ ShotModel, ShotView }
 
 object RoomView {
 
-  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): SceneUpdateFragment =
-    SceneUpdateFragment(
-      view(context.startUpData, model, viewModel)
-    )
+  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+    view(context, model, viewModel)
 
-  def view(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
+  def view(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
     Group()
-      .addChild(RoomGraphic.roomGraphic(startupData))
-      .addChild(doorView(startupData, model, viewModel))
-      .withScale(Vector2(RoomGraphic.getScale(startupData.screenDimensions, Assets.Rooms.EmptyRoom.size)))
-      .withRef(Assets.Rooms.EmptyRoom.size / 2, Assets.Rooms.EmptyRoom.size / 2)
-      .moveTo(startupData.screenDimensions.center)
+      .addChild(RoomGraphic.roomGraphic(context.startUpData))
+      .addChild(doorView(context.startUpData, model, viewModel))
+      .addChild(anythingView(context, model, viewModel))
 
   def doorView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
     DoorView.view(startupData, model.doors, ())
 
-  def anythingView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
-    model match {
-      case ArenaRoom(_, _, _, enemies, elements) => Group() //chiamare le rispettive view
-      case ItemRoom(_, _, _, item)               => Group()
-      case BossRoom(_, _, _, boss)               => Group()
-    }
+  def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+    model.anythings.foldLeft(Group())((s1, s2) =>
+      s1.addChild(
+        s2 match {
+          case shot: ShotModel => ShotView().draw(context, shot, ())
+          case _               => Group()
+        }
+      )
+    )
 }
 
 object RoomGraphic {
-
-  def getScale(screenDimension: Rectangle, imageDimensions: Int): Double =
-    Math.min(1.0 / imageDimensions * screenDimension.width, 1.0 / imageDimensions * screenDimension.height)
 
   def roomGraphic(startupData: StartupData): Graphic[Material.Bitmap] =
     Graphic(
       Rectangle(
         0,
         0,
-        Rooms.EmptyRoom.size,
-        Rooms.EmptyRoom.size
+        Rooms.roomSize,
+        Rooms.roomSize
       ),
       1,
       Material.Bitmap(Rooms.EmptyRoom.name)
