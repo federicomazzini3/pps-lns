@@ -7,6 +7,7 @@ import indigo.shared.scenegraph.Group
 import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
+import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
 import lns.scenes.game.room.{ Boundary, Passage, RoomView }
@@ -37,7 +38,6 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-
     case ShotEvent(p, d) =>
       model match {
         case model @ GameStarted(_, room, _) =>
@@ -79,6 +79,26 @@ final case class GameScene() extends EmptyScene {
       model
   }
 
+  override def updateViewModel(
+      context: FrameContext[StartupData],
+      model: SceneModel,
+      viewModel: SceneViewModel
+  ): GlobalEvent => Outcome[SceneViewModel] = {
+
+    case FrameTick =>
+      model match {
+        case model @ GameStarted(_, _, character) =>
+          for {
+            updatedCharacter <- viewModel.character.update(context, character)
+          } yield viewModel.copy(character = updatedCharacter)
+
+        case _ => Outcome(viewModel)
+      }
+
+    case _ =>
+      Outcome(viewModel)
+  }
+
   override def present(
       context: FrameContext[StartupData],
       model: SceneModel,
@@ -89,7 +109,7 @@ final case class GameScene() extends EmptyScene {
       case GameStarted(dungeon, room, character) =>
         SceneUpdateFragment(
           (RoomView.draw(context, room, ()) |+|
-            CharacterView().draw(context, character, ()))
+            CharacterView().draw(context, character, viewModel.character))
             .fitToScreen(context)(Assets.Rooms.roomSize)
         )
 

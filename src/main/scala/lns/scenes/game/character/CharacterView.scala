@@ -11,7 +11,7 @@ import lns.scenes.game.anything.AnythingView
 case class CharacterView() extends AnythingView with Isaac {
 
   type Model     = CharacterModel
-  type ViewModel = Unit
+  type ViewModel = CharacterViewModel
   type View      = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
@@ -19,7 +19,7 @@ case class CharacterView() extends AnythingView with Isaac {
       /* .addChild(boundingModel) */
       .addChild(shadowModel)
       .addChild(bodyView(model))
-      .addChild(headView(model))
+      .addChild(headView(model, viewModel))
       .withScale(Vector2(5, 5))
   //.withRef(width / 2, height / 2)
   //.withScale(Vector2(scale, scale))

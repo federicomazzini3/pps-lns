@@ -31,8 +31,8 @@ trait AliveModelFixture extends ContextFixture with BeforeAndAfterEach { this: S
   val invincibility = 2
 
   override def beforeEach() = {
-    model = new MyAliveModel(BoundingBox(centerWidth, centerHeight, 10, 10), startLife, invincibility)
-    noInvincibilityModel = new MyAliveModel(BoundingBox(centerWidth, centerHeight, 10, 10), startLife, 0)
+    model = new MyAliveModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), startLife, invincibility)
+    noInvincibilityModel = new MyAliveModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), startLife, 0)
 
     super.beforeEach()
   }

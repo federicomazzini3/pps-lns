@@ -8,6 +8,7 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.anything.*
 import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.stats.*
 
 /**
  * Character model that is alive and can move computing its speed by user input
@@ -22,19 +23,27 @@ import lns.scenes.game.shot.ShotEvent
  */
 case class CharacterModel(
     boundingBox: BoundingBox,
-    speed: Vector2,
-    life: Int,
+    stats: Stats,
+    life: Int = 0,
+    speed: Vector2 = Vector2(0, 0),
     invincibilityTimer: Double = 0,
-    fireRateTimer: Double = 0
+    fireRateTimer: Double = 0,
+    shot: Option[Vector2] = None
 ) extends AliveModel
     with DynamicModel
-    with FireModel {
+    with FireModel
+    with DamageModel
+    with StatsModel {
 
   type Model = CharacterModel
 
-  val maxSpeed              = 300
-  val invincibility: Double = 1.5
-  val fireRate: Double      = 0.5
+  val maxLife: Int          = stats.maxLife
+  val invincibility: Double = stats.invincibility
+  val maxSpeed: Int         = stats.maxSpeed
+  val damage: Double        = stats.damage
+  val fireDamage: Double    = stats.fireDamage
+  val fireRange: Int        = stats.fireRange
+  val fireRate: Double      = stats.fireRate
 
   val moveInputMappings: InputMapping[Vector2] =
     InputMapping(
@@ -48,9 +57,12 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.KEY_S)            -> Vector2(0.0d, maxSpeed)
     )
 
-  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withFire(fireRateTimer: Double): Model                       = copyMacro
+  def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
+  def withStats(stats: Stats): Model                                = copyMacro
+  def withStat[A <: Double](what: String)(value: A): Model =
+    copy(stats = StatsLens(what)(stats, value))
 
   def computeSpeed(context: FrameContext[StartupData]): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
@@ -72,11 +84,11 @@ case class CharacterModel(
  */
 object CharacterModel {
   def initial(startupData: StartupData): CharacterModel = CharacterModel(
-    BoundingBox(
+    boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))
     ),
-    Vector2(0, 0),
-    10
+    stats = Stats.Isaac,
+    life = Stats.Isaac.maxLife
   )
 }

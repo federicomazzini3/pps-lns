@@ -1,28 +1,7 @@
 package lns.core
 
 import indigo.*
-
-/*
-trait AnimationRect {
-  val x: Int
-  val y: Int
-  val width: Int
-  val height: Int
-}
-
-abstract class AnimationCycle{
-  val rect: AnimationRect
-  val time: Millis
-
-  def generateFrame: Int => Frame
-  def get(range: Range): NonEmptyList[Frame] =
-    NonEmptyList.fromList(range.toList.map(generateFrame(_))).get
-}
-
-object AnimationCycle {
-  def apply(x: Int, y: Int, width: Int, height: Int, time: Millis)(f: Int => Frame): AnimationCycle =
-}
- */
+import lns.scenes.game.anything.{ DynamicState, FireState }
 
 object Animations {
 
@@ -35,39 +14,50 @@ object Animations {
     val headWidth: Int  = 28
     val headHeight: Int = 25
 
-    def generateHeadFrame(x: Int, y: Int, width: Int, height: Int, time: Millis): NonEmptyList[Frame] =
-      generateFramesList(generateFrame(0 until 2)(i => Frame(Rectangle(x + (i * 40), y, width, height), time)))
-    val head: Animation = Animation
-      .create(
-        AnimationKey("character_head"),
-        Cycle
-          .create(
-            "open_close_eyes",
-            generateHeadFrame(10, 25, 28, 25, Millis(500))
-          )
+    def generateHeadFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(x + 40, y, headWidth, headHeight), Millis(250)),
+          Frame(Rectangle(x, y, headWidth, headHeight), Millis(250))
+        )
       )
+
+    val head: Animation = Animation
+      .create(AnimationKey("character_head"), Cycle.create("down_shot", generateHeadFrame(10, 25)))
+      .addCycle(Cycle.create("right_shot", generateHeadFrame(90, 25)))
+      .addCycle(Cycle.create("up_shot", generateHeadFrame(170, 25)))
+      .addCycle(Cycle.create("left_shot", generateHeadFrame(250, 25)))
+
+    def headCrop(state: FireState | DynamicState, eyesOpen: Boolean): Rectangle = state match {
+      case FireState.FIRE_LEFT | DynamicState.MOVE_LEFT if eyesOpen =>
+        Rectangle(250, 25, Character.headWidth, Character.headHeight)
+      case FireState.FIRE_LEFT | DynamicState.MOVE_LEFT =>
+        Rectangle(290, 25, Character.headWidth, Character.headHeight)
+      case FireState.FIRE_RIGHT | DynamicState.MOVE_RIGHT if eyesOpen =>
+        Rectangle(90, 25, Character.headWidth, Character.headHeight)
+      case FireState.FIRE_RIGHT | DynamicState.MOVE_RIGHT =>
+        Rectangle(130, 25, Character.headWidth, Character.headHeight)
+      case FireState.FIRE_UP | DynamicState.MOVE_UP if eyesOpen =>
+        Rectangle(170, 25, Character.headWidth, Character.headHeight)
+      case FireState.FIRE_UP | DynamicState.MOVE_UP =>
+        Rectangle(210, 25, Character.headWidth, Character.headHeight)
+      case _ if eyesOpen =>
+        Rectangle(10, 25, Character.headWidth, Character.headHeight)
+      case _ =>
+        Rectangle(50, 25, Character.headWidth, Character.headHeight)
+    }
 
     /*Character body*/
     val bodyWidth: Int  = 18
     val bodyHeight: Int = 15
 
-    def generateBodyFrame(x: Int, y: Int, width: Int, height: Int, time: Millis): NonEmptyList[Frame] =
-      generateFramesList(generateFrame(0 until 10)(i => Frame(Rectangle(x + (i * 32), y, width, height), time)))
+    def generateBodyFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 10)(i => Frame(Rectangle(x + (i * 32), y, bodyWidth, bodyHeight), Millis(80)))
+      )
 
     val body: Animation = Animation
-      .create(
-        AnimationKey("character_body"),
-        Cycle
-          .create(
-            "walking_left_right",
-            generateBodyFrame(15, 123, bodyWidth, bodyHeight, Millis(80))
-          )
-      )
-      .addCycle(
-        Cycle.create(
-          "walking_up_down",
-          generateBodyFrame(15, 80, bodyWidth, bodyHeight, Millis(80))
-        )
-      )
+      .create(AnimationKey("character_body"), Cycle.create("walking_left_right", generateBodyFrame(15, 123)))
+      .addCycle(Cycle.create("walking_up_down", generateBodyFrame(15, 80)))
   }
 }

@@ -6,6 +6,7 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.stats.*
 
 import scala.language.implicitConversions
 
@@ -57,7 +58,11 @@ trait DynamicModel extends AnythingModel {
 
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model
 
-  def isMoving(): Boolean = getState() match {
+  /**
+   * @return
+   *   Boolean: true if the model is moving otherwise false
+   */
+  def isMoving(): Boolean = getDynamicState() match {
     case IDLE => false
     case _    => true
   }
@@ -66,7 +71,7 @@ trait DynamicModel extends AnythingModel {
    * @return
    *   the [[DynamicState]] based on the current speed vector
    */
-  def getState(): DynamicState = speed match {
+  def getDynamicState(): DynamicState = speed match {
     case Vector2(x, _) if x < 0 => MOVE_LEFT
     case Vector2(x, _) if x > 0 => MOVE_RIGHT
     case Vector2(_, y) if y < 0 => MOVE_UP
@@ -163,8 +168,12 @@ trait DamageModel extends AnythingModel {
 
   val damage: Double
 
-  def withDamage(damage: Double): Model
 }
+
+enum FireState {
+  case NO_FIRE, FIRE_LEFT, FIRE_RIGHT, FIRE_DOWN, FIRE_UP
+}
+import FireState.*
 
 /**
  * Base model for every object that can fire. It is designed to be extended or mixed with other [[AnythingModel]]
@@ -173,10 +182,35 @@ trait DamageModel extends AnythingModel {
 trait FireModel extends AnythingModel {
   type Model >: this.type <: FireModel
 
+  val shot: Option[Vector2]
+
+  val fireDamage: Double
+  val fireRange: Int
   val fireRate: Double
   val fireRateTimer: Double
 
-  def withFire(fireRateTimer: Double): Model
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model
+
+  /**
+   * @return
+   *   Boolean: true if the model is firing otherwise false
+   */
+  def isFiring(): Boolean = getFireState() match {
+    case NO_FIRE => false
+    case _       => true
+  }
+
+  /**
+   * @return
+   *   the [[FireState]] based on the current optional shot direction
+   */
+  def getFireState(): FireState = shot match {
+    case Some(Vector2(x, _)) if x < 0 => FIRE_LEFT
+    case Some(Vector2(x, _)) if x > 0 => FIRE_RIGHT
+    case Some(Vector2(_, y)) if y < 0 => FIRE_UP
+    case Some(Vector2(_, y)) if y > 0 => FIRE_DOWN
+    case _                            => NO_FIRE
+  }
 
   /**
    * @param context
@@ -214,12 +248,12 @@ trait FireModel extends AnythingModel {
       newObj = fireRateTimer match {
         case 0 =>
           shot match {
-            case Some(direction) => superObj.withFire(fireRate).asInstanceOf[Model]
+            case Some(direction) => superObj.withFire(fireRate, Some(direction)).asInstanceOf[Model]
             case _               => superObj
           }
         case _ if fireRateTimer - context.gameTime.delta.toDouble > 0 =>
-          superObj.withFire(fireRateTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
-        case _ => superObj.withFire(0).asInstanceOf[Model]
+          superObj.withFire(fireRateTimer - context.gameTime.delta.toDouble, None).asInstanceOf[Model]
+        case _ => superObj.withFire(0, None).asInstanceOf[Model]
       }
     } yield newObj
 
@@ -228,4 +262,18 @@ trait FireModel extends AnythingModel {
       case _               => retObj
     }
   }
+}
+
+trait StatsModel extends AnythingModel {
+  type Model >: this.type <: StatsModel
+
+  val stats: Stats
+
+  def withStats(stats: Stats): Model
+  def withStat[A <: Double](what: String)(value: A): Model
+
+  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+  def changeStat[A <: Double](context: FrameContext[StartupData], what: String, value: A): Outcome[Model] = Outcome(
+    withStat(what)(value)
+  )
 }
