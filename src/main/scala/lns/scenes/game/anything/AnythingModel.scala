@@ -6,6 +6,7 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.stats.*
 
 import scala.language.implicitConversions
 
@@ -167,7 +168,6 @@ trait DamageModel extends AnythingModel {
 
   val damage: Double
 
-  def withDamage(damage: Double): Model
 }
 
 enum FireState {
@@ -184,6 +184,8 @@ trait FireModel extends AnythingModel {
 
   val shot: Option[Vector2]
 
+  val fireDamage: Double
+  val fireRange: Int
   val fireRate: Double
   val fireRateTimer: Double
 
@@ -260,4 +262,18 @@ trait FireModel extends AnythingModel {
       case _               => retObj
     }
   }
+}
+
+trait StatsModel extends AnythingModel {
+  type Model >: this.type <: StatsModel
+
+  val stats: Stats
+
+  def withStats(stats: Stats): Model
+  def withStat[A <: Double](what: String)(value: A): Model
+
+  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+  def changeStat[A <: Double](context: FrameContext[StartupData], what: String, value: A): Outcome[Model] = Outcome(
+    withStat(what)(value)
+  )
 }

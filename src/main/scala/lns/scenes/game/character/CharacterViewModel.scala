@@ -11,6 +11,7 @@ case class CharacterViewModel(
     fireState: FireState = FireState.NO_FIRE
 ) extends FireViewModel {
   type ViewModel = CharacterViewModel
+  type Model     = CharacterModel
 
   def withFireTimer(fireAnimationTimer: Double, fireState: FireState): ViewModel = copyMacro
 }

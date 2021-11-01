@@ -4,8 +4,7 @@ import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Assets
 import lns.core.Animations.*
-import lns.scenes.game.anything.FireState
-import lns.scenes.game.anything.DynamicState
+import lns.scenes.game.anything.*
 
 /**
  * Isaac Character view elements builder

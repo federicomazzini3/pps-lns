@@ -27,8 +27,8 @@ trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this:
   var movingModel: MyDynamicModel = _
 
   override def beforeEach() = {
-    model = new MyDynamicModel(BoundingBox(centerWidth, centerHeight, 10, 10), Vector2(0, 0))
-    movingModel = new MyDynamicModel(BoundingBox(centerWidth, centerHeight, 10, 10), Vector2(2, 2))
+    model = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), Vector2(0, 0))
+    movingModel = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), Vector2(2, 2))
 
     super.beforeEach()
   }
@@ -44,7 +44,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
             .update(getContext(1))(room)
             .getOrElse(fail("Undefined Model"))
 
-          assert(updatedModel.boundingBox.x == centerWidth && updatedModel.boundingBox.y == centerHeight)
+          assert(updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY)
           assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by 2,2" in {
@@ -52,7 +52,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
             .update(getContext(1))(room)
             .getOrElse(fail("Undefined Model"))
 
-          assert(updatedModel.boundingBox.x == centerWidth + 2 && updatedModel.boundingBox.y == centerHeight + 2)
+          assert(updatedModel.boundingBox.x == roomCenterX + 2 && updatedModel.boundingBox.y == roomCenterY + 2)
           assert(updatedModel.isMoving() == true)
         }
       }
@@ -62,7 +62,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
             .update(getContext(2))(room)
             .getOrElse(fail("Undefined Model"))
 
-          assert(updatedModel.boundingBox.x == centerWidth && updatedModel.boundingBox.y == centerHeight)
+          assert(updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY)
           assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by (4,4)" in {
@@ -70,7 +70,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
             .update(getContext(2))(room)
             .getOrElse(fail("Undefined Model"))
 
-          assert(updatedModel.boundingBox.x == centerWidth + 4 && updatedModel.boundingBox.y == centerHeight + 4)
+          assert(updatedModel.boundingBox.x == roomCenterX + 4 && updatedModel.boundingBox.y == roomCenterY + 4)
           assert(updatedModel.isMoving() == true)
         }
       }
@@ -84,7 +84,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
 
           val updatedModel2 = updatedModel.update(getContext(1))(room).unsafeGet
 
-          assert(updatedModel2.boundingBox.x == centerWidth && updatedModel2.boundingBox.y == centerHeight)
+          assert(updatedModel2.boundingBox.x == roomCenterX && updatedModel2.boundingBox.y == roomCenterY)
           assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by (4,4)" in {
@@ -94,7 +94,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
 
           val updatedModel2 = updatedModel.update(getContext(1))(room).unsafeGet
 
-          assert(updatedModel2.boundingBox.x == centerWidth + 4 && updatedModel2.boundingBox.y == centerHeight + 4)
+          assert(updatedModel2.boundingBox.x == roomCenterX + 4 && updatedModel2.boundingBox.y == roomCenterY + 4)
           assert(updatedModel.isMoving() == true)
         }
       }

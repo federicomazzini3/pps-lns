@@ -16,12 +16,12 @@ trait ContextFixture {
 
   val width           = 1920
   val height          = 1080
-  val centerWidth     = width / 2
-  val centerHeight    = height / 2
   val startupData     = StartupData(screenDimensions = Rectangle(0, 0, width, height))
   val dice            = Dice.fromSeed(1000)
   val boundaryLocator = new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText)
   val room            = RoomModel.initial()
+  val roomCenterX     = Assets.Rooms.floorSize / 2
+  val roomCenterY     = Assets.Rooms.floorSize / 2
 
   def getContext(timeDelta: Double, inputState: InputState = InputState.default): FrameContext[StartupData] =
     new FrameContext[StartupData](
