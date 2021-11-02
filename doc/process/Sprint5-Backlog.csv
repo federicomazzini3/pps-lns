@@ -1,0 +1,11 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Refactor coordinate omogenee fra character e altri anything,,6,Federico,,6,8,6,6,4,2,0
+Refactor interazione Scala Prolog,,6,Alan,,6,2,2,1,0,0,
+Fix run test + coverage,,3,Alan,,15,12,10,5,5,0,
+Come utente voglio che il dungeon sia composto da più stanze,,3,,,3,3,3,3,1,0,
+,Interazione Scala Prolog,,Alan,3h,,,,,,,
+Come utente voglio che il personaggio abbia delle caratteristiche migliorabili,,12,Matteo,,12,12,10,9,9,,
+Come utente voglio che le stanze abbiano degli elementi bloccanti,,12,,,12,12,12,12,12,12,9
+,Trait SolidModel + Model per le rocce,,,4h,,,,,,,
+,Gestione interna degli Anything,,Federico,4h,,,,,,,
+,Algoritmo prolog disposizione elementi bloccanti,,,4h,,,,,,,
