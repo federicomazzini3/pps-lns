@@ -6,6 +6,9 @@ import lns.scenes.game.anything.FireState
 import lns.core.Animations.*
 import lns.core.Macros.copyMacro
 
+/**
+ * Character ViewModel to manage its animations
+ */
 case class CharacterViewModel(
     fireAnimationTimer: Double = 0,
     fireState: FireState = FireState.NO_FIRE

@@ -11,15 +11,22 @@ import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.*
 
 /**
- * Character model that is alive and can move computing its speed by user input
+ * Character model that is alive, it's dynamic by computing its speed and new position by user input, can fire computing
+ * shot by user input and have stats
  * @param boundingBox
- *   [[DynamicModel]] boundingBox
- * @param speed
- *   [[DynamicModel]] speed
+ *   [[AnythingModel]] boundingBox
+ * @param stats
+ *   Initial [[Stats]]
  * @param life
- *   [[AliveModel]] life
+ *   [[AliveModel]] life, default 0
+ * @param speed
+ *   [[DynamicModel]] speed, default Vector2(0, 0)
  * @param invincibilityTimer
  *   [[AliveModel]] invincibilityTimer, default 0
+ * @param fireRateTimer
+ *   [[FireModel]] fireRateTimer, default 0
+ * @param shot
+ *   [[FireModel]] shot, default None
  */
 case class CharacterModel(
     boundingBox: BoundingBox,

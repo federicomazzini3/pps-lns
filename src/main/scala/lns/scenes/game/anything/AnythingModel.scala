@@ -167,7 +167,6 @@ trait DamageModel extends AnythingModel {
   type Model >: this.type <: DamageModel
 
   val damage: Double
-
 }
 
 enum FireState {
@@ -221,6 +220,7 @@ trait FireModel extends AnythingModel {
   def computeFire(context: FrameContext[StartupData]): Option[Vector2]
 
   /**
+   * Create a new ShotEvent capable of being captured by the game model during game loop on every frame
    * @param Vector2
    *   direction vector
    * @return
@@ -264,6 +264,10 @@ trait FireModel extends AnythingModel {
   }
 }
 
+/**
+ * Base model for every object that can have stats. It is designed to be extended or mixed with other [[AnythingModel]]
+ * traits.
+ */
 trait StatsModel extends AnythingModel {
   type Model >: this.type <: StatsModel
 
@@ -272,7 +276,28 @@ trait StatsModel extends AnythingModel {
   def withStats(stats: Stats): Model
   def withStat[A <: Double](what: String)(value: A): Model
 
+  /**
+   * Replace all models stats
+   * @param context
+   *   indigo frame context data
+   * @param newStats
+   *   the new [[Stats]] object to replace with current
+   * @return
+   *   the Outcome of the updated model
+   */
   def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+
+  /**
+   * Replace single models stat
+   * @param context
+   *   indigo frame context data
+   * @param what
+   *   the string that refers to a property of the [[Stats]] case class
+   * @param value
+   *   the value of the property to replace with current
+   * @return
+   *   the Outcome of the updated model
+   */
   def changeStat[A <: Double](context: FrameContext[StartupData], what: String, value: A): Outcome[Model] = Outcome(
     withStat(what)(value)
   )

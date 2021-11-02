@@ -8,6 +8,26 @@ import lns.scenes.game.anything.{ AliveModel, DamageModel, DynamicModel }
 import lns.scenes.game.room.RoomModel
 import org.scalajs.dom.raw.Position
 
+/**
+ * Shot model that is alive, it's dynamic by computing its speed by initial direction and maxSpeed, and can damage other
+ * objects
+ * @param boundingBox
+ *   [[AnythingModel]] boundingBox
+ * @param speed
+ *   [[DynamicModel]] speed
+ * @param maxSpeed
+ *   maxSpeed to compute new speed
+ * @param direction
+ *   direction to compute new speed
+ * @param damage
+ *   [[DamageModel]] damage
+ * @param range
+ *   to check the max distance shot and interrupt his movement
+ * @param life
+ *   [[AliveModel]] life, default 1
+ * @param invincibilityTimer
+ *   [[AliveModel]] invincibilityTimer, default 0
+ */
 case class ShotModel(
     boundingBox: BoundingBox,
     speed: Vector2,
@@ -32,8 +52,14 @@ case class ShotModel(
     maxSpeed * direction
 }
 
+/**
+ * Extends [[GlobalEvent]] and can be intercepted by the [[GameView]] to create a new [[ShotModel]]
+ */
 case class ShotEvent(position: Vertex, direction: Vector2) extends GlobalEvent
 
+/**
+ * Factory of [[ShotModel]]
+ */
 object ShotModel {
   def apply(position: Vertex, direction: Vector2): ShotModel = ShotModel(
     BoundingBox(

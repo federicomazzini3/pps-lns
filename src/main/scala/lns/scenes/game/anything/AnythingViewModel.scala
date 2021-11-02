@@ -24,6 +24,10 @@ trait AnythingViewModel {
   def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] = Outcome(this)
 }
 
+/**
+ * Base model for every thing that can fire. It is designed to be extended or mixed with other [[AnythingViewModel]]
+ * traits.
+ */
 trait FireViewModel extends AnythingViewModel {
   type ViewModel >: this.type <: FireViewModel
   type Model <: FireModel
@@ -33,6 +37,17 @@ trait FireViewModel extends AnythingViewModel {
 
   def withFireTimer(fireAnimationTimer: Double, fireState: FireState): ViewModel
 
+  /**
+   * Update request called during game loop on every frame. Check if the model referred to him firing and there isn't a
+   * fireAnimationTimer to start a new animation keeping the relative fireState. Otherwise, if only the
+   * fireAnimationTimer is present, it is decreased to mark the end of the animation
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @return
+   *   the Outcome of the updated model
+   */
   override def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] =
     for {
       superObj <- super.update(context, model)
