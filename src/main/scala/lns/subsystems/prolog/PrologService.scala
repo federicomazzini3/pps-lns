@@ -120,6 +120,8 @@ trait AsyncSession {
   def getAllAnswersResults: List[(QueryId, Substitution)]
 }
 
+// TODO: Pattern strategy -> factories as functions
+//  (theory: String, query: Option[Query] = None) => AsyncSession
 trait AsyncSessionFactory {
   def create(theory: String, query: Option[Query] = None): AsyncSession
 }

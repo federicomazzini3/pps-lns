@@ -4,9 +4,11 @@ import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.{ AliveModel, DamageModel, DynamicModel }
+import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.room.RoomModel
 import org.scalajs.dom.raw.Position
+
+import scala.language.implicitConversions
 
 /**
  * Shot model that is alive, it's dynamic by computing its speed by initial direction and maxSpeed, and can damage other
@@ -48,20 +50,20 @@ case class ShotModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withDamage(damage: Double): Model                            = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData]): Vector2 =
+  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
     maxSpeed * direction
 }
 
 /**
  * Extends [[GlobalEvent]] and can be intercepted by the [[GameView]] to create a new [[ShotModel]]
  */
-case class ShotEvent(position: Vertex, direction: Vector2) extends GlobalEvent
+case class ShotEvent(position: Vector2, direction: Vector2) extends GlobalEvent
 
 /**
  * Factory of [[ShotModel]]
  */
 object ShotModel {
-  def apply(position: Vertex, direction: Vector2): ShotModel = ShotModel(
+  def apply(position: Vector2, direction: Vector2): ShotModel = ShotModel(
     BoundingBox(
       position,
       Vertex(5, 5)

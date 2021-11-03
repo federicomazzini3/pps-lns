@@ -1,11 +1,15 @@
 package lns.scenes.game.dungeon
 
 import indigo.shared.datatypes.Rectangle
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.scenes.game.anything.AnythingModel
+import lns.scenes.game.enemy.boney.BoneyModel
+import lns.scenes.game.enemy.mask.MaskModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
+import lns.scenes.game.stats.*
 
 import scala.collection.immutable.HashMap
 import lns.scenes.game.room.door.{ DoorState, Location }
@@ -25,7 +29,11 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Arena =>
-        RoomModel.arenaRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
+        val enemyTest = Math.random() > 0.9 match {
+          case true => BoneyModel.initial
+          case _    => MaskModel.initial
+        }
+        RoomModel.arenaRoom(position, generateDoors(grid, position), Set(enemyTest)) // Set.empty[AnythingModel]
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
     }

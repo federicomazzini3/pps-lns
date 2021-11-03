@@ -6,10 +6,13 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.AnythingModel
+import lns.scenes.game.anything.{ AnythingModel, given }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
+import lns.scenes.game.character.CharacterModel
+
+import scala.language.implicitConversions
 
 type Door           = (Location, DoorState)
 type DoorsLocations = Set[Location]
@@ -55,15 +58,6 @@ trait RoomModel {
   def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
 
   /**
-   * Call the method update in all of anythings in a room. Can be override from subclasses for more specific behavior
-   * @param context
-   * @return
-   *   a new updated set of anything model
-   */
-  def updateAnythings(context: FrameContext[StartupData]): Set[AnythingModel] =
-    anythings.map(any => any.update(context)(this).unsafeGet)
-
-  /**
    * Add a shot to the shot list
    * @param shot
    *   the shot to add
@@ -85,26 +79,36 @@ trait RoomModel {
     }
 
   /**
+   * Call the method update in all of anythings in a room. Can be override from subclasses for more specific behavior
+   * @param context
+   * @return
+   *   a new updated set of anything model
+   */
+  def updateAnythings(context: FrameContext[StartupData])(character: CharacterModel): Outcome[Set[AnythingModel]] =
+    anythings
+      .map(any => any.update(context)(this)(character))
+
+  /**
    * Update the shot based on FrameContext
    * @param context
    *   the game context
    * @return
    *   a new room with the shot updated
    */
-  def update(context: FrameContext[StartupData]): Outcome[RoomModel] =
-    Outcome(
-      this match {
-        case room: EmptyRoom =>
-          room.copy(anythings = room.updateAnythings(context))
-        case room: ItemRoom =>
-          room.copy(anythings = room.updateAnythings(context))
-        case room: ArenaRoom =>
-          room.copy(anythings = room.updateAnythings(context))
-        case room: BossRoom =>
-          room.copy(anythings = room.updateAnythings(context))
-        case _ => this
-      }
-    )
+  def update(context: FrameContext[StartupData])(character: CharacterModel): Outcome[RoomModel] =
+    val out = updateAnythings(context)(character)
+
+    this match {
+      case room: EmptyRoom =>
+        out.map(anythings => room.copy(anythings = anythings))
+      case room: ItemRoom =>
+        out.map(anythings => room.copy(anythings = anythings))
+      case room: ArenaRoom =>
+        out.map(anythings => room.copy(anythings = anythings))
+      case room: BossRoom =>
+        out.map(anythings => room.copy(anythings = anythings))
+      case _ => Outcome(this)
+    }
 }
 
 /**

@@ -5,7 +5,7 @@ import lns.scenes.game.anything.{ DynamicState, FireState }
 
 object Animations {
 
-  def apply(): List[Animation]                                = List(Character.head, Character.body)
+  def apply(): List[Animation]                                = List(Character.head, Character.body, Boney.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
@@ -60,4 +60,35 @@ object Animations {
       .create(AnimationKey("character_body"), Cycle.create("walking_left_right", generateBodyFrame(15, 123)))
       .addCycle(Cycle.create("walking_up_down", generateBodyFrame(15, 80)))
   }
+
+  object Boney {
+    /*Enemy head*/
+    val headWidth: Int  = 28
+    val headHeight: Int = 25
+
+    def headCrop(state: DynamicState): Rectangle = state match {
+      case DynamicState.MOVE_LEFT =>
+        Rectangle(32, 0, headWidth, headHeight)
+      case DynamicState.MOVE_RIGHT =>
+        Rectangle(32, 0, headWidth, headHeight)
+      case DynamicState.MOVE_UP =>
+        Rectangle(64, 0, headWidth, headHeight)
+      case _ =>
+        Rectangle(0, 0, headWidth, headHeight)
+    }
+
+    /*Enemy body*/
+    val bodyWidth: Int  = 18
+    val bodyHeight: Int = 13
+
+    def generateBodyFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 10)(i => Frame(Rectangle(x + (i * 32), y, bodyWidth, bodyHeight), Millis(80)))
+      )
+
+    val body: Animation = Animation
+      .create(AnimationKey("boney_body"), Cycle.create("walking_left_right", generateBodyFrame(0, 55)))
+      .addCycle(Cycle.create("walking_up_down", generateBodyFrame(0, 35)))
+  }
+
 }

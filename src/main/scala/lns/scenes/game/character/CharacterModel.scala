@@ -6,7 +6,7 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.*
 
@@ -44,6 +44,9 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
+  // TODO: Builder pattern -> usare Require qui oppure sui Trait
+  //  require ( life > 0 , " Incorrect life ")
+
   val maxLife: Int          = stats.maxLife
   val invincibility: Double = stats.invincibility
   val maxSpeed: Int         = stats.maxSpeed
@@ -71,7 +74,7 @@ case class CharacterModel(
   def withStat[A <: Double](what: String)(value: A): Model =
     copy(stats = StatsLens(what)(stats, value))
 
-  def computeSpeed(context: FrameContext[StartupData]): Vector2 =
+  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
 
   val fireInputMappings: InputMapping[Vector2] =
@@ -82,7 +85,7 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.LEFT_ARROW)  -> Vector2(-1, 0)
     )
 
-  def computeFire(context: FrameContext[StartupData]): Option[Vector2] =
+  def computeFire(context: FrameContext[StartupData])(character: AnythingModel): Option[Vector2] =
     context.inputState.mapInputsOption(fireInputMappings)
 }
 
@@ -90,7 +93,7 @@ case class CharacterModel(
  * Factory of [[CharacterModel]]
  */
 object CharacterModel {
-  def initial(startupData: StartupData): CharacterModel = CharacterModel(
+  def initial: CharacterModel = CharacterModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))

@@ -37,6 +37,6 @@ object GameModel {
     GameStarted(
       dungeonModel,
       dungeonModel.initialRoom,
-      CharacterModel.initial(startupData)
+      CharacterModel.initial
     )
 }

@@ -12,6 +12,8 @@ import lns.core.Assets.*
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
 import lns.scenes.game.shot.{ ShotModel, ShotView }
+import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
+import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
 
 object RoomView {
 
@@ -31,8 +33,10 @@ object RoomView {
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
         s2 match {
-          case shot: ShotModel => ShotView().draw(context, shot, ())
-          case _               => Group()
+          case shot: ShotModel   => ShotView().draw(context, shot, ())
+          case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
+          case enemy: MaskModel  => MaskView().draw(context, enemy, ())
+          case _                 => Group()
         }
       )
     )
