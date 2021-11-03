@@ -13,6 +13,10 @@ import scala.language.implicitConversions
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 
+given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
+  def apply(set: Set[Outcome[AnythingModel]]): Outcome[Set[AnythingModel]] =
+    set.foldLeft(Outcome(Set[AnythingModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
+
 /**
  * Base model for every thing placed inside a room
  */
@@ -39,7 +43,9 @@ trait AnythingModel {
    * @return
    *   the Outcome of the updated model
    */
-  def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = Outcome(this)
+  def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] = Outcome(
+    this
+  )
 }
 
 enum DynamicState {
@@ -72,11 +78,11 @@ trait DynamicModel extends AnythingModel {
    *   the [[DynamicState]] based on the current speed vector
    */
   def getDynamicState(): DynamicState = speed match {
-    case Vector2(x, _) if x < 0 => MOVE_LEFT
-    case Vector2(x, _) if x > 0 => MOVE_RIGHT
-    case Vector2(_, y) if y < 0 => MOVE_UP
-    case Vector2(_, y) if y > 0 => MOVE_DOWN
-    case _                      => IDLE
+    case Vector2(x, y) if x < 0 && Math.abs(x) >= Math.abs(y) => MOVE_LEFT
+    case Vector2(x, y) if x > 0 && Math.abs(x) >= Math.abs(y) => MOVE_RIGHT
+    case Vector2(_, y) if y < 0                               => MOVE_UP
+    case Vector2(_, y) if y > 0                               => MOVE_DOWN
+    case _                                                    => IDLE
   }
 
   /**
@@ -85,7 +91,7 @@ trait DynamicModel extends AnythingModel {
    * @return
    *   the speed vector
    */
-  def computeSpeed(context: FrameContext[StartupData]): Vector2
+  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2
 
   /**
    * Update request called during game loop on every frame. The Anything movement speed direction and module is first
@@ -97,10 +103,10 @@ trait DynamicModel extends AnythingModel {
    * @return
    *   the Outcome of the updated model wich is moved by its speed vector data normalized on gameTime.delta
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)
-      newSpeed    = computeSpeed(context) * context.gameTime.delta.toDouble
+      superObj <- super.update(context)(room)(character)
+      newSpeed    = computeSpeed(context)(room)(character) * context.gameTime.delta.toDouble
       newLocation = room.boundPosition(boundingBox.moveBy(newSpeed))
       newObj      = superObj.withDynamic(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
     } yield newObj
@@ -146,9 +152,9 @@ trait AliveModel extends AnythingModel {
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)
+      superObj <- super.update(context)(room)(character)
       newObj = invincibilityTimer match {
         case 0 => superObj
         case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
@@ -217,7 +223,7 @@ trait FireModel extends AnythingModel {
    * @return
    *   Optional direction vector
    */
-  def computeFire(context: FrameContext[StartupData]): Option[Vector2]
+  def computeFire(context: FrameContext[StartupData])(character: AnythingModel): Option[Vector2]
 
   /**
    * Create a new ShotEvent capable of being captured by the game model during game loop on every frame
@@ -227,7 +233,7 @@ trait FireModel extends AnythingModel {
    *   ShotEvent
    */
   def createEvent(direction: Vector2): ShotEvent =
-    ShotEvent(Vertex(boundingBox.horizontalCenter, boundingBox.verticalCenter), direction)
+    ShotEvent(Vector2(boundingBox.horizontalCenter, boundingBox.verticalCenter), direction)
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer
@@ -240,11 +246,11 @@ trait FireModel extends AnythingModel {
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel): Outcome[Model] = {
-    val shot = if (fireRateTimer == 0) computeFire(context) else None
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+    val shot = if (fireRateTimer == 0) computeFire(context)(character) else None
 
     val retObj = for {
-      superObj <- super.update(context)(room)
+      superObj <- super.update(context)(room)(character)
       newObj = fireRateTimer match {
         case 0 =>
           shot match {
@@ -261,7 +267,7 @@ trait FireModel extends AnythingModel {
       case Some(direction) => retObj.addGlobalEvents(createEvent(direction))
       case _               => retObj
     }
-  }
+
 }
 
 /**

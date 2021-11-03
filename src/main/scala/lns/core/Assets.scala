@@ -14,7 +14,8 @@ object Assets {
 
   def initialFont(): FontInfo = Fonts.fontInfo
 
-  def secondary(): Set[AssetType] = Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Prolog.assets
+  def secondary(): Set[AssetType] =
+    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Prolog.assets ++ Enemies.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -119,6 +120,33 @@ object Assets {
 
     val assets: Set[AssetType] = Set(
       AssetType.Image(character, AssetPath(baseUrl + specificUrl + "isaac.png"))
+    )
+  }
+
+  object Enemies {
+    val specificUrl: String = "enemies/"
+
+    object Boney {
+      val width                 = 28
+      val height                = 33
+      val withScale: Int => Int = (size: Int) => size * 5
+
+      val name = AssetName("boney")
+      val path = AssetPath(baseUrl + specificUrl + "boney.png")
+    }
+
+    object Mask {
+      val width                 = 28
+      val height                = 32
+      val withScale: Int => Int = (size: Int) => size * 5
+
+      val name = AssetName("mask")
+      val path = AssetPath(baseUrl + specificUrl + "mask.png")
+    }
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(Boney.name, Boney.path),
+      AssetType.Image(Mask.name, Mask.path)
     )
   }
 

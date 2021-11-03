@@ -54,7 +54,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
       "after one frame update with time delta = 1s" - {
         "should not move" in {
           val updatedModel = model
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(model)
             .getOrElse(fail("Undefined Model"))
 
           assert(
@@ -80,7 +80,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
           ).foreach { keys =>
             s"with keys '${keys._1}' should move correctly" in {
               val updatedModel = model
-                .update(getContext(second, inputKeys(keys._2)))(room)
+                .update(getContext(second, inputKeys(keys._2)))(room)(model)
                 .getOrElse(fail("Undefined Model"))
 
               keys._1 match {
@@ -127,12 +127,12 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
         ).foreach { keys =>
           s"with keys '${keys._1}' should fire correctly generating ShotEvent" in {
             val updatedModelOutcome = model
-              .update(getContext(1, inputKeys(keys._2)))(room)
+              .update(getContext(1, inputKeys(keys._2)))(room)(model)
 
             val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
 
             val updatedPosition =
-              Vertex(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.verticalCenter)
+              Vector2(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.verticalCenter)
 
             keys._1 match {
               case "Up" =>

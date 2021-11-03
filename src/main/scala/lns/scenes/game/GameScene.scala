@@ -50,8 +50,8 @@ final case class GameScene() extends EmptyScene {
 
         case model @ GameStarted(dungeon, room, character) =>
           for {
-            character <- character.update(context)(room)
-            room      <- room.update(context)
+            character <- character.update(context)(room)(character)
+            room      <- room.update(context)(character)
             (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
           } yield model.copy(character = newCharacter, room = newRoom)
 

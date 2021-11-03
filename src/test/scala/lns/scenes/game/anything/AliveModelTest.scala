@@ -45,14 +45,14 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
       "after one frame update should" - {
         "maintain its life" in {
           val updatedModel = model
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(character)
             .unsafeGet
 
           assert(updatedModel.life == startLife)
         }
         "have no invincibility countdown" in {
           val updatedModel: MyAliveModel = model
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(character)
             .unsafeGet
 
           assert(updatedModel.invincibilityTimer == 0)
@@ -96,7 +96,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
           val updatedModel = model.hit(getContext(1), hitDamage1).unsafeGet
 
           val updatedModel2: MyAliveModel = updatedModel
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(character)
             .unsafeGet
 
           assert(updatedModel2.life == startLife - hitDamage1)
@@ -106,7 +106,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
             val updatedModel = noInvincibilityModel.hit(getContext(1), hitDamage1).unsafeGet
 
             val updatedModel2: MyAliveModel = updatedModel
-              .update(getContext(1))(room)
+              .update(getContext(1))(room)(character)
               .unsafeGet
 
             assert(updatedModel2.invincibilityTimer == 0)
@@ -118,7 +118,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
               val updatedModel = model.hit(getContext(1), hitDamage1).unsafeGet
 
               val updatedModel2: MyAliveModel = updatedModel
-                .update(getContext(1))(room)
+                .update(getContext(1))(room)(character)
                 .unsafeGet
 
               assert(updatedModel2.invincibilityTimer == invincibility - 1)
@@ -127,7 +127,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
               val updatedModel = model.hit(getContext(1), hitDamage1).unsafeGet
 
               val updatedModel2: MyAliveModel = updatedModel
-                .update(getContext(1))(room)
+                .update(getContext(1))(room)(character)
                 .unsafeGet
 
               val updatedModel3 = updatedModel2.hit(getContext(1), hitDamage1).unsafeGet
@@ -140,7 +140,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
               val updatedModel = model.hit(getContext(3), hitDamage1).unsafeGet
 
               val updatedModel2: MyAliveModel = updatedModel
-                .update(getContext(3))(room)
+                .update(getContext(3))(room)(character)
                 .unsafeGet
 
               assert(updatedModel2.invincibilityTimer == 0)
@@ -149,7 +149,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
               val updatedModel = model.hit(getContext(1), hitDamage1).unsafeGet
 
               val updatedModel2: MyAliveModel = updatedModel
-                .update(getContext(3))(room)
+                .update(getContext(3))(room)(character)
                 .unsafeGet
 
               val updatedModel3: MyAliveModel = updatedModel2.hit(getContext(3), hitDamage1).unsafeGet
@@ -182,7 +182,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
           val updatedModel = model.hit(getContext(1), hitDamage2).unsafeGet
 
           val updatedModel2: MyAliveModel = updatedModel
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(character)
             .unsafeGet
 
           assert(updatedModel2.life == 0)
@@ -191,7 +191,7 @@ class AliveModelTest extends AnyFreeSpec with AliveModelFixture {
           val updatedModel = model.hit(getContext(1), hitDamage2).unsafeGet
 
           val updatedModel2: MyAliveModel = updatedModel
-            .update(getContext(1))(room)
+            .update(getContext(1))(room)(character)
             .unsafeGet
 
           assert(updatedModel2.invincibilityTimer == 0)
