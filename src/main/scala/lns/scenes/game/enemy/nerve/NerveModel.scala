@@ -1,5 +1,7 @@
 package lns.scenes.game.enemy.nerve
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
@@ -10,7 +12,8 @@ import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.{ FiresContinuously, KeepsAway }
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.*
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.MaxLife
 
 /**
  * Enemy model that is alive and stay fixed in a position
@@ -36,16 +39,9 @@ case class NerveModel(
 
   type Model = NerveModel
 
-  val maxLife: Int          = stats.maxLife
-  val invincibility: Double = stats.invincibility
-  val damage: Double        = stats.damage
-
   def withAlive(life: Int, invincibilityTimer: Double): Model = copyMacro
 
   def withStats(stats: Stats): Model = copyMacro
-
-  def withStat[A <: Double](what: String)(value: A): Model =
-    copy(stats = StatsLens(what)(stats, value))
 
 }
 
@@ -62,6 +58,6 @@ object NerveModel {
       )
     ),
     stats = Stats.Isaac,
-    life = Stats.Isaac.maxLife
+    life = MaxLife @@ Stats.Isaac
   )
 }
