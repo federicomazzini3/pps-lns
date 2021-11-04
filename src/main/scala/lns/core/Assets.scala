@@ -144,9 +144,19 @@ object Assets {
       val path = AssetPath(baseUrl + specificUrl + "mask.png")
     }
 
+    object Nerve {
+      val width                 = 26
+      val height                = 50
+      val withScale: Int => Int = (size: Int) => size * 5
+
+      val name = AssetName("nerve")
+      val path = AssetPath(baseUrl + specificUrl + "nerve.png")
+    }
+
     val assets: Set[AssetType] = Set(
       AssetType.Image(Boney.name, Boney.path),
-      AssetType.Image(Mask.name, Mask.path)
+      AssetType.Image(Mask.name, Mask.path),
+      AssetType.Image(Nerve.name, Nerve.path)
     )
   }
 

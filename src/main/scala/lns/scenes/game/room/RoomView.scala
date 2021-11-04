@@ -14,6 +14,7 @@ import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
 import lns.scenes.game.shot.{ ShotModel, ShotView }
 import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
 import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
+import lns.scenes.game.enemy.nerve.{ NerveModel, NerveView }
 
 object RoomView {
 
@@ -36,6 +37,7 @@ object RoomView {
           case shot: ShotModel   => ShotView().draw(context, shot, ())
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
           case enemy: MaskModel  => MaskView().draw(context, enemy, ())
+          case enemy: NerveModel => NerveView().draw(context, enemy, ())
           case _                 => Group()
         }
       )
