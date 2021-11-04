@@ -5,6 +5,8 @@ import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Assets
 import lns.core.Animations.*
 import lns.scenes.game.anything.*
+import lns.scenes.game.stats.*
+import lns.scenes.game.stats.PropertyName.*
 
 /**
  * Isaac Character view elements builder
@@ -41,8 +43,9 @@ trait Isaac {
 
   def headManualAnimation(model: CharacterModel, viewModel: CharacterViewModel): Rectangle =
     viewModel.fireAnimationTimer match {
-      case x if x > 0 && x > model.fireRate / 2 => Character.headCrop(viewModel.fireState, false)
-      case x if x > 0                           => Character.headCrop(viewModel.fireState, true)
+      case x if x > 0 && x > FireRate @@ model.stats / 2 =>
+        Character.headCrop(viewModel.fireState, false)
+      case x if x > 0 => Character.headCrop(viewModel.fireState, true)
       case _ =>
         model.isFiring() match {
           case true => Character.headCrop(model.getFireState(), false)

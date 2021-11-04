@@ -1,5 +1,7 @@
 package lns.scenes.game.anything
 
+import scala.language.implicitConversions
+
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
@@ -9,15 +11,19 @@ import lns.core.ContextFixture
 import lns.scenes.game.room.RoomModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 case class MyDynamicModel(
     boundingBox: BoundingBox,
+    stats: Stats,
     nextSpeed: Vector2,
     speed: Vector2 = Vector2(0, 0)
 ) extends DynamicModel {
   type Model = MyDynamicModel
 
-  override def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyDynamicModel = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyDynamicModel = copyMacro
+  def withStats(stats: Stats): Model                                        = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel) = nextSpeed
 }
@@ -27,9 +33,11 @@ trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this:
   var model: MyDynamicModel       = _
   var movingModel: MyDynamicModel = _
 
+  val stats = Stats(MaxSpeed -> 300)
+
   override def beforeEach() = {
-    model = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), Vector2(0, 0))
-    movingModel = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), Vector2(2, 2))
+    model = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
+    movingModel = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
 
     super.beforeEach()
   }

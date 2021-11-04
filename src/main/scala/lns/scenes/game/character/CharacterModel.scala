@@ -11,6 +11,7 @@ import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 /**
  * Character model that is alive, it's dynamic by computing its speed and new position by user input, can fire computing
@@ -41,23 +42,15 @@ case class CharacterModel(
 ) extends AliveModel
     with DynamicModel
     with FireModel
-    with DamageModel
-    with StatsModel {
+    with DamageModel {
 
   type Model = CharacterModel
 
   // TODO: Builder pattern -> usare Require qui oppure sui Trait
   //  require ( life > 0 , " Incorrect life ")
 
-  val maxLife: Int          = stats("maxLife")
-  val invincibility: Double = stats("invincibility")
-  val maxSpeed: Int         = stats("maxSpeed")
-  val damage: Double        = stats("damage")
-  val fireDamage: Double    = stats("fireDamage")
-  val fireRange: Int        = stats("fireRange")
-  val fireRate: Double      = stats("fireRate")
-
   val moveInputMappings: InputMapping[Vector2] =
+    val maxSpeed = MaxSpeed @@ stats
     InputMapping(
       Combo.withKeyInputs(Key.KEY_A, Key.KEY_W) -> Vector2(-maxSpeed, -maxSpeed),
       Combo.withKeyInputs(Key.KEY_A, Key.KEY_S) -> Vector2(-maxSpeed, maxSpeed),
@@ -99,6 +92,6 @@ object CharacterModel {
       Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))
     ),
     stats = Stats.Isaac,
-    life = Stats.Isaac("maxLife")
+    life = MaxLife @@ Stats.Isaac
   )
 }

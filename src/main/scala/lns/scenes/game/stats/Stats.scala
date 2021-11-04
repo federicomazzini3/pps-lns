@@ -2,11 +2,14 @@ package lns.scenes.game.stats
 
 import scala.language.implicitConversions
 
-/*ENUM*/
+enum PropertyName:
+  case MaxLife, Invincibility, MaxSpeed, Damage, FireDamage, FireRange, FireRate
+
+import PropertyName.*
 
 type PropertyValue = Double
-type StatProperty  = (String, PropertyValue)
-type Stats         = Map[String, PropertyValue]
+type StatProperty  = (PropertyName, PropertyValue)
+type Stats         = Map[PropertyName, PropertyValue]
 
 given Conversion[PropertyValue, Int] with
   def apply(v: PropertyValue): Int = v.toInt
@@ -16,16 +19,27 @@ extension (stats: Stats) {
     stats + stats.get(p._1).map(x => p._1 -> (x + p._2)).getOrElse(p)
 }
 
+extension (p: PropertyName) {
+  def @@(s: Stats): PropertyValue = s.getOrElse(p, 0.0)
+}
+
+extension (p: PropertyValue) {
+  def +(v: PropertyValue): PropertyValue = p match {
+    case p if (v + p) < 0 => 0
+    case _                => v + p
+  }
+}
+
 object Stats {
   def apply(args: StatProperty*): Stats = Map(args*)
 
   def Isaac = Stats(
-    "maxLife"       -> 10,
-    "invincibility" -> 1.5,
-    "maxSpeed"      -> 300,
-    "damage"        -> 0,
-    "fireDamage"    -> 3.0,
-    "fireRange"     -> 500,
-    "fireRate"      -> 0.4
+    MaxLife       -> 10,
+    Invincibility -> 1.5,
+    MaxSpeed      -> 300,
+    Damage        -> 0,
+    FireDamage    -> 3.0,
+    FireRange     -> 500,
+    FireRate      -> 0.4
   )
 }

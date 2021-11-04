@@ -1,5 +1,7 @@
 package lns.scenes.game.enemy.boney
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
@@ -8,7 +10,8 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.anything.*
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.*
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.Follower
 
@@ -41,21 +44,13 @@ case class BoneyModel(
     with DynamicModel
     with DamageModel
     with StatsModel
-    with Follower(stats.maxSpeed) {
+    with Follower(MaxSpeed @@ stats) {
 
   type Model = BoneyModel
-
-  val maxLife: Int          = stats.maxLife
-  val invincibility: Double = stats.invincibility
-  // val maxSpeed: Int         = stats.maxSpeed
-  val damage: Double = stats.damage
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withStats(stats: Stats): Model                               = copyMacro
-  def withStat[A <: Double](what: String)(value: A): Model =
-    copy(stats = StatsLens(what)(stats, value))
-
 }
 
 /**
@@ -71,6 +66,6 @@ object BoneyModel {
       )
     ),
     stats = Stats.Isaac,
-    life = Stats.Isaac.maxLife
+    life = MaxLife @@ Stats.Isaac
   )
 }

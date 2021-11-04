@@ -4,9 +4,11 @@ import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
+import org.scalajs.dom.raw.Position
 import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.room.RoomModel
-import org.scalajs.dom.raw.Position
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 import scala.language.implicitConversions
 
@@ -32,11 +34,9 @@ import scala.language.implicitConversions
  */
 case class ShotModel(
     boundingBox: BoundingBox,
+    stats: Stats,
     speed: Vector2,
-    maxSpeed: Vector2,
     direction: Vector2,
-    damage: Double,
-    range: Double,
     life: Int = 1,
     invincibilityTimer: Double = 0
 ) extends AliveModel
@@ -44,14 +44,13 @@ case class ShotModel(
     with DamageModel {
 
   type Model = ShotModel
-  val invincibility: Double = 0
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withDamage(damage: Double): Model                            = copyMacro
+  def withStats(stats: Stats): Model                               = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
-    maxSpeed * direction
+    direction * MaxSpeed @@ stats
 }
 
 /**
@@ -68,10 +67,8 @@ object ShotModel {
       position,
       Vertex(5, 5)
     ),
-    Vector2(0, 0),
+    Stats.Isaac,
     Vector2(800, 800),
-    direction,
-    10,
-    500
+    direction
   )
 }

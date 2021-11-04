@@ -1,5 +1,7 @@
 package lns.scenes.game.anything
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
@@ -7,8 +9,7 @@ import lns.StartupData
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.*
-
-import scala.language.implicitConversions
+import lns.scenes.game.stats.PropertyName.*
 
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
@@ -43,21 +44,68 @@ trait AnythingModel {
    * @return
    *   the Outcome of the updated model
    */
-  def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] = Outcome(
-    this
-  )
+  def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+    Outcome(this)
 }
 
-enum DynamicState {
-  case IDLE, MOVE_LEFT, MOVE_RIGHT, MOVE_DOWN, MOVE_UP
+/**
+ * Base model for every object that can have stats. It is designed to be extended or mixed with other [[AnythingModel]]
+ * traits.
+ */
+trait StatsModel {
+  type Model >: this.type <: StatsModel
+
+  val stats: Stats
+
+  def withStats(stats: Stats): Model
+
+  /**
+   * Replace all models stats
+   * @param context
+   *   indigo frame context data
+   * @param newStats
+   *   the new [[Stats]] object to replace with current
+   * @return
+   *   the Outcome of the updated model
+   */
+  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+
+  /**
+   * Replace single models stat
+   * @param context
+   *   indigo frame context data
+   * @param property
+   *   [[property]] to replace
+   * @return
+   *   the Outcome of the updated model
+   */
+  def changeStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats + property))
+
+  /**
+   * Upldate single models stat
+   * @param context
+   *   indigo frame context data
+   * @param property
+   *   [[property]] to sum with current property
+   * @return
+   *   the Outcome of the updated model
+   */
+  def sumStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats +++ property))
+
 }
+
+enum DynamicState:
+  case IDLE, MOVE_LEFT, MOVE_RIGHT, MOVE_DOWN, MOVE_UP
+
 import DynamicState.*
 
 /**
  * Base model for every object that can move. It is designed to be extended or mixed with other [[AnythingModel]]
  * traits.
  */
-trait DynamicModel extends AnythingModel {
+trait DynamicModel extends AnythingModel with StatsModel {
   type Model >: this.type <: DynamicModel
 
   val speed: Vector2
@@ -117,12 +165,11 @@ trait DynamicModel extends AnythingModel {
  * Base model for every object that is alive and can be damaged. It is designed to be extended or mixed with other
  * [[AnythingModel]] traits.
  */
-trait AliveModel extends AnythingModel {
+trait AliveModel extends AnythingModel with StatsModel {
   type Model >: this.type <: AliveModel
 
   val life: Int
   val invincibilityTimer: Double
-  val invincibility: Double
 
   def withAlive(life: Int, invincibilityTimer: Double): Model
 
@@ -136,7 +183,7 @@ trait AliveModel extends AnythingModel {
    *   the Outcome of the updated model
    */
   def hit(context: FrameContext[StartupData], damage: Int): Outcome[Model] = invincibilityTimer match {
-    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, invincibility))
+    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats))
     case 0                      => Outcome(withAlive(0, 0))
     case _                      => Outcome(this)
   }
@@ -169,29 +216,24 @@ trait AliveModel extends AnythingModel {
  * Base model for every object that make damage on contact to other model that extends [[AliveModel]] trait. It is
  * designed to be extended or mixed with other [[AnythingModel]] traits.
  */
-trait DamageModel extends AnythingModel {
+trait DamageModel extends AnythingModel with StatsModel {
   type Model >: this.type <: DamageModel
 
-  val damage: Double
 }
 
-enum FireState {
+enum FireState:
   case NO_FIRE, FIRE_LEFT, FIRE_RIGHT, FIRE_DOWN, FIRE_UP
-}
+
 import FireState.*
 
 /**
  * Base model for every object that can fire. It is designed to be extended or mixed with other [[AnythingModel]]
  * traits.
  */
-trait FireModel extends AnythingModel {
+trait FireModel extends AnythingModel with StatsModel {
   type Model >: this.type <: FireModel
 
   val shot: Option[Vector2]
-
-  val fireDamage: Double
-  val fireRange: Int
-  val fireRate: Double
   val fireRateTimer: Double
 
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model
@@ -254,8 +296,9 @@ trait FireModel extends AnythingModel {
       newObj = fireRateTimer match {
         case 0 =>
           shot match {
-            case Some(direction) => superObj.withFire(fireRate, Some(direction)).asInstanceOf[Model]
-            case _               => superObj
+            case Some(direction) =>
+              superObj.withFire(FireRate @@ stats, Some(direction)).asInstanceOf[Model]
+            case _ => superObj
           }
         case _ if fireRateTimer - context.gameTime.delta.toDouble > 0 =>
           superObj.withFire(fireRateTimer - context.gameTime.delta.toDouble, None).asInstanceOf[Model]
@@ -267,53 +310,5 @@ trait FireModel extends AnythingModel {
       case Some(direction) => retObj.addGlobalEvents(createEvent(direction))
       case _               => retObj
     }
-
-}
-
-/**
- * Base model for every object that can have stats. It is designed to be extended or mixed with other [[AnythingModel]]
- * traits.
- */
-trait StatsModel extends AnythingModel {
-  type Model >: this.type <: StatsModel
-
-  val stats: Stats
-
-  def withStats(stats: Stats): Model
-
-  /**
-   * Replace all models stats
-   * @param context
-   *   indigo frame context data
-   * @param newStats
-   *   the new [[Stats]] object to replace with current
-   * @return
-   *   the Outcome of the updated model
-   */
-  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
-
-  /**
-   * Replace single models stat
-   * @param context
-   *   indigo frame context data
-   * @param property
-   *   [[property]] to replace
-   * @return
-   *   the Outcome of the updated model
-   */
-  def changeStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
-    Outcome(withStats(stats + property))
-
-  /**
-   * Upldate single models stat
-   * @param context
-   *   indigo frame context data
-   * @param property
-   *   [[property]] to sum with current property
-   * @return
-   *   the Outcome of the updated model
-   */
-  def sumStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
-    Outcome(withStats(stats +++ property))
 
 }
