@@ -1,5 +1,7 @@
 package lns.scenes.game.anything
 
+import scala.language.implicitConversions
+
 import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.{ BoundingBox, Vertex }
@@ -9,19 +11,20 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.shot.ShotEvent
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 case class MyFireModel(
-    fireDamage: Double,
-    fireRange: Int,
-    fireRate: Double,
-    fireDirection: Option[Vector2],
     boundingBox: BoundingBox,
+    stats: Stats,
+    fireDirection: Option[Vector2],
     fireRateTimer: Double = 0,
     shot: Option[Vector2] = None
 ) extends FireModel {
   type Model = MyFireModel
 
-  override def withFire(fireRateTimer: Double, shot: Option[Vector2]): MyFireModel = copyMacro
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): MyFireModel = copyMacro
+  def withStats(stats: Stats): Model                                      = copyMacro
 
   def computeFire(context: FrameContext[StartupData])(character: AnythingModel) = fireDirection
 }
@@ -30,23 +33,29 @@ trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
   var ShootingModel: MyFireModel    = _
   var NotShootingModel: MyFireModel = _
 
-  val fireDamage    = 3.5
-  val fireRange     = 500
-  val fireRate      = 2
+  val stats = Stats(
+    FireDamage -> 3.5,
+    FireRange  -> 500,
+    FireRate   -> 2
+  )
+
+  val fireRate      = FireRate @@ stats
   val position      = Vertex(roomCenterX, roomCenterY)
   val size          = Vertex(10, 10)
   val fireDirection = Vector2(1, 0);
 
   override def beforeEach() = {
     ShootingModel = new MyFireModel(
-      fireDamage,
-      fireRange,
-      fireRate,
-      Some(fireDirection),
-      BoundingBox(position.x, position.y, size.x, size.y)
+      BoundingBox(position.x, position.y, size.x, size.y),
+      stats,
+      Some(fireDirection)
     )
-    NotShootingModel =
-      new MyFireModel(fireDamage, fireRange, fireRate, None, BoundingBox(position.x, position.y, size.x, size.y))
+
+    NotShootingModel = new MyFireModel(
+      BoundingBox(position.x, position.y, size.x, size.y),
+      stats,
+      None
+    )
 
     super.beforeEach()
   }
@@ -167,7 +176,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
       ).foreach { keys =>
         s"${keys._1} have correct FireState" in {
           val updatedModel =
-            new MyFireModel(fireDamage, fireRange, fireRate, Some(keys._2), BoundingBox(position.x, position.y, 10, 10))
+            new MyFireModel(BoundingBox(position.x, position.y, 10, 10), stats, Some(keys._2))
               .update(getContext(1))(room)(character)
               .getOrElse(fail("Undefined Model"))
 

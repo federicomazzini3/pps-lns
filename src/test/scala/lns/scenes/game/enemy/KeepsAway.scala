@@ -1,5 +1,7 @@
 package lns.scenes.game.enemy
 
+import scala.language.implicitConversions
+
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
@@ -11,35 +13,41 @@ import lns.scenes.game.room.RoomModel
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
-    maxSpeed: Int,
+    stats: Stats,
     range: (Int, Int),
     speed: Vector2 = Vector2(0, 0)
 ) extends DynamicModel
-    with KeepsAway(maxSpeed, range) {
+    with KeepsAway(MaxSpeed @@ stats, range) {
   type Model = MyKeepsAwayModel
 
-  override def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
+  def withStats(stats: Stats): Model                                          = copyMacro
 }
 
 trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
 
-  var model: MyKeepsAwayModel            = _
-  var modelInMiddle: MyKeepsAwayModel    = _
-  var modelAway: MyKeepsAwayModel        = _
-  val maxSpeed                           = 2
-  val range                              = (300, 600)
-  val initialPos                         = 100
-  val initialPosInMiddle                 = 400
-  val initialPosAway                     = 700
+  var model: MyKeepsAwayModel         = _
+  var modelInMiddle: MyKeepsAwayModel = _
+  var modelAway: MyKeepsAwayModel     = _
+
+  val stats              = Stats(MaxSpeed -> 300)
+  val maxSpeed           = MaxSpeed @@ stats
+  val range              = (300, 600)
+  val initialPos         = 100
+  val initialPosInMiddle = 400
+  val initialPosAway     = 700
+
   override val character: CharacterModel = CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
   override def beforeEach() = {
-    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), maxSpeed, range)
-    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), maxSpeed, range)
-    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), maxSpeed, range)
+    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), stats, range)
+    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), stats, range)
+    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), stats, range)
 
     super.beforeEach()
   }

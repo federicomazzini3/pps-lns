@@ -4,6 +4,8 @@ import indigo.*
 import indigo.shared.*
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
+import lns.scenes.game.stats.*
+import lns.scenes.game.stats.PropertyName.*
 
 /**
  * Base viewModel for every thing placed inside a room
@@ -53,7 +55,7 @@ trait FireViewModel extends AnythingViewModel {
       superObj <- super.update(context, model)
       newObj = fireAnimationTimer match {
         case 0 if model.isFiring() =>
-          superObj.withFireTimer(model.fireRate, model.getFireState()).asInstanceOf[ViewModel]
+          superObj.withFireTimer(FireRate @@ model.stats, model.getFireState()).asInstanceOf[ViewModel]
         case 0 => superObj
         case _ if fireAnimationTimer - context.gameTime.delta.toDouble > 0 =>
           superObj

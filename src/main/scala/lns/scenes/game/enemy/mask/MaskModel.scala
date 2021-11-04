@@ -1,5 +1,7 @@
 package lns.scenes.game.enemy.mask
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
@@ -10,7 +12,8 @@ import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.{ KeepsAway, FiresContinuously }
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.*
+import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.PropertyName.*
 
 /**
  * Enemy model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
@@ -44,26 +47,15 @@ case class MaskModel(
     with DamageModel
     with StatsModel
     with FireModel
-    with KeepsAway(stats.maxSpeed, (600, 900))
+    with KeepsAway(MaxSpeed @@ stats, (600, 900))
     with FiresContinuously {
 
   type Model = MaskModel
-
-  val maxLife: Int          = stats.maxLife
-  val invincibility: Double = stats.invincibility
-  // val maxSpeed: Int         = stats.maxSpeed
-  val damage: Double     = stats.damage
-  val fireDamage: Double = stats.fireDamage
-  val fireRange: Int     = stats.fireRange
-  val fireRate: Double   = stats.fireRate
 
   def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
   def withStats(stats: Stats): Model                                = copyMacro
-  def withStat[A <: Double](what: String)(value: A): Model =
-    copy(stats = StatsLens(what)(stats, value))
-
 }
 
 /**
@@ -79,6 +71,6 @@ object MaskModel {
       )
     ),
     stats = Stats.Isaac,
-    life = Stats.Isaac.maxLife
+    life = MaxLife @@ Stats.Isaac
   )
 }
