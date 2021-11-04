@@ -1,5 +1,7 @@
 package lns.scenes.game.character
 
+import scala.language.implicitConversions
+
 import indigo.shared.Outcome
 import indigo.shared.constants.Key
 import indigo.shared.events.{ InputState, KeyboardEvent }
@@ -14,7 +16,7 @@ import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.{ Stats, StatsLens }
+import lns.scenes.game.stats.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 
@@ -152,84 +154,45 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
 
   "A CharacterModel should have stats" - {
     "start with initial Isaac stats" - {
-      "maxLife" in {
-        assert(model.maxLife == Stats.Isaac.maxLife)
-      }
-      "invincibility" in {
-        assert(model.invincibility == Stats.Isaac.invincibility)
-      }
-      "maxSpeed" in {
-        assert(model.maxSpeed == Stats.Isaac.maxSpeed)
-      }
-      "contactDamage" in {
-        assert(model.damage == Stats.Isaac.damage)
-      }
-      "fireDamage" in {
-        assert(model.fireDamage == Stats.Isaac.fireDamage)
-      }
-      "fireRange" in {
-        assert(model.fireRange == Stats.Isaac.fireRange)
-      }
-      "fireRate" in {
-        assert(model.fireRate == Stats.Isaac.fireRate)
+      Stats.Isaac.foreach { case (key, value) =>
+        s"$key as $value" in {
+          assert(model.stats(key) == Stats.Isaac(key))
+        }
       }
     }
-    "should change the stats during gameplay" - {
+    "should change his stats during gameplay" - {
       "all" in {
         val newStats = Stats(
-          maxLife = 20,
-          invincibility = 3,
-          maxSpeed = 600,
-          damage = 1,
-          fireDamage = 4,
-          fireRange = 600,
-          fireRate = 1.2
+          "maxLife"       -> 20,
+          "invincibility" -> 3,
+          "maxSpeed"      -> 600,
+          "damage"        -> 1,
+          "fireDamage"    -> 6,
+          "fireRange"     -> 1000,
+          "fireRate"      -> 0.8
         )
         val updatedModel = model.changeStats(getContext(1), newStats).getOrElse(fail("Undefined Model"))
 
         assert(updatedModel.stats == newStats)
       }
-      "only maxLife" in {
-        val updatedModel = model.changeStat(getContext(1), "maxLife", 100).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.maxLife.set(Stats.Isaac, 100)
-        assert(updatedModel.stats == compareStats)
+      "replace one" - {
+        val newValue = 100
+        Stats.Isaac.foreach { case (key, value) =>
+          s"$key from $value to $newValue" in {
+            val updatedModel = model.changeStat(getContext(1), (key, newValue)).getOrElse(fail("Undefined Model"))
+            assert(updatedModel.stats(key) == newValue)
+          }
+        }
       }
-      "only invincibility" in {
-        val updatedModel = model.changeStat(getContext(1), "invincibility", 5).getOrElse(fail("Undefined Model"))
+      "sum one" - {
+        val newValue = 100
+        Stats.Isaac.foreach { case (key, value) =>
+          s"$key from $value add $newValue = ${Stats.Isaac(key) + newValue}" in {
+            val updatedModel = model.sumStat(getContext(1), (key, newValue)).getOrElse(fail("Undefined Model"))
 
-        val compareStats = StatsLens.invincibility.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
-      }
-      "only maxSpeed" in {
-        val updatedModel = model.changeStat(getContext(1), "maxSpeed", 5).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.maxSpeed.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
-      }
-      "only damage" in {
-        val updatedModel = model.changeStat(getContext(1), "damage", 5).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.damage.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
-      }
-      "only fireDamage" in {
-        val updatedModel = model.changeStat(getContext(1), "fireDamage", 5).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.fireDamage.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
-      }
-      "only fireRange" in {
-        val updatedModel = model.changeStat(getContext(1), "fireRange", 5).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.fireRange.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
-      }
-      "only fireRate" in {
-        val updatedModel = model.changeStat(getContext(1), "fireRate", 5).getOrElse(fail("Undefined Model"))
-
-        val compareStats = StatsLens.fireRate.set(Stats.Isaac, 5)
-        assert(updatedModel.stats == compareStats)
+            assert(updatedModel.stats(key) == Stats.Isaac(key) + newValue)
+          }
+        }
       }
     }
   }

@@ -280,7 +280,6 @@ trait StatsModel extends AnythingModel {
   val stats: Stats
 
   def withStats(stats: Stats): Model
-  def withStat[A <: Double](what: String)(value: A): Model
 
   /**
    * Replace all models stats
@@ -297,14 +296,24 @@ trait StatsModel extends AnythingModel {
    * Replace single models stat
    * @param context
    *   indigo frame context data
-   * @param what
-   *   the string that refers to a property of the [[Stats]] case class
-   * @param value
-   *   the value of the property to replace with current
+   * @param property
+   *   [[property]] to replace
    * @return
    *   the Outcome of the updated model
    */
-  def changeStat[A <: Double](context: FrameContext[StartupData], what: String, value: A): Outcome[Model] = Outcome(
-    withStat(what)(value)
-  )
+  def changeStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats + property))
+
+  /**
+   * Upldate single models stat
+   * @param context
+   *   indigo frame context data
+   * @param property
+   *   [[property]] to sum with current property
+   * @return
+   *   the Outcome of the updated model
+   */
+  def sumStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats +++ property))
+
 }

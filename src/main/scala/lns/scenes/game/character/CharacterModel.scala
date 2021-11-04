@@ -1,5 +1,7 @@
 package lns.scenes.game.character
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
@@ -8,7 +10,7 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.*
+import lns.scenes.game.stats.{ *, given }
 
 /**
  * Character model that is alive, it's dynamic by computing its speed and new position by user input, can fire computing
@@ -47,13 +49,13 @@ case class CharacterModel(
   // TODO: Builder pattern -> usare Require qui oppure sui Trait
   //  require ( life > 0 , " Incorrect life ")
 
-  val maxLife: Int          = stats.maxLife
-  val invincibility: Double = stats.invincibility
-  val maxSpeed: Int         = stats.maxSpeed
-  val damage: Double        = stats.damage
-  val fireDamage: Double    = stats.fireDamage
-  val fireRange: Int        = stats.fireRange
-  val fireRate: Double      = stats.fireRate
+  val maxLife: Int          = stats("maxLife")
+  val invincibility: Double = stats("invincibility")
+  val maxSpeed: Int         = stats("maxSpeed")
+  val damage: Double        = stats("damage")
+  val fireDamage: Double    = stats("fireDamage")
+  val fireRange: Int        = stats("fireRange")
+  val fireRate: Double      = stats("fireRate")
 
   val moveInputMappings: InputMapping[Vector2] =
     InputMapping(
@@ -71,8 +73,6 @@ case class CharacterModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
   def withStats(stats: Stats): Model                                = copyMacro
-  def withStat[A <: Double](what: String)(value: A): Model =
-    copy(stats = StatsLens(what)(stats, value))
 
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
@@ -99,6 +99,6 @@ object CharacterModel {
       Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))
     ),
     stats = Stats.Isaac,
-    life = Stats.Isaac.maxLife
+    life = Stats.Isaac("maxLife")
   )
 }
