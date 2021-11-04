@@ -21,9 +21,9 @@ given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
 type Timer = Double
 extension (timer: Timer)
   def elapsed(time: Double) = timer match {
-    case 0                  => 0
-    case x if timer - x > 0 => timer - x
-    case _                  => 0
+    case 0                 => 0
+    case x if x - time > 0 => x - time
+    case _                 => 0
   }
 
 /**
