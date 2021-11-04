@@ -2,7 +2,7 @@ package lns.scenes.game.room
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.room.door.Location
+import lns.scenes.game.room.door.{ Collision, Location }
 import lns.scenes.game.room.door.Location.*
 import org.scalajs.dom.raw.Position
 
@@ -17,7 +17,7 @@ object Boundary {
    * @return
    *   a new position inside the bounding box, shifted by the minimum necessary on the x and y axis
    */
-  def bound(container: BoundingBox, elem: BoundingBox): Vertex = {
+  def containerBound(container: BoundingBox, elem: BoundingBox): BoundingBox = {
 
     /**
      * a point is update with the edge coordinate (left or right) of the bounding box if it's beyond
@@ -39,7 +39,7 @@ object Boundary {
       else if beyond(container, elem)(Below) then container.bottom - elem.height
       else elem.position.y
 
-    Vertex(xBounded, yBounded)
+    elem.moveTo(xBounded, yBounded)
   }
 
   /**
@@ -59,6 +59,15 @@ object Boundary {
       case Location.Right => container.right <= elem.right
       case Location.Above => container.top >= elem.bottom
       case Location.Below => container.bottom <= elem.bottom
+    }
+
+  def elementBound(elem1: BoundingBox, elem2: BoundingBox): BoundingBox =
+    Collision(elem1, elem2) match {
+      case Some(Above, Below) => elem2.moveTo(elem2.x, elem1.top - elem2.height)
+      case Some(Below, Above) => elem2.moveTo(elem2.x, elem1.bottom)
+      case Some(Right, Left)  => elem2.moveTo(elem1.right, elem2.y)
+      case Some(Left, Right)  => elem2.moveTo(elem1.left - elem2.width, elem2.y)
+      case _                  => elem2
     }
 
   /**

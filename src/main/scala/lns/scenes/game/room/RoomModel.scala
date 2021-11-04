@@ -6,11 +6,12 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingModel, given }
+import lns.scenes.game.anything.{ AnythingModel, SolidModel }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.anything.given_Conversion_Set_Outcome
 
 import scala.language.implicitConversions
 
@@ -55,7 +56,11 @@ trait RoomModel {
    * @return
    *   the bounded character's position
    */
-  def boundPosition(anything: BoundingBox): Vertex = Boundary.bound(floor, anything)
+  def boundPosition(anything: BoundingBox): BoundingBox =
+    val characterBounded = Boundary.containerBound(floor, anything)
+    anythings
+      .filter(a => a.isInstanceOf[SolidModel])
+      .foldLeft(characterBounded)((character, element) => Boundary.elementBound(element.boundingBox, character))
 
   /**
    * Add a shot to the shot list

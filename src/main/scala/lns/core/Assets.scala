@@ -15,7 +15,7 @@ object Assets {
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] =
-    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Prolog.assets ++ Enemies.assets
+    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Elements.assets ++ Prolog.assets ++ Enemies.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -219,7 +219,6 @@ object Assets {
     val coinGold: AssetName        = AssetName("coin-gold")
     val coinSilver: AssetName      = AssetName("coin-silver")
     val key: AssetName             = AssetName("key")
-    val stone: AssetName           = AssetName("stone")
 
     val assets: Set[AssetType] = Set(
       AssetType.Image(barrelUncovered, AssetPath(baseUrl + specificUrl + "barrel-uncovered.png")),
@@ -232,10 +231,26 @@ object Assets {
       AssetType.Image(crateBroken, AssetPath(baseUrl + specificUrl + "crate-broken.png")),
       AssetType.Image(crateCovered, AssetPath(baseUrl + specificUrl + "crate-covered.png")),
       AssetType.Image(crateUncovered, AssetPath(baseUrl + specificUrl + "crate-uncovered.png")),
-      AssetType.Image(key, AssetPath(baseUrl + specificUrl + "key.png")),
-      AssetType.Image(stone, AssetPath(baseUrl + specificUrl + "stone.png"))
+      AssetType.Image(key, AssetPath(baseUrl + specificUrl + "key.png"))
     )
 
+  }
+
+  object Elements {
+
+    val specificUrl: String = "elements/"
+
+    object Stone {
+      val name: AssetName       = AssetName("stone")
+      val width                 = 147
+      val height                = 128
+      val withScale: Int => Int = (size: Int) => size * 5
+    }
+
+    import Stone.*
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(name, AssetPath(baseUrl + specificUrl + "stone.png"))
+    )
   }
 
 }

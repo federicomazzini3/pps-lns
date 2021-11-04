@@ -88,3 +88,15 @@ object DoorImplicit {
     def :+(toAddLocation: Location): Set[Location] = Set(doorLocation, toAddLocation)
   }
 }
+
+object LocationImplicit {
+  import Location.*
+  extension (location: Location) {
+    def opposite: Location = location match {
+      case Above => Below
+      case Below => Above
+      case Right => Left
+      case Left  => Right
+    }
+  }
+}

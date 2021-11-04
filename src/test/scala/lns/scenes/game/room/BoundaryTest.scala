@@ -9,20 +9,21 @@ class BoundaryTest extends AnyFreeSpec {
     "inside a bounding box" - {
       val inside = BoundingBox(100, 100, 1, 1)
       "should be the same after the Bound" in {
-        assert(Vertex(100, 100) == Boundary.bound(container, inside))
+        assert(inside == Boundary.containerBound(container, inside))
       }
       "moved beyond the left edge" - {
         "should be constraint on left value" in {
           val newPosition = inside.moveBy(-200, 0)
-          assert(Vertex(container.left, newPosition.y) == Boundary.bound(container, newPosition))
+          assert(newPosition.moveTo(container.left, newPosition.y) == Boundary.containerBound(container, newPosition))
         }
       }
       "moved beyond the right edge" - {
         "should be constraint on right value" in {
           val newPosition = inside.moveBy(+200, 0)
           assert(
-            Vertex(container.right - newPosition.width, newPosition.y) == // the original position is in top left
-              Boundary.bound(container, newPosition)
+            newPosition
+              .moveTo(container.right - newPosition.width, newPosition.y) == // the original position is in top left
+              Boundary.containerBound(container, newPosition)
           )
         }
       }
@@ -30,8 +31,9 @@ class BoundaryTest extends AnyFreeSpec {
         "should be constraint on top value" in {
           val newPosition = inside.moveBy(0, -200)
           assert(
-            Vertex(newPosition.x, container.top - newPosition.height) == // the original position is in top left
-              Boundary.bound(container, newPosition)
+            newPosition
+              .moveTo(newPosition.x, container.top - newPosition.height) == // the original position is in top left
+              Boundary.containerBound(container, newPosition)
           )
         }
       }
@@ -39,8 +41,9 @@ class BoundaryTest extends AnyFreeSpec {
         "should be constraint on bottom value" in {
           val newPosition = inside.moveBy(0, +200)
           assert(
-            Vertex(newPosition.x, container.bottom - newPosition.height) == //the original position is in top left
-              Boundary.bound(container, newPosition)
+            newPosition
+              .moveTo(newPosition.x, container.bottom - newPosition.height) == //the original position is in top left
+              Boundary.containerBound(container, newPosition)
           )
         }
       }
