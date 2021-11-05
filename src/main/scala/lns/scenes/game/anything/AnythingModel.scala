@@ -1,7 +1,6 @@
 package lns.scenes.game.anything
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
@@ -315,4 +314,5 @@ trait FireModel extends AnythingModel with StatsModel {
 
 trait SolidModel extends AnythingModel {
   type Model >: this.type <: SolidModel
+  val enabled: Boolean
 }

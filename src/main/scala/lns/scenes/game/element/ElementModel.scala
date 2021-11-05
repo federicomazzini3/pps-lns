@@ -1,4 +1,4 @@
-package lns.scenes.game.solid
+package lns.scenes.game.element
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.scenes.game.anything.{ AnythingModel, SolidModel }
@@ -6,9 +6,11 @@ import lns.scenes.game.anything.{ AnythingModel, SolidModel }
 case class StoneModel(val boundingBox: BoundingBox) extends SolidModel {
 
   type Model = StoneModel
+
+  val enabled = true
 }
 
-object SolidModel {
+object ElementModel {
   import lns.core.Assets.Elements.*
 
   /*def stone(position: Vertex): StoneModel =
@@ -36,6 +38,12 @@ object SolidModel {
       StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width * 2, 300),
+          Vertex(Stone.width, Stone.height)
+        )
+      ),
+      StoneModel(
+        BoundingBox(
+          Vertex(470 + Stone.width * 2, 300 + Stone.height),
           Vertex(Stone.width, Stone.height)
         )
       )

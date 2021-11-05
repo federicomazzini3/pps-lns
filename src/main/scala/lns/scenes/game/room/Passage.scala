@@ -1,6 +1,6 @@
 package lns.scenes.game.room
 
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.scenes.game.GameModel.GameStarted
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.anything.*
@@ -11,6 +11,8 @@ import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.DoorState.*
 import lns.scenes.game.dungeon.room
+import lns.scenes.game.room.door.LocationImplicit.opposite
+import DynamicState.*
 
 object Passage {
 
@@ -32,64 +34,68 @@ object Passage {
      * @return
      *   the new current room of the game
      */
-    def changeRoom(dungeon: DungeonModel, room: RoomModel)(locations: Location): RoomModel = locations match {
-      case Left  => dungeon.room(room.positionInDungeon)(Left).getOrElse(room)
-      case Right => dungeon.room(room.positionInDungeon)(Right).getOrElse(room)
-      case Above => dungeon.room(room.positionInDungeon)(Above).getOrElse(room)
-      case Below => dungeon.room(room.positionInDungeon)(Below).getOrElse(room)
-    }
+    def changeRoom(locations: Location): RoomModel =
+      dungeon.room(room.positionInDungeon)(locations).getOrElse(room)
 
     /**
      * moving the character accordingly to the destination port
      * @param character
      * @param floor
-     * @param doorDestination
+     * @param location
      * @return
      *   a new character with updated position
      */
-    def moveCharacter(character: CharacterModel)(floor: BoundingBox)(doorDestination: Location): CharacterModel =
-      doorDestination match {
-        case Left =>
-          character.copy(boundingBox = character.boundingBox.moveTo(floor.left, character.boundingBox.y))
-        case Right =>
-          character.copy(boundingBox =
-            character.boundingBox.moveTo(floor.right - character.boundingBox.width, character.boundingBox.y)
-          )
-        case Above =>
-          character.copy(boundingBox =
-            character.boundingBox.moveTo(character.boundingBox.x, floor.top - character.boundingBox.height)
-          )
-        case Below =>
-          character.copy(boundingBox =
-            character.boundingBox.moveTo(character.boundingBox.x, floor.bottom - character.boundingBox.height)
-          )
+    def moveCharacter(location: Location): CharacterModel =
+      val moves: Map[Location, Vertex] =
+        Map(
+          Above -> Vertex(character.boundingBox.x, room.floor.top - character.boundingBox.height),
+          Below -> Vertex(character.boundingBox.x, room.floor.bottom - character.boundingBox.height),
+          Left  -> Vertex(room.floor.left, character.boundingBox.y),
+          Right -> Vertex(room.floor.right - character.boundingBox.width, character.boundingBox.y)
+        )
+
+      character.copy(boundingBox = character.boundingBox.moveTo(moves(location)))
+
+    /**
+     * Check, for an element, if it's center aligned in a specific edge of its container
+     * @param container
+     *   the element's container
+     * @param elem
+     *   the element inside
+     * @param location
+     *   the specific edge to check
+     * @return
+     *   if the element is center aligned
+     */
+    def characterOnDoor(location: Location): Boolean =
+      val container = room.floor
+      val elem      = character.boundingBox
+      location match {
+        case Left | Right  => container.verticalCenter > elem.top && container.verticalCenter < elem.bottom
+        case Above | Below => container.horizontalCenter > elem.left && container.horizontalCenter < elem.right
       }
 
-    character.getDynamicState() match {
-      case DynamicState.MOVE_RIGHT
-          if Boundary.beyond(room.floor, character.boundingBox)(Right) &&
-            Boundary.centerAligned(room.floor, character.boundingBox)(Right) &&
-            Door.verifyOpen(room.doors)(Right) =>
-        (changeRoom(dungeon, room)(Right), moveCharacter(character)(room.floor)(Left))
+    def doorToPass: Option[Location] =
+      (Collision.withContainer(room.floor, character.boundingBox), character.getDynamicState()) match {
 
-      case DynamicState.MOVE_LEFT
-          if Boundary.beyond(room.floor, character.boundingBox)(Left) &&
-            Boundary.centerAligned(room.floor, character.boundingBox)(Left) &&
-            Door.verifyOpen(room.doors)(Left) =>
-        (changeRoom(dungeon, room)(Left), moveCharacter(character)(room.floor)(Right))
+        case ((None, Some(Above)), MOVE_UP) if Door.verifyOpen(room.doors)(Above) && characterOnDoor(Above) =>
+          Some(Above)
 
-      case DynamicState.MOVE_UP
-          if Boundary.beyond(room.floor, character.boundingBox)(Above) &&
-            Boundary.centerAligned(room.floor, character.boundingBox)(Above) &&
-            Door.verifyOpen(room.doors)(Above) =>
-        (changeRoom(dungeon, room)(Above), moveCharacter(character)(room.floor)(Below))
+        case ((None, Some(Below)), MOVE_DOWN) if Door.verifyOpen(room.doors)(Below) && characterOnDoor(Below) =>
+          Some(Below)
 
-      case DynamicState.MOVE_DOWN
-          if Boundary.beyond(room.floor, character.boundingBox)(Below) &&
-            Boundary.centerAligned(room.floor, character.boundingBox)(Below) &&
-            Door.verifyOpen(room.doors)(Below) =>
-        (changeRoom(dungeon, room)(Below), moveCharacter(character)(room.floor)(Above))
+        case ((Some(Left), None), MOVE_LEFT) if Door.verifyOpen(room.doors)(Left) && characterOnDoor(Left) =>
+          Some(Left)
 
+        case ((Some(Right), None), MOVE_RIGHT) if Door.verifyOpen(room.doors)(Right) && characterOnDoor(Right) =>
+          Some(Right)
+
+        case _ => None
+      }
+
+    doorToPass match {
+      case Some(doorLocation) =>
+        (changeRoom(doorLocation), moveCharacter(doorLocation.opposite))
       case _ => (room, character)
     }
   }

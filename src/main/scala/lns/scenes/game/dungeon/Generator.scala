@@ -13,7 +13,7 @@ import lns.scenes.game.stats.*
 
 import scala.collection.immutable.HashMap
 import lns.scenes.game.room.door.{ DoorState, Location }
-import lns.scenes.game.solid.SolidModel
+import lns.scenes.game.element.ElementModel
 
 object Generator {
 
@@ -47,7 +47,7 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateBlockingElements(): Set[AnythingModel] = SolidModel.stone()
+  def generateBlockingElements(): Set[AnythingModel] = ElementModel.stone()
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

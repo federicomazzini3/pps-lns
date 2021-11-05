@@ -1,4 +1,4 @@
-package lns.scenes.game.solid
+package lns.scenes.game.element
 
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.{ Rectangle, Vector2 }
@@ -9,7 +9,7 @@ import lns.core.Assets
 import lns.scenes.game.anything.{ AnythingView, SolidModel }
 import lns.scenes.game.character.{ CharacterModel, CharacterViewModel }
 
-case class SolidView() extends AnythingView {
+case class ElementView() extends AnythingView {
 
   type Model     = SolidModel
   type ViewModel = Unit
@@ -18,12 +18,12 @@ case class SolidView() extends AnythingView {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group().addChild(
       model match {
-        case StoneModel(_) => SolidGraphic.stone()
+        case StoneModel(_) => ElementGraphic.stone()
       }
     )
 }
 
-case object SolidGraphic {
+case object ElementGraphic {
 
   import Assets.Elements.Stone.*
   def stone(): Graphic[Material.Bitmap] = Graphic(

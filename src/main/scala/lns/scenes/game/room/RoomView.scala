@@ -15,7 +15,7 @@ import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
 import lns.scenes.game.shot.{ ShotModel, ShotView }
 import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
 import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
-import lns.scenes.game.solid.SolidView
+import lns.scenes.game.element.ElementView
 
 object RoomView {
 
@@ -36,7 +36,7 @@ object RoomView {
       s1.addChild(
         s2 match {
           case shot: ShotModel   => ShotView().draw(context, shot, ())
-          case solid: SolidModel => SolidView().draw(context, solid, ())
+          case solid: SolidModel => ElementView().draw(context, solid, ())
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
           case enemy: MaskModel  => MaskView().draw(context, enemy, ())
           case _                 => Group()

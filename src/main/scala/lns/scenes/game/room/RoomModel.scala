@@ -6,12 +6,11 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingModel, SolidModel }
+import lns.scenes.game.anything.{ AnythingModel, DynamicState, SolidModel, given_Conversion_Set_Outcome }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.anything.given_Conversion_Set_Outcome
 
 import scala.language.implicitConversions
 
@@ -59,7 +58,7 @@ trait RoomModel {
   def boundPosition(anything: BoundingBox): BoundingBox =
     val characterBounded = Boundary.containerBound(floor, anything)
     anythings
-      .filter(a => a.isInstanceOf[SolidModel])
+      .collect { case a: SolidModel if a.enabled => a }
       .foldLeft(characterBounded)((character, element) => Boundary.elementBound(element.boundingBox, character))
 
   /**
@@ -149,10 +148,11 @@ case class ArenaRoom(
 ) extends RoomModel {
 
   //da filtrare con i nemici (quando ci saranno)
-  val doors = anythings.size match {
-    case 0 => doorsLocations.open
-    case _ => doorsLocations.open //close
-  }
+  val doors =
+    anythings.collect { case e: Enemy => e }.size match {
+      case 0 => doorsLocations.open
+      case _ => doorsLocations.close
+    }
 }
 
 /**
