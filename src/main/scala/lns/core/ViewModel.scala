@@ -1,7 +1,8 @@
 package lns.core
 
 import lns.StartupData
-import lns.scenes.game.GameViewModel
+import lns.core.Model
+import lns.scenes.game.*
 import lns.scenes.menu.MenuViewModel
 
 /**
@@ -12,6 +13,6 @@ final case class ViewModel(menu: MenuViewModel, game: GameViewModel)
 
 object ViewModel {
 
-  def initial(startupData: StartupData): ViewModel =
-    ViewModel(MenuViewModel.initial(startupData), GameViewModel.initial(startupData))
+  def initial(startupData: StartupData, model: Model): ViewModel =
+    ViewModel(MenuViewModel.initial(startupData), GameViewModel.initial(startupData, model.game))
 }

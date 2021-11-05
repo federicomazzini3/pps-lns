@@ -2,7 +2,7 @@ package lns.scenes.game.enemy.boney
 
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
-import lns.core.Animations.{ Boney, Character }
+import lns.core.Animations.Boney
 import lns.core.Assets
 import lns.scenes.game.anything.DynamicState
 

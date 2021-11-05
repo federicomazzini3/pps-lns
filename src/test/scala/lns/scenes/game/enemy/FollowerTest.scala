@@ -19,13 +19,19 @@ import lns.scenes.game.stats.PropertyName.*
 case class MyFollowerModel(
     boundingBox: BoundingBox,
     stats: Stats,
+    status: EnemyState = EnemyState.Attacking,
+    life: Int = 0,
+    invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
-) extends DynamicModel
-    with Follower(MaxSpeed @@ stats) {
+) extends EnemyModel
+    with DynamicModel
+    with Follower {
   type Model = MyFollowerModel
 
-  override def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyFollowerModel = copyMacro
-  def withStats(stats: Stats): Model                                                  = copyMacro
+  def withStats(stats: Stats): Model                               = copyMacro
+  def withStatus(status: EnemyState): Model                        = copyMacro
+  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
 }
 
 trait FollowerModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

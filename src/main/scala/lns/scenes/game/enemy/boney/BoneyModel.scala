@@ -1,7 +1,6 @@
 package lns.scenes.game.enemy.boney
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
@@ -13,7 +12,7 @@ import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.enemy.Follower
+import lns.scenes.game.enemy.{ EnemyModel, EnemyState, Follower }
 
 /**
  * Enemy model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
@@ -21,36 +20,34 @@ import lns.scenes.game.enemy.Follower
  *
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
+ * @param status
+ *   Initial [[EnemyState]]
  * @param stats
  *   Initial [[Stats]]
- * @param life
- *   [[AliveModel]] life, default 0
  * @param speed
  *   [[DynamicModel]] speed, default Vector2(0, 0)
+ * @param life
+ *   [[AliveModel]] life, default 0
  * @param invincibilityTimer
  *   [[AliveModel]] invincibilityTimer, default 0
- * @param fireRateTimer
- *   [[FireModel]] fireRateTimer, default 0
- * @param shot
- *   [[FireModel]] shot, default None
  */
 case class BoneyModel(
     boundingBox: BoundingBox,
     stats: Stats,
-    life: Int = 0,
+    status: EnemyState = EnemyState.Attacking,
     speed: Vector2 = Vector2(0, 0),
+    life: Int = 0,
     invincibilityTimer: Double = 0
-) extends AliveModel
+) extends EnemyModel
     with DynamicModel
-    with DamageModel
-    with StatsModel
-    with Follower(MaxSpeed @@ stats) {
+    with Follower {
 
   type Model = BoneyModel
 
+  def withStats(stats: Stats): Model                               = copyMacro
+  def withStatus(status: EnemyState): Model                        = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withStats(stats: Stats): Model                               = copyMacro
 }
 
 /**

@@ -1,7 +1,7 @@
 package lns.scenes.game.room
 
 import indigoextras.geometry.BoundingBox
-import lns.scenes.game.GameModel.GameStarted
+import lns.scenes.game.GameModel.Started
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.anything.*
 import lns.scenes.game.dungeon.DungeonModel

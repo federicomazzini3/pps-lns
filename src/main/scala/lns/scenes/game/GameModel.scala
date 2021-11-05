@@ -15,15 +15,15 @@ sealed trait GameModel
 
 object GameModel {
 
-  case class GameNotStarted(val prologClient: PrologClient) extends GameModel
+  case class NotStarted(val prologClient: PrologClient) extends GameModel
 
-  case class GameStarted(
+  case class Started(
       val dungeon: DungeonModel,
       val room: RoomModel,
       val character: CharacterModel
   ) extends GameModel
 
-  def initial: GameModel = GameNotStarted(PrologClient())
+  def initial: GameModel = NotStarted(PrologClient())
 
   def start(startupData: StartupData, rooms: Map[Position, RoomType]): GameModel =
     /** Generation here */
@@ -34,7 +34,7 @@ object GameModel {
         )
       )
 
-    GameStarted(
+    Started(
       dungeonModel,
       dungeonModel.initialRoom,
       CharacterModel.initial

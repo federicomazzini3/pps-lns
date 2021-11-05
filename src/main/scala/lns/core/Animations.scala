@@ -2,10 +2,11 @@ package lns.core
 
 import indigo.*
 import lns.scenes.game.anything.{ DynamicState, FireState }
+import lns.scenes.game.enemy.EnemyState
 
 object Animations {
 
-  def apply(): List[Animation]                                = List(Character.head, Character.body, Boney.body)
+  def apply(): List[Animation] = List(Character.head, Character.body, Boney.body, Nerve.body, Parabite.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
@@ -89,6 +90,66 @@ object Animations {
     val body: Animation = Animation
       .create(AnimationKey("boney_body"), Cycle.create("walking_left_right", generateBodyFrame(0, 55)))
       .addCycle(Cycle.create("walking_up_down", generateBodyFrame(0, 35)))
+  }
+
+  object Nerve {
+
+    val bodyWidth: Int  = 26
+    val bodyHeight: Int = 50
+
+    def generateBodyFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 6)(i => Frame(Rectangle(x + (i * (bodyWidth + 6)), y, bodyWidth, bodyHeight), Millis(80)))
+      )
+
+    val body: Animation = Animation
+      .create(AnimationKey("nerve_body"), Cycle.create("idle", generateBodyFrame(3, 7)))
+  }
+
+  object Parabite {
+
+    /*Enemy body*/
+    val offset          = 309
+    val bodyWidth: Int  = 26
+    val bodyHeight: Int = 32
+    val hideFrameTime   = 180
+    val hideTime        = 180 * 3
+
+    def generateHidingFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
+          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
+          Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTime))
+        )
+      )
+
+    def generateWakeupFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
+          Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTime)),
+          Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTime))
+        )
+      )
+
+    def generateWalkingFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 2)(i =>
+          Frame(Rectangle(offset + x + (i * (bodyWidth + 6)), y, bodyWidth, bodyHeight), Millis(80))
+        )
+      )
+
+    def generateIdleFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 2)(i => Frame(Rectangle(x + (i * (bodyWidth + 6)), y, bodyWidth, bodyHeight), Millis(80)))
+      )
+
+    val body: Animation = Animation
+      .create(AnimationKey("parabite_body"), Cycle.create("walking", generateWalkingFrame(0, 34)))
+      .addCycle(Cycle.create("hiding", generateHidingFrame))
+      .addCycle(Cycle.create("wakeup", generateWakeupFrame))
+      .addCycle(Cycle.create("idle", generateIdleFrame(0, 0)))
   }
 
 }
