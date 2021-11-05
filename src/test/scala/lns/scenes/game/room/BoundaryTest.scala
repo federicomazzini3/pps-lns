@@ -5,11 +5,11 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 class BoundaryTest extends AnyFreeSpec {
 
   val container = BoundingBox(0, 0, 200, 200)
-  "A position" - {
+  "An element" - {
     "inside a bounding box" - {
       val inside = BoundingBox(100, 100, 1, 1)
-      "should be the same after the Bound" in {
-        assert(inside == Boundary.containerBound(container, inside))
+      "should be located the same after the Bound" in {
+        assert(inside.position == Boundary.containerBound(container, inside).position)
       }
       "moved beyond the left edge" - {
         "should be constraint on left value" in {
@@ -46,6 +46,40 @@ class BoundaryTest extends AnyFreeSpec {
               Boundary.containerBound(container, newPosition)
           )
         }
+      }
+    }
+  }
+
+  val element = BoundingBox(0, 0, 100, 100)
+  "one element" - {
+    "that doesn't collide with another element" - {
+      val block = BoundingBox(101, 101, 50, 50)
+      "should be located the same after the bounding" in {
+        assert(element.position == Boundary.elementBound(block, element).position)
+      }
+    }
+    "that collide on bottom side with another element" - {
+      val block = BoundingBox(0, 99, 50, 50)
+      "should be adjacent on bottom side" in {
+        assert(block.top == Boundary.elementBound(block, element).bottom)
+      }
+    }
+    "that collide on top side with another element" - {
+      val block = BoundingBox(0, 1 - 50, 50, 50)
+      "should be adjacent on top side" in {
+        assert(block.bottom == Boundary.elementBound(block, element).top)
+      }
+    }
+    "that collide on left side with another element" - {
+      val block = BoundingBox(1 - 50, 0, 50, 50)
+      "should be adjacent on bottom side" in {
+        assert(block.right == Boundary.elementBound(block, element).left)
+      }
+    }
+    "that collide on right side with another element" - {
+      val block = BoundingBox(99, 0, 50, 50)
+      "should be adjacent on right side" in {
+        assert(block.left == Boundary.elementBound(block, element).right)
       }
     }
   }
