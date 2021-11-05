@@ -1,11 +1,17 @@
 package lns.scenes.game.anything
 
+import scala.language.implicitConversions
+
 import indigo.*
 import indigo.shared.*
 import lns.StartupData
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
+
+given vmInversion: Conversion[Set[Outcome[AnythingViewModel]], Outcome[Set[AnythingViewModel]]] with
+  def apply(set: Set[Outcome[AnythingViewModel]]): Outcome[Set[AnythingViewModel]] =
+    set.foldLeft(Outcome(Set[AnythingViewModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
 
 /**
  * Base viewModel for every thing placed inside a room

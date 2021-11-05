@@ -7,6 +7,7 @@ import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.enemy.boney.BoneyModel
 import lns.scenes.game.enemy.mask.MaskModel
 import lns.scenes.game.enemy.nerve.NerveModel
+import lns.scenes.game.enemy.parabite.ParabiteModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
@@ -30,7 +31,7 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])
       case RoomType.Arena =>
-        val enemyTest = NerveModel.initial
+        val enemyTest = ParabiteModel.initial
         RoomModel.arenaRoom(position, generateDoors(grid, position), Set(enemyTest)) // Set.empty[AnythingModel]
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), Set.empty[AnythingModel])

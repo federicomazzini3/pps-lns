@@ -76,7 +76,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def initialModel(startupData: StartupData): Outcome[Model] = Outcome(Model.initial(startupData))
 
   def initialViewModel(startupData: StartupData, model: Model): Outcome[ViewModel] =
-    Outcome(ViewModel.initial(startupData))
+    Outcome(ViewModel.initial(startupData, model))
 
   def present(context: FrameContext[StartupData], model: Model, viewModel: ViewModel): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment.empty)

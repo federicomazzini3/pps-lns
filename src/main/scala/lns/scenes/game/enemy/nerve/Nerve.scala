@@ -38,7 +38,7 @@ trait Nerve {
    */
   def bodyView(model: NerveModel): Sprite[Material.Bitmap] = bodyAnimation(model)
     .withRef(Nerve.bodyWidth / 2, 0)
-    .moveTo(width / 2, 20)
+  // .moveTo(width / 2, 20)
 
   /**
    * Plays the animation cycle if the character is moving

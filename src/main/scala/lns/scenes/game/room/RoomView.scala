@@ -15,22 +15,23 @@ import lns.scenes.game.shot.{ ShotModel, ShotView }
 import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
 import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
 import lns.scenes.game.enemy.nerve.{ NerveModel, NerveView }
+import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel, ParabiteView }
 
 object RoomView {
 
-  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+  def draw(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     view(context, model, viewModel)
 
-  def view(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+  def view(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     Group()
       .addChild(RoomGraphic.roomGraphic(context.startUpData))
       .addChild(doorView(context.startUpData, model, viewModel))
       .addChild(anythingView(context, model, viewModel))
 
-  def doorView(startupData: StartupData, model: RoomModel, viewModel: Unit): Group =
+  def doorView(startupData: StartupData, model: RoomModel, viewModel: RoomViewModel): Group =
     DoorView.view(startupData, model.doors, ())
 
-  def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: Unit): Group =
+  def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
         s2 match {
@@ -38,7 +39,10 @@ object RoomView {
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
           case enemy: MaskModel  => MaskView().draw(context, enemy, ())
           case enemy: NerveModel => NerveView().draw(context, enemy, ())
-          case _                 => Group()
+          case enemy: ParabiteModel =>
+            ParabiteView()
+              .draw(context, enemy, viewModel.anythings.head.asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
+          case _ => Group()
         }
       )
     )
