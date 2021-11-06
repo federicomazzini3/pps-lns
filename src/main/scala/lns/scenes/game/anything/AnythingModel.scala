@@ -1,7 +1,6 @@
 package lns.scenes.game.anything
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
@@ -164,7 +163,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
       superObj <- super.update(context)(room)(character)
       newSpeed    = computeSpeed(context)(room)(character) * context.gameTime.delta.toDouble
       newLocation = room.boundPosition(boundingBox.moveBy(newSpeed))
-      newObj      = superObj.withDynamic(boundingBox.moveTo(newLocation), newSpeed).asInstanceOf[Model]
+      newObj      = superObj.withDynamic(newLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
 }
@@ -315,4 +314,9 @@ trait FireModel extends AnythingModel with StatsModel {
       case _               => retObj
     }
 
+}
+
+trait SolidModel extends AnythingModel {
+  type Model >: this.type <: SolidModel
+  val enabled: Boolean
 }

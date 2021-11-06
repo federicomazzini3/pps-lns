@@ -12,9 +12,7 @@ import lns.scenes.game.stats.PropertyName.*
  * Isaac Character view elements builder
  */
 trait Isaac {
-  val width: Int  = 28
-  val height: Int = 33
-  val scale: Int  = 2
+  import Assets.Character.*
 
   val shadowModel: Shape =
     Shape

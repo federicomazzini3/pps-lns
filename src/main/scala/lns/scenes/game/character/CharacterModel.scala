@@ -86,10 +86,12 @@ case class CharacterModel(
  * Factory of [[CharacterModel]]
  */
 object CharacterModel {
+  import Assets.Rooms.*
+  import Assets.Character.*
   def initial: CharacterModel = CharacterModel(
     boundingBox = BoundingBox(
-      Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vertex(Assets.Character.withScale(Assets.Character.width), Assets.Character.withScale(Assets.Character.height))
+      Vertex(floorSize / 2, floorSize / 2),
+      Vertex(withScale(width), withScale(height))
     ),
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac

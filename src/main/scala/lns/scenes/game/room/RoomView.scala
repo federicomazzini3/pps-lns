@@ -9,11 +9,13 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Assets.*
+import lns.scenes.game.anything.SolidModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
 import lns.scenes.game.shot.{ ShotModel, ShotView }
 import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
 import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
+import lns.scenes.game.element.ElementView
 import lns.scenes.game.enemy.nerve.{ NerveModel, NerveView }
 import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel, ParabiteView }
 
@@ -24,7 +26,7 @@ object RoomView {
 
   def view(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     Group()
-      .addChild(RoomGraphic.roomGraphic(context.startUpData))
+      .addChild(RoomGraphic(context.startUpData))
       .addChild(doorView(context.startUpData, model, viewModel))
       .addChild(anythingView(context, model, viewModel))
 
@@ -36,6 +38,7 @@ object RoomView {
       s1.addChild(
         s2 match {
           case shot: ShotModel   => ShotView().draw(context, shot, ())
+          case solid: SolidModel => ElementView().draw(context, solid, ())
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
           case enemy: MaskModel  => MaskView().draw(context, enemy, ())
           case enemy: NerveModel => NerveView().draw(context, enemy, ())
@@ -50,7 +53,7 @@ object RoomView {
 
 object RoomGraphic {
 
-  def roomGraphic(startupData: StartupData): Graphic[Material.Bitmap] =
+  def apply(startupData: StartupData): Graphic[Material.Bitmap] =
     Graphic(
       Rectangle(
         0,
