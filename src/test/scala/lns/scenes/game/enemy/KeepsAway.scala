@@ -20,13 +20,19 @@ case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
     stats: Stats,
     range: (Int, Int),
+    status: EnemyState = EnemyState.Attacking,
+    life: Int = 0,
+    invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
-) extends DynamicModel
-    with KeepsAway(MaxSpeed @@ stats, range) {
+) extends EnemyModel
+    with DynamicModel
+    with KeepsAway(range) {
   type Model = MyKeepsAwayModel
 
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
   def withStats(stats: Stats): Model                                          = copyMacro
+  def withStatus(status: EnemyState): Model                                   = copyMacro
+  def withAlive(life: Int, invincibilityTimer: Double): Model                 = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
 }
 
 trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

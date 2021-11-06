@@ -1,4 +1,4 @@
-package lns.scenes.game.character
+package lns.scenes.game.enemy.nerve
 
 import indigo.*
 import indigo.shared.datatypes.Vector2
@@ -6,20 +6,18 @@ import lns.StartupData
 import lns.scenes.game.anything.AnythingView
 
 /**
- * Character Isaac view based on CharacterModel and built grouping its elements head, body and shadow
+ * Nerve view based on EnemyModel and built grouping its elements head and shadow
  */
-case class CharacterView() extends AnythingView with Isaac {
+case class NerveView() extends AnythingView with Nerve {
 
-  type Model     = CharacterModel
-  type ViewModel = CharacterViewModel
+  type Model     = NerveModel
+  type ViewModel = Unit
   type View      = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
       /* .addChild(boundingModel) */
-      .addChild(shadowModel)
       .addChild(bodyView(model))
-      .addChild(headView(model, viewModel))
       .withScale(Vector2(5, 5))
   //.withDepth(Depth(-model.boundingBox.top.toInt))
   //.withRef(width / 2, height / 2)
