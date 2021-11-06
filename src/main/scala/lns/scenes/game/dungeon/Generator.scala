@@ -17,6 +17,8 @@ import scala.collection.immutable.HashMap
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.element.ElementModel
 
+import java.util.UUID
+
 object Generator {
 
   def apply(grid: BasicGrid): DungeonModel =
@@ -32,8 +34,12 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
       case RoomType.Arena =>
-        val enemyTest = ParabiteModel.initial
-        RoomModel.arenaRoom(position, generateDoors(grid, position), Set(enemyTest) ++ generateBlockingElements()) // Set.empty[AnythingModel]
+        val enemyTest = UUID.randomUUID() -> ParabiteModel.initial
+        RoomModel.arenaRoom(
+          position,
+          generateDoors(grid, position),
+          Map(enemyTest) ++ generateBlockingElements()
+        ) // Set.empty[AnythingModel]
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
     }
@@ -42,7 +48,7 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateBlockingElements(): Set[AnythingModel] = ElementModel.stone()
+  def generateBlockingElements(): Map[UUID, AnythingModel] = ElementModel.stone()
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

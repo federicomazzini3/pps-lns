@@ -34,7 +34,7 @@ object RoomView {
     DoorView.view(startupData, model.doors, ())
 
   def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
-    model.anythings.foldLeft(Group())((s1, s2) =>
+    model.anythings.values.foldLeft(Group())((s1, s2) =>
       s1.addChild(
         s2 match {
           case shot: ShotModel   => ShotView().draw(context, shot, ())

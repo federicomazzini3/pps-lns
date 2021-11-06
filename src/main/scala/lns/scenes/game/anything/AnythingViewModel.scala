@@ -1,7 +1,6 @@
 package lns.scenes.game.anything
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigo.shared.*
 import lns.StartupData
@@ -9,9 +8,17 @@ import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
-given vmInversion: Conversion[Set[Outcome[AnythingViewModel]], Outcome[Set[AnythingViewModel]]] with
+import java.util.UUID
+
+given vmInverionsSet: Conversion[Set[Outcome[AnythingViewModel]], Outcome[Set[AnythingViewModel]]] with
   def apply(set: Set[Outcome[AnythingViewModel]]): Outcome[Set[AnythingViewModel]] =
     set.foldLeft(Outcome(Set[AnythingViewModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
+
+given vmInversionMap: Conversion[Map[UUID, Outcome[AnythingViewModel]], Outcome[Map[UUID, AnythingViewModel]]] with
+  def apply(set: Map[UUID, Outcome[AnythingViewModel]]): Outcome[Map[UUID, AnythingViewModel]] =
+    set.foldLeft(Outcome(Map[UUID, AnythingViewModel]().empty))((acc, el) =>
+      acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
+    )
 
 /**
  * Base viewModel for every thing placed inside a room
