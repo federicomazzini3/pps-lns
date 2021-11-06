@@ -32,16 +32,16 @@ object Generator {
       case RoomType.Empty =>
         RoomModel.emptyRoom(position, generateDoors(grid, position))
       case RoomType.Item =>
-        RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
+        RoomModel.itemRoom(position, generateDoors(grid, position), Map.empty) //generateBlockingElements())
       case RoomType.Arena =>
         val enemyTest = UUID.randomUUID() -> ParabiteModel.initial
         RoomModel.arenaRoom(
           position,
           generateDoors(grid, position),
-          Map(enemyTest) ++ generateBlockingElements()
-        ) // Set.empty[AnythingModel]
+          Map(enemyTest) //++ generateBlockingElements()
+        )
       case RoomType.Boss =>
-        RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
+        RoomModel.bossRoom(position, generateDoors(grid, position), Map.empty) //generateBlockingElements())
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
