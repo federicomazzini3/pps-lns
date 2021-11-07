@@ -17,7 +17,9 @@ given vmInverionsSet: Conversion[Set[Outcome[AnythingViewModel]], Outcome[Set[An
 given vmInversionMap: Conversion[Map[UUID, Outcome[AnythingViewModel]], Outcome[Map[UUID, AnythingViewModel]]] with
   def apply(set: Map[UUID, Outcome[AnythingViewModel]]): Outcome[Map[UUID, AnythingViewModel]] =
     set.foldLeft(Outcome(Map[UUID, AnythingViewModel]().empty))((acc, el) =>
-      acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
+      acc.merge[AnythingViewModel, Map[UUID, AnythingViewModel]](el._2)((set, el2) => set + (el._1 -> el2))
+    //acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
+    //acc.merge(el._2)((set, el._2) => set + el)
     )
 
 /**

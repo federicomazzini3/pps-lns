@@ -22,7 +22,7 @@ given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
 given Conversion[Map[UUID, Outcome[AnythingModel]], Outcome[Map[UUID, AnythingModel]]] with
   def apply(set: Map[UUID, Outcome[AnythingModel]]): Outcome[Map[UUID, AnythingModel]] =
     set.foldLeft(Outcome(Map[UUID, AnythingModel]().empty))((acc, el) =>
-      acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
+      acc.merge[AnythingModel, Map[UUID, AnythingModel]](el._2)((set, el2) => set + (el._1 -> el2))
     )
 
 type Timer = Double
