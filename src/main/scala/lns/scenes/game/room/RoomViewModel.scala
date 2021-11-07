@@ -25,7 +25,7 @@ case class RoomViewModel(val positionInDungeon: Position, val anythings: Map[UUI
       .map((id, any) =>
         (id -> (any match {
           case any: ParabiteViewModel =>
-            any.update(context, model.anythings.head.asInstanceOf[ParabiteModel]) //TODO: RISOLVERE!!!
+            any.update(context, model.anythings(id).asInstanceOf[ParabiteModel]) //TODO: RISOLVERE!!!
         }))
       )
 
@@ -39,11 +39,13 @@ object RoomViewModel {
   def initial(model: RoomModel): RoomViewModel =
     RoomViewModel(
       model.positionInDungeon,
-      model.anythings.map((id, any) =>
-        (id -> (any match {
-          case a: ParabiteModel => ParabiteViewModel()
-        }))
-      )
+      model.anythings
+        .collect { case (id, e: ParabiteModel): (UUID, ParabiteModel) => (id -> e) }
+        .map((id, any) =>
+          (id -> (any match {
+            case a: ParabiteModel => println("VIEW MODEL CREATO"); ParabiteViewModel()
+          }))
+        )
     )
 
 }
