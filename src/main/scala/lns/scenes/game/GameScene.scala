@@ -6,7 +6,8 @@ import indigo.shared.datatypes.Vector2
 import indigo.shared.scenegraph.Group
 import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
-import lns.scenes.game.GameModel.{ GameNotStarted, GameStarted }
+import lns.scenes.game.GameModel
+import lns.scenes.game.GameViewModel
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
@@ -14,7 +15,6 @@ import lns.scenes.game.room.{ Boundary, Passage, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.character.*
 import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
-import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.shot.*
 import lns.subsystems.prolog.PrologEvent
 
@@ -40,7 +40,7 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneModel] = {
     case ShotEvent(p, d) =>
       model match {
-        case model @ GameStarted(_, room, _) =>
+        case model @ GameModel.Started(_, room, _) =>
           Outcome(model.copy(room = room.addShot(ShotModel(p, d))))
         case _ => Outcome(model)
       }
@@ -48,14 +48,14 @@ final case class GameScene() extends EmptyScene {
     case FrameTick =>
       model match {
 
-        case model @ GameStarted(dungeon, room, character) =>
+        case model @ GameModel.Started(dungeon, room, character) =>
           for {
             character <- character.update(context)(room)(character)
             room      <- room.update(context)(character)
             (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
           } yield model.copy(character = newCharacter, room = newRoom)
 
-        case model @ GameNotStarted(prologClient) if !prologClient.consultDone =>
+        case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
             .consult(
               context.startUpData.dungeonGenerator.get,
@@ -67,7 +67,7 @@ final case class GameScene() extends EmptyScene {
 
     case PrologEvent.Answer(queryId, substitution) =>
       model match {
-        case model @ GameNotStarted(prologClient) if prologClient.hasQuery(queryId) =>
+        case GameModel.NotStarted(prologClient) if prologClient.hasQuery(queryId) =>
           GameModel.start(
             context.startUpData,
             Generator.getDungeon(substitution)
@@ -86,13 +86,20 @@ final case class GameScene() extends EmptyScene {
   ): GlobalEvent => Outcome[SceneViewModel] = {
 
     case FrameTick =>
-      model match {
-        case model @ GameStarted(_, _, character) =>
+      (model, viewModel) match {
+        case (model: GameModel.Started, viewModel @ GameViewModel.Started(dungeon, room, character)) =>
           for {
-            updatedCharacter <- viewModel.character.update(context, character)
-          } yield viewModel.copy(character = updatedCharacter)
+            updatedCharacter <- viewModel.character.update(context, model.character)
+            newRoom =
+              if (room.positionInDungeon != model.room.positionInDungeon)
+                viewModel.dungeon.content(model.room.positionInDungeon)
+              else room
+            updatedRoom <- newRoom.update(context, model.room)
+          } yield viewModel.copy(character = updatedCharacter, room = updatedRoom)
 
-        case _ => Outcome(viewModel)
+        case (model: GameModel.Started, _) => Outcome(GameViewModel.start(model))
+        case _                             => Outcome(viewModel)
+
       }
 
     case _ =>
@@ -104,11 +111,11 @@ final case class GameScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    model match {
+    (model, viewModel) match {
 
-      case GameStarted(dungeon, room, character) =>
+      case (GameModel.Started(dungeon, room, character), viewModel: GameViewModel.Started) =>
         SceneUpdateFragment(
-          (RoomView.draw(context, room, ()) |+|
+          (RoomView.draw(context, room, viewModel.room) |+|
             CharacterView().draw(context, character, viewModel.character))
             .fitToScreen(context)(Assets.Rooms.roomSize)
         )

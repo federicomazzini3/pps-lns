@@ -20,5 +20,5 @@ case class CharacterViewModel(
 }
 
 object CharacterViewModel {
-  def initial(startupData: StartupData): CharacterViewModel = CharacterViewModel()
+  def initial: CharacterViewModel = CharacterViewModel()
 }

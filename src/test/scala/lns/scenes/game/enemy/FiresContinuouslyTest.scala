@@ -21,14 +21,20 @@ import lns.scenes.game.stats.PropertyName.*
 case class MyFiringModel(
     boundingBox: BoundingBox,
     stats: Stats,
+    status: EnemyState = EnemyState.Attacking,
+    life:Int = 0,
+    invincibilityTimer:Double = 0,
     fireRateTimer: Double = 0,
     shot: Option[Vector2] = None
-) extends FireModel
+) extends EnemyModel
+    with FireModel
     with FiresContinuously {
   type Model = MyFiringModel
 
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
   def withStats(stats: Stats): Model                                 = copyMacro
+  def withStatus(status: EnemyState): Model                        = copyMacro
+  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
 }
 
 trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

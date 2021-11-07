@@ -17,6 +17,14 @@ given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
   def apply(set: Set[Outcome[AnythingModel]]): Outcome[Set[AnythingModel]] =
     set.foldLeft(Outcome(Set[AnythingModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
 
+type Timer = Double
+extension (timer: Timer)
+  def elapsed(time: Double) = timer match {
+    case 0                 => 0
+    case x if x - time > 0 => x - time
+    case _                 => 0
+  }
+
 /**
  * Base model for every thing placed inside a room
  */
@@ -168,9 +176,9 @@ trait AliveModel extends AnythingModel with StatsModel {
   type Model >: this.type <: AliveModel
 
   val life: Int
-  val invincibilityTimer: Double
+  val invincibilityTimer: Timer
 
-  def withAlive(life: Int, invincibilityTimer: Double): Model
+  def withAlive(life: Int, invincibilityTimer: Timer): Model
 
   /**
    * Hit the object causing some damage to its life and starting a countdown timer during which it can't be hitted again
@@ -201,12 +209,11 @@ trait AliveModel extends AnythingModel with StatsModel {
   override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)(character)
-      newObj = invincibilityTimer match {
-        case 0 => superObj
-        case _ if invincibilityTimer - context.gameTime.delta.toDouble > 0 =>
-          superObj.withAlive(life, invincibilityTimer - context.gameTime.delta.toDouble).asInstanceOf[Model]
-        case _ => superObj.withAlive(life, 0).asInstanceOf[Model]
-      }
+      newObj =
+        invincibilityTimer match {
+          case 0 => superObj
+          case x => superObj.withAlive(life, x.elapsed(context.gameTime.delta.toDouble)).asInstanceOf[Model]
+        }
     } yield newObj
 
 }
@@ -235,7 +242,7 @@ trait FireModel extends AnythingModel with StatsModel {
   val shot: Option[Vector2]
   val fireRateTimer: Double
 
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model
+  def withFire(fireRateTimer: Timer, shot: Option[Vector2]): Model
 
   /**
    * @return
@@ -295,13 +302,10 @@ trait FireModel extends AnythingModel with StatsModel {
       newObj = fireRateTimer match {
         case 0 =>
           shot match {
-            case Some(direction) =>
-              superObj.withFire(FireRate @@ stats, Some(direction)).asInstanceOf[Model]
-            case _ => superObj
+            case Some(direction) => superObj.withFire(FireRate @@ stats, Some(direction)).asInstanceOf[Model]
+            case _               => superObj
           }
-        case _ if fireRateTimer - context.gameTime.delta.toDouble > 0 =>
-          superObj.withFire(fireRateTimer - context.gameTime.delta.toDouble, None).asInstanceOf[Model]
-        case _ => superObj.withFire(0, None).asInstanceOf[Model]
+        case _ => superObj.withFire(fireRateTimer.elapsed(context.gameTime.delta.toDouble), None).asInstanceOf[Model]
       }
     } yield newObj
 
