@@ -41,8 +41,8 @@ case class MaskModel(
     status: EnemyState = EnemyState.Attacking,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
-    invincibilityTimer: Double = 0,
-    fireRateTimer: Double = 0,
+    invincibilityTimer: Timer = 0,
+    fireRateTimer: Timer = 0,
     shot: Option[Vector2] = None
 ) extends EnemyModel
     with DynamicModel

@@ -33,7 +33,7 @@ case class NerveModel(
     stats: Stats,
     status: EnemyState = EnemyState.Attacking,
     life: Int = 0,
-    invincibilityTimer: Double = 0
+    invincibilityTimer: Timer = 0
 ) extends EnemyModel {
 
   type Model = NerveModel
