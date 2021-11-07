@@ -109,7 +109,7 @@ class CheckInsideTest extends AnyFreeSpec {
   }
 }
 
-class CollisionWithAnotherElement extends AnyFreeSpec {
+class CollisionTest extends AnyFreeSpec {
   def checkCollision(elem1: BoundingBox, elem2: BoundingBox)(predicted: Option[(Location, Location)]) =
     assert(Collision.withElement(elem1, elem2) == predicted)
 
@@ -126,28 +126,28 @@ class CollisionWithAnotherElement extends AnyFreeSpec {
       val movedElem2 = elem2.moveTo(elem1.left - 50, elem1.y)
       "should collide on left - right side" in {
         assert(Collision.withElement(elem1, movedElem2) == Some(Left, Right))
-        checkCollision(elem1, elem2)(Some(Left, Right))
+        checkCollision(elem1, movedElem2)(Some(Left, Right))
       }
     }
     "that interset each other on right - left side" - {
       val movedElem2 = elem2.moveTo(elem1.right - 1, elem1.y)
       "should collide on right - left side" in {
         assert(Collision.withElement(elem1, movedElem2) == Some(Right, Left))
-        checkCollision(elem1, elem2)(Some(Right, Left))
+        checkCollision(elem1, movedElem2)(Some(Right, Left))
       }
     }
     "that interset each other on top - bottom side" - {
       val movedElem2 = elem2.moveTo(elem1.x, elem1.top - 50)
       "should collide on left - right side" in {
         assert(Collision.withElement(elem1, movedElem2) == Some(Above, Below))
-        checkCollision(elem1, elem2)(Some(Above, Below))
+        checkCollision(elem1, movedElem2)(Some(Above, Below))
       }
     }
     "that interset each other on bottom - top side" - {
       val movedElem2 = elem2.moveTo(elem1.x, elem1.bottom - 1)
       "should collide on left - right side" in {
         assert(Collision.withElement(elem1, movedElem2) == Some(Below, Above))
-        checkCollision(elem1, elem2)(Some(Below, Above))
+        checkCollision(elem1, movedElem2)(Some(Below, Above))
       }
     }
   }
