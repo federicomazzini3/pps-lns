@@ -28,8 +28,8 @@ object Collision {
       elem2.contains(elem1.bottomLeft) || elem2.contains(elem1.bottomRight)
 
   def checkInside(container: BoundingBox, elem: BoundingBox): Boolean =
-    container.left >= elem.left && container.right <= elem.right &&
-      container.top >= elem.bottom && container.bottom <= elem.bottom
+    container.left < elem.left && container.right > elem.right &&
+      container.top < elem.bottom && container.bottom > elem.bottom
 
   def nearestContainerEdges(container: BoundingBox, elem: BoundingBox): (Option[Location], Option[Location]) =
     def nearestXEdge: Option[Location] =
