@@ -12,6 +12,9 @@ type Stats         = Map[PropertyName, PropertyValue]
 given Conversion[PropertyValue, Int] with
   def apply(v: PropertyValue): Int = v.toInt
 
+given Conversion[PropertyValue, String] with
+  def apply(v: PropertyValue): String = v.toString
+
 /**
  * PropertyValue extension to allow you add value but the result cannot be less than 0
  */
@@ -44,7 +47,7 @@ object Stats {
   def apply(args: StatProperty*): Stats = Map(args*)
 
   def Isaac = Stats(
-    MaxLife       -> 10,
+    MaxLife       -> 3,
     Invincibility -> 1.5,
     MaxSpeed      -> 300,
     Damage        -> 0,
