@@ -36,7 +36,7 @@ object RoomView {
   def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
-        s2 match {
+        s2._2 match {
           case shot: ShotModel   => ShotView().draw(context, shot, ())
           case solid: SolidModel => ElementView().draw(context, solid, ())
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
@@ -44,7 +44,7 @@ object RoomView {
           case enemy: NerveModel => NerveView().draw(context, enemy, ())
           case enemy: ParabiteModel =>
             ParabiteView()
-              .draw(context, enemy, viewModel.anythings.head.asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
+              .draw(context, enemy, viewModel.anythings(s2._1).asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
           case _ => Group()
         }
       )

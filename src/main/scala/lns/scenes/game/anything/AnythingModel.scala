@@ -10,12 +10,20 @@ import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
+import java.util.UUID
+
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 
 given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
   def apply(set: Set[Outcome[AnythingModel]]): Outcome[Set[AnythingModel]] =
     set.foldLeft(Outcome(Set[AnythingModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
+
+given Conversion[Map[UUID, Outcome[AnythingModel]], Outcome[Map[UUID, AnythingModel]]] with
+  def apply(set: Map[UUID, Outcome[AnythingModel]]): Outcome[Map[UUID, AnythingModel]] =
+    set.foldLeft(Outcome(Map[UUID, AnythingModel]().empty))((acc, el) =>
+      acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
+    )
 
 type Timer = Double
 extension (timer: Timer)

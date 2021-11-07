@@ -3,6 +3,8 @@ package lns.scenes.game.element
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.scenes.game.anything.{ AnythingModel, SolidModel }
 
+import java.util.UUID
+
 case class StoneModel(val boundingBox: BoundingBox) extends SolidModel {
 
   type Model = StoneModel
@@ -21,27 +23,27 @@ object ElementModel {
       )
     )*/
 
-  def stone(): Set[AnythingModel] =
-    Set(
-      StoneModel(
+  def stone(): Map[UUID, AnythingModel] =
+    Map(
+      UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470, 300),
           Vertex(Stone.width, Stone.height)
         )
       ),
-      StoneModel(
+      UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width, 300),
           Vertex(Stone.width, Stone.height)
         )
       ),
-      StoneModel(
+      UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width * 2, 300),
           Vertex(Stone.width, Stone.height)
         )
       ),
-      StoneModel(
+      UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width * 2, 300 + Stone.height),
           Vertex(Stone.width, Stone.height)

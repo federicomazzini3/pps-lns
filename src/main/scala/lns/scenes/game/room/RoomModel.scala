@@ -6,12 +6,13 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingModel, DynamicState, SolidModel, given_Conversion_Set_Outcome }
+import lns.scenes.game.anything.{ AnythingModel, DynamicState, SolidModel, given }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.EnemyModel
+import java.util.UUID
 
 import scala.language.implicitConversions
 
@@ -47,7 +48,7 @@ trait RoomModel {
   /**
    * the shots fired in a room
    */
-  val anythings: Set[AnythingModel]
+  val anythings: Map[UUID, AnythingModel]
 
   /**
    * Confine the character inside the limit of the room
@@ -58,7 +59,7 @@ trait RoomModel {
    */
   def boundPosition(anything: BoundingBox): BoundingBox =
     val characterBounded = Boundary.containerBound(floor, anything)
-    anythings
+    anythings.values
       .collect { case a: SolidModel if a.enabled => a }
       .foldLeft(characterBounded)((character, element) => Boundary.elementBound(element.boundingBox, character))
 
@@ -70,7 +71,7 @@ trait RoomModel {
    *   a new room with the new shot added
    */
   def addShot(shot: ShotModel): RoomModel =
-    val updatedAnythings = anythings + shot
+    val updatedAnythings = anythings + (UUID.randomUUID() -> shot)
     this match {
       case room: EmptyRoom =>
         room.copy(anythings = updatedAnythings)
@@ -89,9 +90,11 @@ trait RoomModel {
    * @return
    *   a new updated set of anything model
    */
-  def updateAnythings(context: FrameContext[StartupData])(character: CharacterModel): Outcome[Set[AnythingModel]] =
+  def updateAnythings(
+      context: FrameContext[StartupData]
+  )(character: CharacterModel): Outcome[Map[UUID, AnythingModel]] =
     anythings
-      .map(any => any.update(context)(this)(character))
+      .map((id, any) => id -> any.update(context)(this)(character))
 
   /**
    * Update the shot based on FrameContext
@@ -127,7 +130,7 @@ case class EmptyRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Set[AnythingModel] = Set.empty
+    val anythings: Map[UUID, AnythingModel] = Map.empty
 ) extends RoomModel {
   val doors = doorsLocations.open
 }
@@ -145,12 +148,12 @@ case class ArenaRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Set[AnythingModel] = Set.empty
+    val anythings: Map[UUID, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   //da filtrare con i nemici (quando ci saranno)
   val doors =
-    anythings.collect { case e: EnemyModel => e }.size match {
+    anythings.collect { case (id, e): (UUID, EnemyModel) => e }.size match {
       case 0 => doorsLocations.open
       case _ => doorsLocations.close
     }
@@ -169,7 +172,7 @@ case class ItemRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Set[AnythingModel] = Set.empty
+    val anythings: Map[UUID, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   val doors = doorsLocations.open
@@ -188,7 +191,7 @@ case class BossRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Set[AnythingModel] = Set.empty
+    val anythings: Map[UUID, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   val doors = doorsLocations.close
@@ -218,7 +221,7 @@ object RoomModel {
   def arenaRoom(
       position: Position,
       locations: DoorsLocations,
-      anythings: Set[AnythingModel]
+      anythings: Map[UUID, AnythingModel]
   ): ArenaRoom = ArenaRoom(
     position,
     defaultFloor,
@@ -226,7 +229,7 @@ object RoomModel {
     anythings
   )
 
-  def itemRoom(position: Position, locations: DoorsLocations, anythings: Set[AnythingModel]): ItemRoom =
+  def itemRoom(position: Position, locations: DoorsLocations, anythings: Map[UUID, AnythingModel]): ItemRoom =
     ItemRoom(
       position,
       defaultFloor,
@@ -234,7 +237,7 @@ object RoomModel {
       anythings
     )
 
-  def bossRoom(position: Position, locations: DoorsLocations, anythings: Set[AnythingModel]): BossRoom =
+  def bossRoom(position: Position, locations: DoorsLocations, anythings: Map[UUID, AnythingModel]): BossRoom =
     BossRoom(
       position,
       defaultFloor,
