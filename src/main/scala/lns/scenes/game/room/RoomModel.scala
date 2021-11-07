@@ -11,6 +11,7 @@ import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.enemy.EnemyModel
 
 import scala.language.implicitConversions
 
@@ -149,7 +150,7 @@ case class ArenaRoom(
 
   //da filtrare con i nemici (quando ci saranno)
   val doors =
-    anythings.collect { case e: Enemy => e }.size match {
+    anythings.collect { case e: EnemyModel => e }.size match {
       case 0 => doorsLocations.open
       case _ => doorsLocations.close
     }
