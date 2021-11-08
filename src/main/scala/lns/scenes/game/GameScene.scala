@@ -8,6 +8,7 @@ import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
+import lns.scenes.game.HUD.HUDView
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
@@ -114,11 +115,16 @@ final case class GameScene() extends EmptyScene {
     (model, viewModel) match {
 
       case (GameModel.Started(dungeon, room, character), viewModel: GameViewModel.Started) =>
-        SceneUpdateFragment(
-          (RoomView.draw(context, room, viewModel.room) |+|
-            CharacterView().draw(context, character, viewModel.character))
-            .fitToScreen(context)(Assets.Rooms.roomSize)
-        )
+        SceneUpdateFragment.empty
+          .addLayers(
+            Layer(
+              BindingKey("game"),
+              (RoomView.draw(context, room, viewModel.room) |+|
+                CharacterView().draw(context, character, viewModel.character))
+                .fitToScreen(context)(Assets.Rooms.roomSize)
+            ),
+            Layer(BindingKey("HUD"), (HUDView.draw(context, character)))
+          )
 
       case _ => DungeonLoadingView(context.startUpData)
     }

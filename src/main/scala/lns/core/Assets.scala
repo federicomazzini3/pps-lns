@@ -15,7 +15,7 @@ object Assets {
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] =
-    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Elements.assets ++ Prolog.assets ++ Enemies.assets
+    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Elements.assets ++ Prolog.assets ++ Enemies.assets ++ HUD.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -273,4 +273,30 @@ object Assets {
     )
   }
 
+  object HUD {
+    val name = AssetName("hud")
+
+    val width  = 112
+    val height = 52
+
+    val iconWidth  = 28
+    val iconHeight = 26
+
+    def getIcon(x: Int, y: Int): Graphic[Material.Bitmap] =
+      Graphic(0, 0, width, height, 1, Material.Bitmap(name)).withCrop(x, y, iconWidth, iconHeight)
+
+    object Graphics {
+      val heartFull: Graphic[Material.Bitmap]  = getIcon(0, 0)
+      val heartHalf: Graphic[Material.Bitmap]  = getIcon(28, 0)
+      val heartEmpty: Graphic[Material.Bitmap] = getIcon(56, 0)
+      val MaxSpeed: Graphic[Material.Bitmap]   = getIcon(0, 26)
+      val FireDamage: Graphic[Material.Bitmap] = getIcon(28, 26)
+      val FireRange: Graphic[Material.Bitmap]  = getIcon(56, 26)
+      val FireRate: Graphic[Material.Bitmap]   = getIcon(84, 26)
+    }
+
+    val assets: Set[AssetType] = Set(
+      AssetType.Image(name, AssetPath(baseUrl + "hud/hud.png"))
+    )
+  }
 }
