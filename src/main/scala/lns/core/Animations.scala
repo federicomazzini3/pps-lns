@@ -109,29 +109,23 @@ object Animations {
   object Parabite {
 
     /*Enemy body*/
-    val offset           = 309
-    val bodyWidth: Int   = 26
-    val bodyHeight: Int  = 32
-    val hideFrameTime    = 180
-    val hideTime: Double = (180.0 * 2) / 1000
+    val offset                    = 309
+    val bodyWidth: Int            = 26
+    val bodyHeight: Int           = 32
+    val hideFrameTime: Double     = 0.180
+    val hideTime: Double          = hideFrameTime * 3
+    val hideFrameTimeMillis: Long = (hideFrameTime * 1000).toLong
 
     def generateHidingFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
-          Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
-          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
-          Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTime))
+          Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTimeMillis))
         )
       )
 
-    def generateWakeupFrame: NonEmptyList[Frame] =
-      generateFramesList(
-        List(
-          Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTime)),
-          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
-          Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTime))
-        )
-      )
+    def generateWakeupFrame: NonEmptyList[Frame] = generateHidingFrame.reverse
 
     def generateWalkingFrame(x: Int, y: Int): NonEmptyList[Frame] =
       generateFramesList(

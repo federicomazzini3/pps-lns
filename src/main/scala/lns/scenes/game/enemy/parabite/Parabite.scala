@@ -3,7 +3,7 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Parabite
-import lns.core.Assets
+import lns.core.{ Animations, Assets }
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.enemy.EnemyState
 
@@ -59,6 +59,16 @@ trait Parabite {
   // .moveTo(width / 2, 0)
 
   /**
+   * Calculates current animation frame for the hiding animation
+   * @param timer
+   *   current animation timer from X to 0
+   * @return
+   *   anim frame
+   */
+  def getFrame(timer: Double): Int =
+    Math.floor((Animations.Parabite.hideTime - timer) / Animations.Parabite.hideFrameTime).toInt
+
+  /**
    * Plays the animation cycle if the character is moving
    *
    * @param model
@@ -71,12 +81,18 @@ trait Parabite {
     case EnemyState.Hiding =>
       viewModel.animationTimer match {
         case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
-        case _ => bodySprite.changeCycle(CycleLabel("hiding")).play()
+        case t =>
+          bodySprite
+            .changeCycle(CycleLabel("hiding"))
+            .jumpToFrame(getFrame(t))
       }
     case EnemyState.Idle =>
       viewModel.animationTimer match {
         case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
-        case _ => bodySprite.changeCycle(CycleLabel("wakeup")).play()
+        case t =>
+          bodySprite
+            .changeCycle(CycleLabel("wakeup"))
+            .jumpToFrame(getFrame(t))
       }
     case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
   }
