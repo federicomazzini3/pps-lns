@@ -37,7 +37,7 @@ case class BoneyModel(
     status: EnemyState = EnemyState.Attacking,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
-    invincibilityTimer: Double = 0
+    invincibilityTimer: Timer = 0
 ) extends EnemyModel
     with DynamicModel
     with Follower {

@@ -109,11 +109,11 @@ object Animations {
   object Parabite {
 
     /*Enemy body*/
-    val offset          = 309
-    val bodyWidth: Int  = 26
-    val bodyHeight: Int = 32
-    val hideFrameTime   = 180
-    val hideTime        = 180 * 3
+    val offset           = 309
+    val bodyWidth: Int   = 26
+    val bodyHeight: Int  = 32
+    val hideFrameTime    = 180
+    val hideTime: Double = (180.0 * 2) / 1000
 
     def generateHidingFrame: NonEmptyList[Frame] =
       generateFramesList(
@@ -127,8 +127,8 @@ object Animations {
     def generateWakeupFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
-          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
           Frame(Rectangle(offset + 0, 64, bodyWidth, bodyHeight - 1), Millis(hideFrameTime)),
+          Frame(Rectangle(offset + 64, 0, bodyWidth, bodyHeight), Millis(hideFrameTime)),
           Frame(Rectangle(offset + 32, 0, bodyWidth, bodyHeight), Millis(hideFrameTime))
         )
       )

@@ -151,10 +151,30 @@ trait DynamicModel extends AnythingModel with StatsModel {
   /**
    * @param context
    *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @param character
+   *   character model as [[AnythingModel]]
    * @return
    *   the speed vector
    */
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2
+
+  /**
+   * @param context
+   *   indigo frame context data
+   * @param room
+   *   current room in which the Anything is placed
+   * @param character
+   *   character model as [[AnythingModel]]
+   * @return
+   *   a Tuple2 representing the computed speed and the moved boundingBox
+   */
+  def computeMove(context: FrameContext[StartupData])(room: RoomModel)(
+      character: AnythingModel
+  ): (Vector2, BoundingBox) =
+    val speed: Vector2 = computeSpeed(context)(room)(character)
+    (speed, boundingBox.moveBy(speed * context.gameTime.delta.toDouble))
 
   /**
    * Update request called during game loop on every frame. The Anything movement speed direction and module is first
@@ -169,9 +189,9 @@ trait DynamicModel extends AnythingModel with StatsModel {
   override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)(character)
-      newSpeed    = computeSpeed(context)(room)(character) * context.gameTime.delta.toDouble
-      newLocation = room.boundPosition(boundingBox.moveBy(newSpeed))
-      newObj      = superObj.withDynamic(newLocation, newSpeed).asInstanceOf[Model]
+      (newSpeed, newPosition) = computeMove(context)(room)(character)
+      boundLocation           = room.boundPosition(newPosition)
+      newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
 }
