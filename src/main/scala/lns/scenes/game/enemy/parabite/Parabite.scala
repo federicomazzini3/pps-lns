@@ -3,7 +3,7 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Parabite
-import lns.core.Assets
+import lns.core.{ Animations, Assets }
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.enemy.EnemyState
 
@@ -59,6 +59,16 @@ trait Parabite {
   // .moveTo(width / 2, 0)
 
   /**
+   * Calculates current animation frame for the hiding animation
+   * @param timer
+   *   current animation timer from X to 0
+   * @return
+   *   anim frame
+   */
+  def getFrame(timer: Double): Int =
+    Math.floor((Animations.Parabite.hideTime - timer) / Animations.Parabite.hideFrameTime).toInt
+
+  /**
    * Plays the animation cycle if the character is moving
    *
    * @param model
@@ -66,19 +76,26 @@ trait Parabite {
    * @return
    *   the updated body Sprite
    */
-  def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] = model.status match {
-    case EnemyState.Attacking => bodySprite.changeCycle(CycleLabel("walking")).play()
-    case EnemyState.Hiding =>
-      viewModel.animationTimer match {
-        case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
-        case _ => bodySprite.changeCycle(CycleLabel("hiding")).play()
-      }
-    case EnemyState.Idle =>
-      viewModel.animationTimer match {
-        case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
-        case _ => bodySprite.changeCycle(CycleLabel("wakeup")).play()
-      }
-    case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
-  }
+  def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
+    model.status.head match {
+      case (EnemyState.Attacking, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
+      case (EnemyState.Hiding, _) =>
+        viewModel.animationTimer match {
+          case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
+          case t =>
+            bodySprite
+              .changeCycle(CycleLabel("hiding"))
+              .jumpToFrame(getFrame(t))
+        }
+      case (EnemyState.Idle, _) =>
+        viewModel.animationTimer match {
+          case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
+          case t =>
+            bodySprite
+              .changeCycle(CycleLabel("wakeup"))
+              .jumpToFrame(getFrame(t))
+        }
+      case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
+    }
 
 }

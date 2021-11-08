@@ -151,9 +151,8 @@ case class ArenaRoom(
     val anythings: Map[UUID, AnythingModel] = Map.empty
 ) extends RoomModel {
 
-  //da filtrare con i nemici (quando ci saranno)
   val doors =
-    anythings.collect { case (id, e): (UUID, EnemyModel) => e }.size match {
+    anythings.collect { case (_, e: EnemyModel) => e }.size match {
       case 0 => doorsLocations.open
       case _ => doorsLocations.close
     }

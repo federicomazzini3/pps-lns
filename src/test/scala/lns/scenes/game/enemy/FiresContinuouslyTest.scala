@@ -1,7 +1,6 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.Vector2
@@ -9,19 +8,21 @@ import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
-import lns.scenes.game.anything.{ AnythingModel, FireModel }
+import lns.scenes.game.anything.{AnythingModel, FireModel}
 import lns.scenes.game.room.RoomModel
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{ BeforeAndAfterEach, Suite }
+import org.scalatest.{BeforeAndAfterEach, Suite}
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
+import scala.collection.immutable.Queue
+
 case class MyFiringModel(
     boundingBox: BoundingBox,
     stats: Stats,
-    status: EnemyState = EnemyState.Attacking,
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     life:Int = 0,
     invincibilityTimer:Double = 0,
     fireRateTimer: Double = 0,
@@ -32,7 +33,7 @@ case class MyFiringModel(
   type Model = MyFiringModel
 
   def withStats(stats: Stats): Model                                 = copyMacro
-  def withStatus(status: EnemyState): Model                        = copyMacro
+  def withStatus(status: Queue[EnemyStatus] ): Model                        = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
 }

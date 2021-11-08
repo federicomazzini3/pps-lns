@@ -20,7 +20,7 @@ import scala.collection.immutable.Queue
 case class MyTravellerModel(
     boundingBox: BoundingBox,
     stats: Stats,
-    status: EnemyState = EnemyState.Attacking,
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0),
@@ -30,7 +30,7 @@ case class MyTravellerModel(
   type Model = MyTravellerModel
 
   def withStats(stats: Stats): Model                               = copyMacro
-  def withStatus(status: EnemyState): Model                        = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                   = copyMacro

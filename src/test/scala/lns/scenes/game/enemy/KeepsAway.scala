@@ -1,9 +1,8 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
-
+import indigo.*
 import indigo.shared.FrameContext
-import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
@@ -16,11 +15,13 @@ import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
+import scala.collection.immutable.Queue
+
 case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
     stats: Stats,
     range: (Int, Int),
-    status: EnemyState = EnemyState.Attacking,
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -30,7 +31,7 @@ case class MyKeepsAwayModel(
   type Model = MyKeepsAwayModel
 
   def withStats(stats: Stats): Model                                          = copyMacro
-  def withStatus(status: EnemyState): Model                                   = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                           = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model                 = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
 }
