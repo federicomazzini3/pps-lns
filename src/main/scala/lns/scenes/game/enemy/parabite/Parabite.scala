@@ -76,25 +76,26 @@ trait Parabite {
    * @return
    *   the updated body Sprite
    */
-  def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] = model.status match {
-    case EnemyState.Attacking => bodySprite.changeCycle(CycleLabel("walking")).play()
-    case EnemyState.Hiding =>
-      viewModel.animationTimer match {
-        case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
-        case t =>
-          bodySprite
-            .changeCycle(CycleLabel("hiding"))
-            .jumpToFrame(getFrame(t))
-      }
-    case EnemyState.Idle =>
-      viewModel.animationTimer match {
-        case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
-        case t =>
-          bodySprite
-            .changeCycle(CycleLabel("wakeup"))
-            .jumpToFrame(getFrame(t))
-      }
-    case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
-  }
+  def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
+    model.status.head match {
+      case (EnemyState.Attacking, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
+      case (EnemyState.Hiding, _) =>
+        viewModel.animationTimer match {
+          case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
+          case t =>
+            bodySprite
+              .changeCycle(CycleLabel("hiding"))
+              .jumpToFrame(getFrame(t))
+        }
+      case (EnemyState.Idle, _) =>
+        viewModel.animationTimer match {
+          case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
+          case t =>
+            bodySprite
+              .changeCycle(CycleLabel("wakeup"))
+              .jumpToFrame(getFrame(t))
+        }
+      case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
+    }
 
 }

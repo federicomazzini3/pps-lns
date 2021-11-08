@@ -7,12 +7,13 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.anything.*
-import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.enemy.{ EnemyModel, EnemyState, FiresContinuously, KeepsAway }
-import lns.scenes.game.room.{ Boundary, RoomModel }
+import lns.scenes.game.enemy.{ EnemyModel, EnemyState, EnemyStatus, FiresContinuously, KeepsAway }
+import lns.scenes.game.room.RoomModel
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
+
+import scala.collection.immutable.Queue
 
 /**
  * Enemy model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
@@ -38,7 +39,7 @@ import lns.scenes.game.stats.PropertyName.*
 case class MaskModel(
     boundingBox: BoundingBox,
     stats: Stats,
-    status: EnemyState = EnemyState.Attacking,
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,
@@ -53,7 +54,7 @@ case class MaskModel(
   type Model = MaskModel
 
   def withStats(stats: Stats): Model                                = copyMacro
-  def withStatus(status: EnemyState): Model                         = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro

@@ -14,8 +14,8 @@ import lns.scenes.game.stats.PropertyName.*
  */
 trait Follower { this: EnemyModel with DynamicModel =>
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
-    status match {
-      case EnemyState.Attacking => (character.getPosition() - getPosition()).normalise * MaxSpeed @@ stats
-      case _                    => Vector2.zero
+    status.head match {
+      case (EnemyState.Attacking, _) => (character.getPosition() - getPosition()).normalise * MaxSpeed @@ stats
+      case _                         => Vector2.zero
     }
 }

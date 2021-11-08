@@ -13,26 +13,26 @@ import lns.scenes.game.anything.elapsed
  */
 
 case class ParabiteViewModel(
-    lastStatus: EnemyState = EnemyState.Idle,
+    lastState: EnemyState = EnemyState.Idle,
     animationTimer: Timer = 0
 ) extends AnythingViewModel {
   type ViewModel = ParabiteViewModel
   type Model     = ParabiteModel
 
-  def withStatus(lastStatus: EnemyState, animationTimer: Timer): ViewModel = copyMacro
+  def withLastState(lastState: EnemyState, animationTimer: Timer): ViewModel = copyMacro
 
   override def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] =
     for {
       superObj <- super.update(context, model)
-      newObj = model.status match {
-        case EnemyState.Hiding | EnemyState.Idle if lastStatus != model.status =>
-          superObj.withStatus(model.status, Parabite.hideTime).asInstanceOf[ViewModel]
-        case EnemyState.Hiding | EnemyState.Idle if animationTimer > 0 =>
+      newObj = model.status.head._1 match {
+        case state @ (EnemyState.Hiding | EnemyState.Idle) if lastState != state =>
+          superObj.withLastState(state, Parabite.hideTime).asInstanceOf[ViewModel]
+        case state @ (EnemyState.Hiding | EnemyState.Idle) if animationTimer > 0 =>
           superObj
-            .withStatus(model.status, animationTimer.elapsed(context.gameTime.delta.toDouble))
+            .withLastState(state, animationTimer.elapsed(context.gameTime.delta.toDouble))
             .asInstanceOf[ViewModel]
-        case _ if lastStatus != model.status => superObj.withStatus(model.status, 0).asInstanceOf[ViewModel]
-        case _                               => superObj
+        case state if lastState != state => superObj.withLastState(state, 0).asInstanceOf[ViewModel]
+        case _                           => superObj
       }
     } yield newObj
 }
