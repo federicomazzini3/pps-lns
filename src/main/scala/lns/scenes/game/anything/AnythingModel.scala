@@ -286,11 +286,11 @@ trait FireModel extends AnythingModel with StatsModel {
    *   the [[FireState]] based on the current optional shot direction
    */
   def getFireState(): FireState = shot match {
-    case Some(Vector2(x, _)) if x < 0 => FIRE_LEFT
-    case Some(Vector2(x, _)) if x > 0 => FIRE_RIGHT
-    case Some(Vector2(_, y)) if y < 0 => FIRE_UP
-    case Some(Vector2(_, y)) if y > 0 => FIRE_DOWN
-    case _                            => NO_FIRE
+    case Some(Vector2(x, y)) if x < 0 && Math.abs(x) >= Math.abs(y) => FIRE_LEFT
+    case Some(Vector2(x, y)) if x > 0 && Math.abs(x) >= Math.abs(y) => FIRE_RIGHT
+    case Some(Vector2(_, y)) if y < 0                               => FIRE_UP
+    case Some(Vector2(_, y)) if y > 0                               => FIRE_DOWN
+    case _                                                          => NO_FIRE
   }
 
   /**
@@ -323,25 +323,21 @@ trait FireModel extends AnythingModel with StatsModel {
    *   the Outcome of the updated model
    */
   override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
-    val shot = if (fireRateTimer == 0) computeFire(context)(character) else None
+    val newFireRateTimer = fireRateTimer.elapsed(context.gameTime.delta.toDouble)
+    val newShot          = computeFire(context)(character)
 
     val retObj = for {
       superObj <- super.update(context)(room)(character)
-      newObj = fireRateTimer match {
-        case 0 =>
-          shot match {
-            case Some(direction) => superObj.withFire(FireRate @@ stats, Some(direction)).asInstanceOf[Model]
-            case _               => superObj
-          }
-        case _ => superObj.withFire(fireRateTimer.elapsed(context.gameTime.delta.toDouble), None).asInstanceOf[Model]
+      newObj = (newFireRateTimer, newShot) match {
+        case (0, Some(_)) => superObj.withFire(FireRate @@ stats, newShot).asInstanceOf[Model]
+        case _            => superObj.withFire(newFireRateTimer, newShot).asInstanceOf[Model]
       }
     } yield newObj
 
-    shot match {
-      case Some(direction) => retObj.addGlobalEvents(createEvent(direction))
-      case _               => retObj
+    (newFireRateTimer, newShot) match {
+      case (0, Some(direction)) => retObj.addGlobalEvents(createEvent(direction))
+      case _                    => retObj
     }
-
 }
 
 trait SolidModel extends AnythingModel {

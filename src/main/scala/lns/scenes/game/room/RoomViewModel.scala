@@ -40,7 +40,7 @@ object RoomViewModel {
     RoomViewModel(
       model.positionInDungeon,
       model.anythings
-        .collect { case (id, e: ParabiteModel): (UUID, ParabiteModel) => (id -> e) }
+        .collect { case (id, e: ParabiteModel) => (id -> e) }
         .map((id, any) =>
           (id -> (any match {
             case a: ParabiteModel => println("VIEW MODEL CREATO"); ParabiteViewModel()

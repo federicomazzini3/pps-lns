@@ -64,7 +64,7 @@ trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: 
 }
 
 class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
-  s"A FiresContinuously placed in ($initialPos,$initialPos) and a Character placed " - {
+  s"A FiresContinuously placed in ($initialPos,$initialPos) with fireRate ${fireRate}  and a Character placed " - {
     tests.foreach(test =>
       val characterPos = test._1.getPosition()
       s"in (${characterPos.x},${characterPos.y})" - {
@@ -74,7 +74,7 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
 
             assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
           }
-          s"and after 0.5s and fireRate ${fireRate} should" - {
+          s"and after 0.5s should" - {
             "not fire a shot " in {
               val updatedModel: MyFiringModel = model
                 .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
@@ -83,7 +83,7 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
               assert(outcome.globalEventsOrNil == List())
             }
           }
-          s"and after two frames in 0.9s and fireRate ${fireRate} should" - {
+          s"and after two frames in 0.9s should" - {
             "not fire a shot " in {
               val updatedModel: MyFiringModel = model
                 .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
@@ -93,13 +93,12 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
               assert(outcome.globalEventsOrNil == List())
             }
           }
-          s"but after two frames in 1.5s and fireRate ${fireRate} should" - {
+          s"but after a frame in 1.5s should" - {
             "fire another shot in character direction" in {
               val updatedModel: MyFiringModel = model
                 .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
-                .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
 
-              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(0.5))(room)(test._1)
+              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(1.5))(room)(test._1)
               assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
             }
           }
