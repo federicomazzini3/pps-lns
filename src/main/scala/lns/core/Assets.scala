@@ -114,7 +114,7 @@ object Assets {
 
     val width   = 28
     val height  = 33
-    val offsetY = 13
+    val offsetY = 18
 
     val withScale: Int => Int = (size: Int) => size * 5
 
@@ -151,7 +151,7 @@ object Assets {
     object Nerve {
       val width                 = 26
       val height                = 50
-      val offsetY               = 25
+      val offsetY               = 30
       val withScale: Int => Int = (size: Int) => size * 5
 
       val name = AssetName("nerve")
@@ -220,6 +220,7 @@ object Assets {
     val floorSize: Int = 1375
     val offset: Int    = 0
     val wallSize: Int  = (roomSize - floorSize) / 2
+    val cellSize: Int  = 152
 
     object EmptyRoom {
       val name: AssetName = AssetName("empty-room")
@@ -267,11 +268,13 @@ object Assets {
     val specificUrl: String = "elements/"
 
     object Stone {
-      val name: AssetName       = AssetName("stone")
-      val width                 = 147
-      val height                = 128
-      val offsetY               = 23
-      val withScale: Int => Int = (size: Int) => size * 1
+      val name: AssetName             = AssetName("stone")
+      val width                       = 145
+      val height                      = 180 //original dimension 128
+      val offsetY                     = 35
+      val scale                       = 1.048
+      val withScale: Double => Double = (size: Double) => size * 1.048
+      val size                        = withScale(width)
     }
 
     import Stone.*

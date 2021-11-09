@@ -35,8 +35,8 @@ import scala.language.implicitConversions
 case class ShotModel(
     boundingBox: BoundingBox,
     stats: Stats,
-    speed: Vector2,
     direction: Vector2,
+    speed: Vector2 = Vector2(0, 0),
     life: Int = 1,
     invincibilityTimer: Double = 0
 ) extends AliveModel
@@ -53,7 +53,9 @@ case class ShotModel(
   def withStats(stats: Stats): Model                               = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
-    direction * MaxSpeed @@ stats
+    println(MaxSpeed @@ stats)
+    println(direction.normalise * MaxSpeed @@ stats)
+    direction.normalise * MaxSpeed @@ stats
 }
 
 /**
@@ -68,10 +70,9 @@ object ShotModel {
   def apply(position: Vector2, direction: Vector2): ShotModel = ShotModel(
     BoundingBox(
       position,
-      Vertex(5, 5)
+      Vertex(40, 40)
     ),
-    Stats.Isaac,
-    Vector2(800, 800),
+    Stats.Shot,
     direction
   )
 }

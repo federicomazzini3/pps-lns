@@ -14,13 +14,14 @@ case class ShotView() extends AnythingView {
   type ViewModel = Unit
   type View      = Group
 
-  val scale: Int = 4
+  val scale: Int   = 1
+  val offsetY: Int = 50
 
   def shot(model: Model): Shape =
     Shape
       .Circle(
-        center = Point(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt),
-        radius = model.boundingBox.width.toInt,
+        center = Point(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt / 2),
+        radius = model.boundingBox.width.toInt / 2,
         fill = Fill.Color(RGBA(1, 1, 0, 1)),
         stroke = Stroke(2, RGBA.Black)
       )
@@ -28,6 +29,6 @@ case class ShotView() extends AnythingView {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
       .addChild(shot(model))
-      .withRef(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt / 2)
+      .withRef(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt / 2 + offsetY)
       .withScale(Vector2(scale, scale))
 }
