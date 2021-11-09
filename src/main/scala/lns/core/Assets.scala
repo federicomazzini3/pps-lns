@@ -270,6 +270,7 @@ object Assets {
       val name: AssetName       = AssetName("stone")
       val width                 = 147
       val height                = 128
+      val offsetY               = 0
       val withScale: Int => Int = (size: Int) => size * 5
     }
 

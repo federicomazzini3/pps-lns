@@ -77,12 +77,13 @@ case class ParabiteModel(
  * Factory of [[ParabiteModel]]
  */
 object ParabiteModel {
+  import Assets.Enemies.Parabite.*
   def initial: ParabiteModel = ParabiteModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Parabite.withScale(Assets.Enemies.Parabite.width),
-        Assets.Enemies.Parabite.withScale(Assets.Enemies.Parabite.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac +++ (MaxSpeed -> 600),

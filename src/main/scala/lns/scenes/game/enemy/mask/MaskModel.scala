@@ -65,12 +65,13 @@ case class MaskModel(
  * Factory of [[MaskModel]]
  */
 object MaskModel {
+  import Assets.Enemies.Mask.*
   def initial: MaskModel = MaskModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Mask.withScale(Assets.Enemies.Mask.width),
-        Assets.Enemies.Mask.withScale(Assets.Enemies.Mask.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac,
