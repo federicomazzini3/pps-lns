@@ -1,0 +1,16 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Refactor stats,,6,Matteo,,3,3,2,0,,,
+Come utente voglio delle stanze in cui sono presenti dei nemici,,10,,,10,7,5,3,1,0,
+,EnemyModel e View,,Alan,5h,,,,,,,
+,Supporto a diversi comportamenti per i nemici,,Alan,5h,,,,,,,
+Come utente voglio diversi nemici,,3,,,3,3,3,2,1,0,
+,Implementazione Boney,,Alan,1h,,,,,,,
+,Implementazione Mask,,Alan,1h,,,,,,,
+,Implementazione Nerve,,Alan,1h,,,,,,,
+,Implementazione Parabite,,Alan,1h,,,,,,,
+Come utente voglio che le stanze abbiano degli elementi bloccanti,,12,,,12,16,14,12,9,7,6
+,Trait SolidModel + Model per le rocce,,Federico,4h,,,,,,,
+,Gestione interna degli Anything,,Federico,4h,,,,,,,
+,Algoritmo prolog disposizione elementi bloccanti,,Federico,4h,,,,,,,
+,Gestione collisioni con solid model,,Federico,4h,,,,,,,
+Come utente voglio un HUD per visualizzare lo stato del mio personaggio,,10,Matteo,7h,10,8,8,8,7,7,7
