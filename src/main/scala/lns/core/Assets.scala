@@ -112,8 +112,10 @@ object Assets {
   object Character {
     val specificUrl: String = "characters/"
 
-    val width                 = 28
-    val height                = 33
+    val width   = 28
+    val height  = 33
+    val offsetY = 13
+
     val withScale: Int => Int = (size: Int) => size * 5
 
     val character: AssetName = AssetName("character")
@@ -129,6 +131,7 @@ object Assets {
     object Boney {
       val width                 = 28
       val height                = 33
+      val offsetY               = 13
       val withScale: Int => Int = (size: Int) => size * 5
 
       val name = AssetName("boney")
@@ -138,6 +141,7 @@ object Assets {
     object Mask {
       val width                 = 28
       val height                = 32
+      val offsetY               = 0
       val withScale: Int => Int = (size: Int) => size * 5
 
       val name = AssetName("mask")
@@ -147,6 +151,7 @@ object Assets {
     object Nerve {
       val width                 = 26
       val height                = 50
+      val offsetY               = 25
       val withScale: Int => Int = (size: Int) => size * 5
 
       val name = AssetName("nerve")
@@ -156,6 +161,7 @@ object Assets {
     object Parabite {
       val width                 = 26
       val height                = 33
+      val offsetY               = 13
       val withScale: Int => Int = (size: Int) => size * 5
 
       val name = AssetName("parabite")
@@ -211,8 +217,8 @@ object Assets {
     val specificUrl: String = "rooms/"
 
     val roomSize: Int  = 2048
-    val floorSize: Int = 1325
-    val offset: Int    = 15
+    val floorSize: Int = 1375
+    val offset: Int    = 0
     val wallSize: Int  = (roomSize - floorSize) / 2
 
     object EmptyRoom {

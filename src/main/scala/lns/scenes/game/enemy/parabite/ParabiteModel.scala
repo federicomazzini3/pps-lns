@@ -38,6 +38,7 @@ case class ParabiteModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
+    val enabled: Boolean = true,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,

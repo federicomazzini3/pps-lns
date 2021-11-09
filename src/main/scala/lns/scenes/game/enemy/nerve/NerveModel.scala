@@ -33,6 +33,7 @@ case class NerveModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    val enabled: Boolean = true,
     life: Int = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {

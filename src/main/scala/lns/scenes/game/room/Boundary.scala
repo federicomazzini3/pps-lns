@@ -11,7 +11,7 @@ object Boundary {
 
   def containerBound(container: BoundingBox, elem: BoundingBox): BoundingBox =
     val moves = Map(
-      Above -> (container.top - elem.height),
+      Above -> (container.top),
       Below -> (container.bottom - elem.height),
       Left  -> container.left,
       Right -> (container.right - elem.width)

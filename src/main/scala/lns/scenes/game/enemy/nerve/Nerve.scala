@@ -14,7 +14,7 @@ trait Nerve {
 
   val boundingModel: Shape =
     Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height)),
+      Rectangle(Point(0, 0), Size(width, height - offsetY)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
     )
 
@@ -37,7 +37,7 @@ trait Nerve {
    *   body view Sprite
    */
   def bodyView(model: NerveModel): Sprite[Material.Bitmap] = bodyAnimation(model)
-    .withRef(Nerve.bodyWidth / 2, 0)
+  //.withRef(Nerve.bodyWidth / 2, 0)
   // .moveTo(width / 2, 20)
 
   /**

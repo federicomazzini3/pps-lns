@@ -5,11 +5,10 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import org.scalajs.dom.raw.Position
-import lns.scenes.game.anything.{ SolidModel, * }
+import lns.scenes.game.anything.{ SolidModel, given_Conversion_Vector2_Vertex, * }
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
-import lns.scenes.game.anything.given_Conversion_Vector2_Vertex
 
 import scala.language.implicitConversions
 
@@ -42,9 +41,12 @@ case class ShotModel(
     invincibilityTimer: Double = 0
 ) extends AliveModel
     with DynamicModel
-    with DamageModel {
+    with DamageModel
+    with SolidModel {
 
   type Model = ShotModel
+
+  val enabled = true
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro

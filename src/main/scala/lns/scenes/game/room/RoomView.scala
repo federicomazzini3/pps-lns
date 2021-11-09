@@ -38,14 +38,14 @@ object RoomView {
       s1.addChild(
         s2._2 match {
           case shot: ShotModel   => ShotView().draw(context, shot, ())
-          case solid: SolidModel => ElementView().draw(context, solid, ())
           case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
           case enemy: MaskModel  => MaskView().draw(context, enemy, ())
           case enemy: NerveModel => NerveView().draw(context, enemy, ())
           case enemy: ParabiteModel =>
             ParabiteView()
               .draw(context, enemy, viewModel.anythings(s2._1).asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
-          case _ => Group()
+          case solid: SolidModel => ElementView().draw(context, solid, ())
+          case _                 => Group()
         }
       )
     )

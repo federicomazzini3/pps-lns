@@ -16,7 +16,7 @@ trait Parabite {
 
   val boundingModel: Shape =
     Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height)),
+      Rectangle(Point(0, 0), Size(width, height - offsetY)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
     )
 
