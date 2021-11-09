@@ -32,7 +32,7 @@ class BoundaryTest extends AnyFreeSpec {
           val newPosition = inside.moveBy(0, -200)
           assert(
             newPosition
-              .moveTo(newPosition.x, container.top - newPosition.height) == // the original position is in top left
+              .moveTo(newPosition.x, container.top) == // the original position is in top left
               Boundary.containerBound(container, newPosition)
           )
         }
