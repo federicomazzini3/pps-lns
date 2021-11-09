@@ -28,25 +28,25 @@ object ElementModel {
       UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470, 300),
-          Vertex(Stone.width, Stone.height)
+          Vertex(Stone.width, Stone.height - Stone.offsetY)
         )
       ),
       UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width, 300),
-          Vertex(Stone.width, Stone.height)
+          Vertex(Stone.width, Stone.height - Stone.offsetY)
         )
       ),
       UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width * 2, 300),
-          Vertex(Stone.width, Stone.height)
+          Vertex(Stone.width, Stone.height - Stone.offsetY)
         )
       ),
       UUID.randomUUID() -> StoneModel(
         BoundingBox(
           Vertex(470 + Stone.width * 2, 300 + Stone.height),
-          Vertex(Stone.width, Stone.height)
+          Vertex(Stone.width, Stone.height - Stone.offsetY)
         )
       )
     )
