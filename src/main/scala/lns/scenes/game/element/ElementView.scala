@@ -26,7 +26,6 @@ case class ElementView() extends AnythingView {
               .withRef(0, Assets.Elements.Stone.offsetY)
         }
       )
-      .withDepth(Depth(-model.boundingBox.top.toInt))
 }
 
 case object ElementGraphic {

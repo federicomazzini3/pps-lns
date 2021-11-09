@@ -26,7 +26,4 @@ case class BoneyView() extends AnythingView with Boney {
           .addChild(headView(model))
       )
       .withScale(Vector2(5, 5))
-      .withDepth(Depth(-model.boundingBox.top.toInt))
-  //.withRef(width / 2, height / 2)
-  //.withScale(Vector2(scale, scale))
 }

@@ -45,7 +45,7 @@ object ElementModel {
       ),
       UUID.randomUUID() -> StoneModel(
         BoundingBox(
-          Vertex(470 + Stone.width * 2, 300 + Stone.height),
+          Vertex(470 + Stone.width * 2, 300 + Stone.height - Stone.offsetY),
           Vertex(Stone.width, Stone.height - Stone.offsetY)
         )
       )

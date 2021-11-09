@@ -53,8 +53,6 @@ trait AnythingView {
   def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
     view(contex, model, viewModel)
       .moveTo(model.getPosition())
-      .moveBy(
-        Assets.Rooms.wallSize,
-        Assets.Rooms.wallSize
-      )
+      .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+      .withDepth(Depth(-model.boundingBox.top.toInt))
 }

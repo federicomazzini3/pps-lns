@@ -24,7 +24,4 @@ case class NerveView() extends AnythingView with Nerve {
           .addChild(bodyView(model))
       )
       .withScale(Vector2(5, 5))
-  .withDepth(Depth(-model.boundingBox.top.toInt))
-  //.withRef(width / 2, height / 2)
-  //.withScale(Vector2(scale, scale))
 }
