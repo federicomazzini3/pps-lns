@@ -25,6 +25,4 @@ case class MaskView() extends AnythingView with Mask {
           .addChild(headView(model))
       )
       .withScale(Vector2(5, 5))
-  //.withRef(width / 2, height / 2)
-  //.withScale(Vector2(scale, scale))
 }

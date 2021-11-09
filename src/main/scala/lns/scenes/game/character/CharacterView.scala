@@ -26,7 +26,4 @@ case class CharacterView() extends AnythingView with Isaac {
           .addChild(headView(model, viewModel))
       )
       .withScale(Vector2(5, 5))
-  //.withDepth(Depth(-model.boundingBox.top.toInt))
-  //.withRef(width / 2, height / 2)
-  //.withScale(Vector2(scale, scale))
 }

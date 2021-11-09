@@ -1,5 +1,6 @@
 package lns.scenes.game.element
 
+import indigo.*
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.{ Rectangle, Vector2 }
 import indigo.shared.materials.Material
@@ -16,11 +17,15 @@ case class ElementView() extends AnythingView {
   type View      = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    Group().addChild(
-      model match {
-        case StoneModel(_) => ElementGraphic.stone()
-      }
-    )
+    Group()
+      .addChild(
+        model match {
+          case StoneModel(_) =>
+            ElementGraphic
+              .stone()
+              .withRef(0, Assets.Elements.Stone.offsetY)
+        }
+      )
 }
 
 case object ElementGraphic {
