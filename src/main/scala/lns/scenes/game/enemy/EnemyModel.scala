@@ -5,7 +5,7 @@ import indigo.shared.FrameContext
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.room.RoomModel
 
 import scala.collection.immutable.Queue
@@ -25,7 +25,7 @@ given Conversion[EnemyStatus, Queue[EnemyStatus]] with
  * If there is a sequence of EnemyStatus enqued in status, then the first one will be dropped once its timer reaches
  * zero.
  */
-trait EnemyModel extends AliveModel with DamageModel {
+trait EnemyModel extends AliveModel with DamageModel with SolidModel {
   type Model >: this.type <: EnemyModel
 
   val status: Queue[EnemyStatus]

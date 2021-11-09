@@ -38,6 +38,7 @@ case class ParabiteModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
+    val enabled: Boolean = true,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,
@@ -76,12 +77,13 @@ case class ParabiteModel(
  * Factory of [[ParabiteModel]]
  */
 object ParabiteModel {
+  import Assets.Enemies.Parabite.*
   def initial: ParabiteModel = ParabiteModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Parabite.withScale(Assets.Enemies.Parabite.width),
-        Assets.Enemies.Parabite.withScale(Assets.Enemies.Parabite.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac +++ (MaxSpeed -> 600),

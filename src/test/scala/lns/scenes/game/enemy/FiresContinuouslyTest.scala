@@ -23,6 +23,7 @@ case class MyFiringModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    val enabled: Boolean = true,
     life:Int = 0,
     invincibilityTimer:Double = 0,
     fireRateTimer: Double = 0,

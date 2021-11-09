@@ -36,6 +36,7 @@ case class BoneyModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    val enabled: Boolean = true,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0
@@ -55,12 +56,14 @@ case class BoneyModel(
  * Factory of [[BoneyModel]]
  */
 object BoneyModel {
+  import Assets.Enemies.Boney.*
+
   def initial: BoneyModel = BoneyModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Boney.withScale(Assets.Enemies.Boney.width),
-        Assets.Enemies.Boney.withScale(Assets.Enemies.Boney.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac,

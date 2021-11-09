@@ -40,6 +40,7 @@ case class MaskModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    val enabled: Boolean = true,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,
@@ -64,12 +65,13 @@ case class MaskModel(
  * Factory of [[MaskModel]]
  */
 object MaskModel {
+  import Assets.Enemies.Mask.*
   def initial: MaskModel = MaskModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Mask.withScale(Assets.Enemies.Mask.width),
-        Assets.Enemies.Mask.withScale(Assets.Enemies.Mask.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac,

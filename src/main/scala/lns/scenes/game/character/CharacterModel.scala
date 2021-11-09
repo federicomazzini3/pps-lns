@@ -91,7 +91,7 @@ object CharacterModel {
   def initial: CharacterModel = CharacterModel(
     boundingBox = BoundingBox(
       Vertex(floorSize / 2, floorSize / 2),
-      Vertex(withScale(width), withScale(height))
+      Vertex(withScale(width), withScale(height - offsetY))
     ),
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac

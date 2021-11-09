@@ -33,6 +33,7 @@ case class NerveModel(
     boundingBox: BoundingBox,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    val enabled: Boolean = true,
     life: Int = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {
@@ -48,12 +49,14 @@ case class NerveModel(
  * Factory of [[NerveModel]]
  */
 object NerveModel {
+  import Assets.Enemies.Nerve.*
+
   def initial: NerveModel = NerveModel(
     boundingBox = BoundingBox(
       Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vertex(
-        Assets.Enemies.Nerve.withScale(Assets.Enemies.Nerve.width),
-        Assets.Enemies.Nerve.withScale(Assets.Enemies.Nerve.height)
+        withScale(width),
+        withScale(height - offsetY)
       )
     ),
     stats = Stats.Isaac,
