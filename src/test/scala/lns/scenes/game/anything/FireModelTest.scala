@@ -127,7 +127,6 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.fireRateTimer == fireRate - 1)
-            assert(updatedModel.isFiring() == false)
           }
         }
       }
@@ -137,9 +136,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             val updatedModelOutcome = ShootingModel
               .update(getContext(1))(room)(character)
               .getOrElse(fail("Undefined Model"))
-              .update(getContext(2))(room)(character)
-              .getOrElse(fail("Undefined Model"))
-              .update(getContext(1))(room)(character)
+              .update(getContext(fireRate + 2))(room)(character)
 
             val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
 
@@ -156,13 +153,10 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             val updatedModel = ShootingModel
               .update(getContext(1))(room)(character)
               .getOrElse(fail("Undefined Model"))
-              .update(getContext(2))(room)(character)
-              .getOrElse(fail("Undefined Model"))
-              .update(getContext(1))(room)(character)
+              .update(getContext(fireRate + 2))(room)(character)
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.fireRateTimer == fireRate)
-            assert(updatedModel.isFiring() == true)
           }
         }
       }

@@ -50,9 +50,9 @@ trait FireViewModel extends AnythingViewModel {
   type Model <: FireModel
 
   val fireState: FireState
-  val fireAnimationTimer: Double
+  val fireAnimationTimer: Timer
 
-  def withFireTimer(fireAnimationTimer: Double, fireState: FireState): ViewModel
+  def withFireTimer(fireAnimationTimer: Timer, fireState: FireState): ViewModel
 
   /**
    * Update request called during game loop on every frame. Check if the model referred to him firing and there isn't a
@@ -68,15 +68,14 @@ trait FireViewModel extends AnythingViewModel {
   override def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] =
     for {
       superObj <- super.update(context, model)
-      newObj = fireAnimationTimer match {
+      newTimer = fireAnimationTimer.elapsed(context.gameTime.delta.toDouble)
+      newObj = newTimer match {
         case 0 if model.isFiring() =>
           superObj.withFireTimer(FireRate @@ model.stats, model.getFireState()).asInstanceOf[ViewModel]
-        case 0 => superObj
-        case _ if fireAnimationTimer - context.gameTime.delta.toDouble > 0 =>
-          superObj
-            .withFireTimer(fireAnimationTimer - context.gameTime.delta.toDouble, fireState)
-            .asInstanceOf[ViewModel]
-        case _ => superObj.withFireTimer(0, FireState.NO_FIRE).asInstanceOf[ViewModel]
+        case 0 =>
+          superObj.withFireTimer(0, FireState.NO_FIRE).asInstanceOf[ViewModel]
+        case _ =>
+          superObj.withFireTimer(newTimer, fireState).asInstanceOf[ViewModel]
       }
     } yield newObj
 }

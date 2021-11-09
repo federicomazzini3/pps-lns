@@ -34,7 +34,7 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), Map.empty) //generateBlockingElements())
       case RoomType.Arena =>
-        val enemyTest = UUID.randomUUID() -> ParabiteModel.initial
+        val enemyTest = UUID.randomUUID() -> MaskModel.initial
         RoomModel.arenaRoom(
           position,
           generateDoors(grid, position),
