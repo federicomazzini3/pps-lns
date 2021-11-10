@@ -6,7 +6,7 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
-import lns.scenes.game.room.{ Boundary, RoomModel }
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
@@ -46,6 +46,7 @@ case class CharacterModel(
     with SolidModel {
 
   type Model = CharacterModel
+
   val crossable       = false
   val shotOffset: Int = -8
 
@@ -70,7 +71,7 @@ case class CharacterModel(
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
   def withStats(stats: Stats): Model                                = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
 
   val fireInputMappings: InputMapping[Vector2] =
@@ -81,7 +82,7 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.LEFT_ARROW)  -> Vector2(-1, 0)
     )
 
-  def computeFire(context: FrameContext[StartupData])(character: AnythingModel): Option[Vector2] =
+  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] =
     context.inputState.mapInputsOption(fireInputMappings)
 }
 

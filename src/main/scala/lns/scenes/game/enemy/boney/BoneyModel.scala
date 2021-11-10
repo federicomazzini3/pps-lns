@@ -6,8 +6,8 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
-import lns.scenes.game.room.RoomModel
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*

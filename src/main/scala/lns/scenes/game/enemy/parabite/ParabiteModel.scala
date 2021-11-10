@@ -6,9 +6,9 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
 import lns.scenes.game.enemy.{ *, given }
-import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
@@ -56,13 +56,13 @@ case class ParabiteModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
 
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)(character)
+      superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Idle, 0) if getPosition().distanceTo(character.getPosition()) >= 10 =>
+        case (EnemyState.Idle, 0) if getPosition().distanceTo(gameContext.character.getPosition()) >= 10 =>
           superObj
-            .withTraveller(Queue(character.getPosition().clamp(0, Assets.Rooms.floorSize)))
+            .withTraveller(Queue(gameContext.character.getPosition().clamp(0, Assets.Rooms.floorSize)))
             .withStatus((EnemyState.Attacking, 0.0))
             .asInstanceOf[Model] // TODO: togliere il clamp dopo refactor coordinate
         case (EnemyState.Attacking, _) if superObj.path.isEmpty == true =>

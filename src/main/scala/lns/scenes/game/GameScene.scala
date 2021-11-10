@@ -22,6 +22,8 @@ import lns.subsystems.prolog.PrologEvent
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions
 
+case class GameContext(room: RoomModel, character: CharacterModel)
+
 final case class GameScene() extends EmptyScene {
   type SceneModel     = GameModel
   type SceneViewModel = GameViewModel
@@ -50,8 +52,9 @@ final case class GameScene() extends EmptyScene {
       model match {
 
         case model @ GameModel.Started(dungeon, room, character) =>
+          val gameContext = GameContext(room, character)
           for {
-            character <- character.update(context)(room)(character)
+            character <- character.update(context)(gameContext)
             room      <- room.update(context)(character)
             (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
           } yield model.copy(character = newCharacter, room = newRoom)

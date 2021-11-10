@@ -5,6 +5,7 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.scenes.game.GameContext
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
@@ -55,12 +56,12 @@ trait AnythingModel {
    * Update request called during game loop on every frame
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   the Outcome of the updated model
    */
-  def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
+  def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     Outcome(this)
 }
 
@@ -152,14 +153,12 @@ trait DynamicModel extends AnythingModel with StatsModel {
   /**
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
-   * @param character
-   *   character model as [[AnythingModel]]
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   the speed vector
    */
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Vector2
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2
 
   /**
    * @param context
@@ -171,10 +170,8 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * @return
    *   a Tuple2 representing the computed speed and the moved boundingBox
    */
-  def computeMove(context: FrameContext[StartupData])(room: RoomModel)(
-      character: CharacterModel
-  ): (Vector2, BoundingBox) =
-    val speed: Vector2 = computeSpeed(context)(room)(character)
+  def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
+    val speed: Vector2 = computeSpeed(context)(gameContext)
     (speed, boundingBox.moveBy(speed * context.gameTime.delta.toDouble))
 
   /**
@@ -182,16 +179,16 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * calculated and then validated by the current room
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   the Outcome of the updated model wich is moved by its speed vector data normalized on gameTime.delta
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)(character)
-      (newSpeed, newPosition) = computeMove(context)(room)(character)
-      boundLocation           = room.boundPosition(this, newPosition)(character)
+      superObj <- super.update(context)(gameContext)
+      (newSpeed, newPosition) = computeMove(context)(gameContext)
+      boundLocation           = gameContext.room.boundPosition(this, newPosition)(gameContext.character)
       newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
@@ -230,14 +227,14 @@ trait AliveModel extends AnythingModel with StatsModel {
    * ultil its expiration
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)(character)
+      superObj <- super.update(context)(gameContext)
       newObj =
         invincibilityTimer match {
           case 0 => superObj
@@ -301,7 +298,7 @@ trait FireModel extends AnythingModel with StatsModel {
    * @return
    *   Optional direction vector
    */
-  def computeFire(context: FrameContext[StartupData])(character: AnythingModel): Option[Vector2]
+  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2]
 
   /**
    * Create a new ShotEvent capable of being captured by the game model during game loop on every frame
@@ -319,17 +316,17 @@ trait FireModel extends AnythingModel with StatsModel {
    * timer is present, it is decreased to 0
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     val newFireRateTimer = fireRateTimer.elapsed(context.gameTime.delta.toDouble)
-    val newShot          = computeFire(context)(character)
+    val newShot          = computeFire(context)(gameContext)
 
     val retObj = for {
-      superObj <- super.update(context)(room)(character)
+      superObj <- super.update(context)(gameContext)
       newObj = (newFireRateTimer, newShot) match {
         case (0, Some(_)) => superObj.withFire(FireRate @@ stats, newShot).asInstanceOf[Model]
         case _            => superObj.withFire(newFireRateTimer, newShot).asInstanceOf[Model]

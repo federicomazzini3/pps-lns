@@ -6,6 +6,7 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingModel, DynamicState, SolidModel, given }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
@@ -63,6 +64,7 @@ trait RoomModel {
         bb1.top != bb2.top && bb1.bottom != bb2.bottom
 
     val positionBounded = Boundary.containerBound(floor, position)
+    positionBounded
 
   /*val posBounded = Boundary.containerBound(floor, position)
     model match {
@@ -140,8 +142,9 @@ trait RoomModel {
   def updateAnythings(
       context: FrameContext[StartupData]
   )(character: CharacterModel): Outcome[Map[UUID, AnythingModel]] =
+    val gameContext = GameContext(this, character)
     anythings
-      .map((id, any) => id -> any.update(context)(this)(character))
+      .map((id, any) => id -> any.update(context)(gameContext))
 
   /**
    * Update the shot based on FrameContext

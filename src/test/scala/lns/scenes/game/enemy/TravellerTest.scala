@@ -8,14 +8,15 @@ import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingModel, DynamicModel }
-import lns.scenes.game.room.RoomModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{ BeforeAndAfterEach, Suite }
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 import scala.collection.immutable.Queue
+
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyTravellerModel(
     boundingBox: BoundingBox,
@@ -53,6 +54,8 @@ trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   override val character: CharacterModel =
     CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
+  override val gameContext: GameContext = GameContext(room, character)
+
   override def beforeEach() = {
     stoppedModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats)
     movingModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats, path = path)
@@ -69,7 +72,7 @@ class TravellerTest extends AnyFreeSpec with TravellerModelFixture {
           s"max speed $maxSpeed should" - {
             "not move" in {
               val updatedModel: MyTravellerModel = stoppedModel
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               assert(updatedModel.isMoving() == false)
@@ -84,14 +87,14 @@ class TravellerTest extends AnyFreeSpec with TravellerModelFixture {
           s"max speed $maxSpeed should" - {
             "be moving" in {
               val updatedModel: MyTravellerModel = movingModel
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               assert(updatedModel.isMoving() == true)
             }
             s"move by $maxSpeed" in {
               val updatedModel: MyTravellerModel = movingModel
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val distance = updatedModel.getPosition().distanceTo(Vector2(initialPos, initialPos))
@@ -99,7 +102,7 @@ class TravellerTest extends AnyFreeSpec with TravellerModelFixture {
             }
             s"move in direction $firstDirection" in {
               val updatedModel: MyTravellerModel = movingModel
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val direction = (updatedModel.getPosition() - Vector2(initialPos, initialPos)).normalise

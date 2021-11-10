@@ -1,7 +1,6 @@
 package lns.scenes.game.character
 
 import scala.language.implicitConversions
-
 import indigo.shared.Outcome
 import indigo.shared.constants.Key
 import indigo.shared.events.{ InputState, KeyboardEvent }
@@ -12,6 +11,7 @@ import indigo.shared.datatypes.Vector2
 import lns.StartupData
 import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
@@ -57,7 +57,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
       "after one frame update with time delta = 1s" - {
         "should not move" in {
           val updatedModel = model
-            .update(getContext(1))(room)(model)
+            .update(getContext(1))(GameContext(room, model))
             .getOrElse(fail("Undefined Model"))
 
           assert(
@@ -83,7 +83,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
           ).foreach { keys =>
             s"with keys '${keys._1}' should move correctly" in {
               val updatedModel = model
-                .update(getContext(second, inputKeys(keys._2)))(room)(model)
+                .update(getContext(second, inputKeys(keys._2)))(GameContext(room, model))
                 .getOrElse(fail("Undefined Model"))
 
               val maxSpeed = MaxSpeed @@ model.stats
@@ -132,7 +132,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
         ).foreach { keys =>
           s"with keys '${keys._1}' should fire correctly generating ShotEvent" in {
             val updatedModelOutcome = model
-              .update(getContext(1, inputKeys(keys._2._1)))(room)(model)
+              .update(getContext(1, inputKeys(keys._2._1)))(GameContext(room, model))
 
             val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
 

@@ -8,14 +8,15 @@ import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{AnythingModel, FireModel}
-import lns.scenes.game.room.RoomModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{BeforeAndAfterEach, Suite}
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
+
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.{BeforeAndAfterEach, Suite}
 
 import scala.collection.immutable.Queue
 
@@ -74,35 +75,35 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
       s"in (${characterPos.x},${characterPos.y})" - {
         "after one frame update should" - {
           "fire a shot in character direction" in {
-            val outcome: Outcome[MyFiringModel] = model.update(getContext(1))(room)(test._1)
+            val outcome: Outcome[MyFiringModel] = model.update(getContext(1))(GameContext(room, test._1))
 
             assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
           }
           s"and after 0.5s should" - {
             "not fire a shot " in {
               val updatedModel: MyFiringModel = model
-                .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
+                .update(getContext(1))(GameContext(room, test._1)).getOrElse(fail("Undefined Model"))
 
-              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(0.5))(room)(test._1)
+              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(0.5))(GameContext(room, test._1))
               assert(outcome.globalEventsOrNil == List())
             }
           }
           s"and after two frames in 0.9s should" - {
             "not fire a shot " in {
               val updatedModel: MyFiringModel = model
-                .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
-                .update(getContext(0.8))(room)(test._1).getOrElse(fail("Undefined Model"))
+                .update(getContext(1))(GameContext(room, test._1)).getOrElse(fail("Undefined Model"))
+                .update(getContext(0.8))(GameContext(room, test._1)).getOrElse(fail("Undefined Model"))
 
-              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(0.1))(room)(test._1)
+              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(0.1))(GameContext(room, test._1))
               assert(outcome.globalEventsOrNil == List())
             }
           }
           s"but after a frame in 1.5s should" - {
             "fire another shot in character direction" in {
               val updatedModel: MyFiringModel = model
-                .update(getContext(1))(room)(test._1).getOrElse(fail("Undefined Model"))
+                .update(getContext(1))(GameContext(room, test._1)).getOrElse(fail("Undefined Model"))
 
-              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(1.5))(room)(test._1)
+              val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(1.5))(GameContext(room, test._1))
               assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
             }
           }

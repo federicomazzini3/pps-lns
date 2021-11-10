@@ -5,8 +5,8 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import org.scalajs.dom.raw.Position
+import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ SolidModel, given_Conversion_Vector2_Vertex, * }
-import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
@@ -53,9 +53,7 @@ case class ShotModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withStats(stats: Stats): Model                               = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
-    println(MaxSpeed @@ stats)
-    println(direction.normalise * MaxSpeed @@ stats)
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     direction.normalise * MaxSpeed @@ stats
 }
 
