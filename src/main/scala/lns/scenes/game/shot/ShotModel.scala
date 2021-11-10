@@ -4,10 +4,9 @@ import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import org.scalajs.dom.raw.Position
-import lns.scenes.game.anything.{ SolidModel, given_Conversion_Vector2_Vertex, * }
-import lns.scenes.game.room.RoomModel
-import lns.scenes.game.stats.*
+import lns.scenes.game.GameContext
+import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
 import scala.language.implicitConversions
@@ -33,7 +32,10 @@ import scala.language.implicitConversions
  *   [[AliveModel]] invincibilityTimer, default 0
  */
 case class ShotModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
+    owner: AnythingId,
+    shotAreaOffset: Int,
     stats: Stats,
     direction: Vector2,
     speed: Vector2 = Vector2(0, 0),
@@ -46,32 +48,33 @@ case class ShotModel(
 
   type Model = ShotModel
 
-  val enabled = true
+  val crossable = false
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withStats(stats: Stats): Model                               = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2 =
-    println(MaxSpeed @@ stats)
-    println(direction.normalise * MaxSpeed @@ stats)
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     direction.normalise * MaxSpeed @@ stats
 }
 
 /**
  * Extends [[GlobalEvent]] and can be intercepted by the [[GameView]] to create a new [[ShotModel]]
  */
-case class ShotEvent(position: Vector2, direction: Vector2) extends GlobalEvent
+case class ShotEvent(owner: AnythingId, position: Vector2, direction: Vector2) extends GlobalEvent
 
 /**
  * Factory of [[ShotModel]]
  */
 object ShotModel {
-  def apply(position: Vector2, direction: Vector2): ShotModel = ShotModel(
+  def apply(owner: AnythingId, position: Vector2, direction: Vector2): ShotModel = ShotModel(
+    AnythingId.generate,
     BoundingBox(
       position,
       Vertex(40, 40)
     ),
+    owner,
+    shotAreaOffset = 0,
     Stats.Shot,
     direction
   )

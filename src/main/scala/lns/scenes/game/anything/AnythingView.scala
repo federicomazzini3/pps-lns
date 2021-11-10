@@ -8,7 +8,7 @@ import indigo.shared.events.InputState
 import indigo.shared.input.{ Gamepad, Keyboard, Mouse }
 import indigo.shared.scenegraph.*
 import indigo.shared.time.GameTime
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.*

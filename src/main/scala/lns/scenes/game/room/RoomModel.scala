@@ -1,18 +1,20 @@
 package lns.scenes.game.room
 
+import indigo.*
 import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Rectangle
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingModel, DynamicState, SolidModel, given }
+import lns.scenes.game.GameContext
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicState, SolidModel, given }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.EnemyModel
-import java.util.UUID
+import lns.scenes.game.enemy.nerve.NerveModel
 
 import scala.language.implicitConversions
 
@@ -48,7 +50,7 @@ trait RoomModel {
   /**
    * the shots fired in a room
    */
-  val anythings: Map[UUID, AnythingModel]
+  val anythings: Map[AnythingId, AnythingModel]
 
   /**
    * Confine the character inside the limit of the room
@@ -57,17 +59,34 @@ trait RoomModel {
    * @return
    *   the bounded character's position
    */
-  def boundPosition(anything: BoundingBox): BoundingBox =
-    def differentBB(bb1: BoundingBox, bb2: BoundingBox) =
-      bb1.left != bb2.left && bb1.right != bb2.right &&
-        bb1.top != bb2.top && bb1.bottom != bb2.bottom
+  def boundPosition(model: AnythingModel, position: BoundingBox)(character: CharacterModel): BoundingBox =
+    val posBounded = Boundary.containerBound(floor, position)
+    model match {
+      case solid: SolidModel =>
+        val gameAnythings = anythings + (character.id -> character)
 
-    val anyBounded = Boundary.containerBound(floor, anything)
-    anythings.values
-      .collect {
-        case a: SolidModel if a.enabled && differentBB(a.boundingBox, anyBounded) => a
-      }
-      .foldLeft(anyBounded)((anything, element) => Boundary.elementBound(element.boundingBox, anything))
+        gameAnythings.values
+          .collect {
+            case el: SolidModel if !el.crossable && el.id != solid.id => el
+          }
+          .filter(el =>
+            (solid, el) match {
+              case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
+              case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
+              case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
+              case _                                                  => true
+            }
+          )
+          .foldLeft(posBounded)((pos, el) =>
+            solid match {
+              case a: ShotModel =>
+                Boundary.elementBound(el.shotArea, pos)
+              case _ =>
+                Boundary.elementBound(el.boundingBox, pos)
+            }
+          )
+      case _ => posBounded
+    }
 
   /**
    * Add a shot to the shot list
@@ -77,7 +96,7 @@ trait RoomModel {
    *   a new room with the new shot added
    */
   def addShot(shot: ShotModel): RoomModel =
-    val updatedAnythings = anythings + (UUID.randomUUID() -> shot)
+    val updatedAnythings = anythings + (shot.id -> shot)
     this match {
       case room: EmptyRoom =>
         room.copy(anythings = updatedAnythings)
@@ -98,9 +117,10 @@ trait RoomModel {
    */
   def updateAnythings(
       context: FrameContext[StartupData]
-  )(character: CharacterModel): Outcome[Map[UUID, AnythingModel]] =
+  )(character: CharacterModel): Outcome[Map[AnythingId, AnythingModel]] =
+    val gameContext = GameContext(this, character)
     anythings
-      .map((id, any) => id -> any.update(context)(this)(character))
+      .map((id, any) => id -> any.update(context)(gameContext))
 
   /**
    * Update the shot based on FrameContext
@@ -136,7 +156,7 @@ case class EmptyRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Map[UUID, AnythingModel] = Map.empty
+    val anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
   val doors = doorsLocations.open
 }
@@ -154,7 +174,7 @@ case class ArenaRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Map[UUID, AnythingModel] = Map.empty
+    val anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   val doors =
@@ -177,7 +197,7 @@ case class ItemRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Map[UUID, AnythingModel] = Map.empty
+    val anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   val doors = doorsLocations.open
@@ -196,7 +216,7 @@ case class BossRoom(
     val positionInDungeon: Position,
     val floor: BoundingBox,
     val doorsLocations: DoorsLocations,
-    val anythings: Map[UUID, AnythingModel] = Map.empty
+    val anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
   val doors = doorsLocations.close
@@ -226,7 +246,7 @@ object RoomModel {
   def arenaRoom(
       position: Position,
       locations: DoorsLocations,
-      anythings: Map[UUID, AnythingModel]
+      anythings: Map[AnythingId, AnythingModel]
   ): ArenaRoom = ArenaRoom(
     position,
     defaultFloor,
@@ -234,7 +254,7 @@ object RoomModel {
     anythings
   )
 
-  def itemRoom(position: Position, locations: DoorsLocations, anythings: Map[UUID, AnythingModel]): ItemRoom =
+  def itemRoom(position: Position, locations: DoorsLocations, anythings: Map[AnythingId, AnythingModel]): ItemRoom =
     ItemRoom(
       position,
       defaultFloor,
@@ -242,7 +262,7 @@ object RoomModel {
       anythings
     )
 
-  def bossRoom(position: Position, locations: DoorsLocations, anythings: Map[UUID, AnythingModel]): BossRoom =
+  def bossRoom(position: Position, locations: DoorsLocations, anythings: Map[AnythingId, AnythingModel]): BossRoom =
     BossRoom(
       position,
       defaultFloor,
@@ -252,8 +272,8 @@ object RoomModel {
 
   val defaultFloor: BoundingBox =
     BoundingBox(
-      Vertex(0, 0),
-      Vertex(
+      Vector2(0, 0),
+      Vector2(
         Assets.Rooms.floorSize,
         Assets.Rooms.floorSize
       )

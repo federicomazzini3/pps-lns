@@ -5,7 +5,8 @@ import indigo.shared.FrameContext
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.{ SolidModel, * }
+import lns.scenes.game.GameContext
+import lns.scenes.game.anything.*
 import lns.scenes.game.room.RoomModel
 
 import scala.collection.immutable.Queue
@@ -32,9 +33,9 @@ trait EnemyModel extends AliveModel with DamageModel with SolidModel {
 
   def withStatus(status: Queue[EnemyStatus]): Model
 
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
-      superObj <- super.update(context)(room)(character)
+      superObj <- super.update(context)(gameContext)
       newObj = status.head match {
         case (state, timer) if timer > 0 =>
           superObj

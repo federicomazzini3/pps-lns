@@ -20,7 +20,7 @@ case class ElementView() extends AnythingView {
     Group()
       .addChild(
         model match {
-          case StoneModel(_) =>
+          case s: StoneModel =>
             Group()
               .addChild(
                 ElementGraphic

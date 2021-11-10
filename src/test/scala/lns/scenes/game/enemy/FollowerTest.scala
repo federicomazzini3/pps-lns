@@ -1,27 +1,30 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
-import indigo.shared.FrameContext
-import indigo.shared.datatypes.Vector2
+
+import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
-import lns.scenes.game.anything.{ AnythingModel, DynamicModel }
-import lns.scenes.game.room.RoomModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{ BeforeAndAfterEach, Suite }
+import lns.scenes.game.GameContext
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicModel }
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.{ BeforeAndAfterEach, Suite }
+
 import scala.collection.immutable.Queue
 
 case class MyFollowerModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -47,8 +50,10 @@ trait FollowerModelFixture extends ContextFixture with BeforeAndAfterEach { this
   override val character: CharacterModel =
     CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
+  override val gameContext: GameContext = GameContext(room, character)
+
   override def beforeEach() = {
-    model = new MyFollowerModel(BoundingBox(initialPos, initialPos, 10, 10), stats)
+    model = new MyFollowerModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
 
     super.beforeEach()
   }
@@ -61,14 +66,14 @@ class FollowerTest extends AnyFreeSpec with FollowerModelFixture {
         s"max speed $maxSpeed should" - {
           "be moving" in {
             val updatedModel: MyFollowerModel = model
-              .update(getContext(1))(room)(character)
+              .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.isMoving() == true)
           }
           s"move by $maxSpeed" in {
             val updatedModel: MyFollowerModel = model
-              .update(getContext(1))(room)(character)
+              .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 
             val distance = updatedModel.getPosition().distanceTo(Vector2(initialPos, initialPos))
@@ -76,7 +81,7 @@ class FollowerTest extends AnyFreeSpec with FollowerModelFixture {
           }
           "move in direction (-1,-1)" in {
             val updatedModel: MyFollowerModel = model
-              .update(getContext(1))(room)(character)
+              .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 
             val direction = (updatedModel.getPosition() - Vector2(initialPos, initialPos)).normalise

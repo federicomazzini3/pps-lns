@@ -2,11 +2,11 @@ package lns.scenes.game.enemy.nerve
 
 import scala.language.implicitConversions
 import indigo.*
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.enemy.{ EnemyModel, EnemyState, EnemyStatus, FiresContinuously, KeepsAway }
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.shot.ShotEvent
@@ -30,10 +30,12 @@ import scala.collection.immutable.Queue
  *   [[AliveModel]] invincibilityTimer, default 0
  */
 case class NerveModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {
@@ -52,13 +54,15 @@ object NerveModel {
   import Assets.Enemies.Nerve.*
 
   def initial: NerveModel = NerveModel(
+    AnythingId.generate,
     boundingBox = BoundingBox(
-      Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vertex(
+      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
+      Vector2(
         withScale(width),
         withScale(height - offsetY)
       )
     ),
+    shotAreaOffset = withScale(-offsetY),
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

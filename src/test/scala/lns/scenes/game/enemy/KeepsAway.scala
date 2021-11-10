@@ -1,28 +1,31 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
+
 import indigo.*
-import indigo.shared.FrameContext
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
-import lns.scenes.game.anything.{ AnythingModel, DynamicModel }
-import lns.scenes.game.room.RoomModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{ BeforeAndAfterEach, Suite }
+import lns.scenes.game.GameContext
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicModel }
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.{ BeforeAndAfterEach, Suite }
+
 import scala.collection.immutable.Queue
 
 case class MyKeepsAwayModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     range: (Int, Int),
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -50,12 +53,22 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   val initialPosInMiddle = 400
   val initialPosAway     = 700
 
-  override val character: CharacterModel = CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
+  override val character: CharacterModel =
+    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
+
+  override val gameContext: GameContext = GameContext(room, character)
 
   override def beforeEach() = {
-    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), stats, range)
-    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), stats, range)
-    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), stats, range)
+    model = new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 10, stats, range)
+    modelInMiddle = new MyKeepsAwayModel(
+      AnythingId.generate,
+      BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10),
+      10,
+      stats,
+      range
+    )
+    modelAway =
+      new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPosAway, initialPosAway, 10, 10), 10, stats, range)
 
     super.beforeEach()
   }
@@ -69,14 +82,14 @@ class KeepsAwayTest extends AnyFreeSpec with KeepsAwayModelFixture {
           s"max speed ($maxSpeed,$maxSpeed) should" - {
             "be moving" in {
               val updatedModel: MyKeepsAwayModel = model
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               assert(updatedModel.isMoving() == true)
             }
             "move by $maxSpeed" in {
               val updatedModel: MyKeepsAwayModel = model
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val distance = updatedModel.getPosition().distanceTo(Vector2(initialPos, initialPos))
@@ -84,7 +97,7 @@ class KeepsAwayTest extends AnyFreeSpec with KeepsAwayModelFixture {
             }
             s"move in direction (1,1)" in {
               val updatedModel: MyKeepsAwayModel = model
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val direction = (Vector2(initialPos, initialPos) - updatedModel.getPosition()).normalise
@@ -99,14 +112,14 @@ class KeepsAwayTest extends AnyFreeSpec with KeepsAwayModelFixture {
         "time delta 1s should" - {
           "not be moving" in {
             val updatedModel: MyKeepsAwayModel = modelInMiddle
-              .update(getContext(1))(room)(character)
+              .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.isMoving() == false)
           }
           "maintains position" in {
             val updatedModel: MyKeepsAwayModel = modelInMiddle
-              .update(getContext(1))(room)(character)
+              .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 
             assert(updatedModel.getPosition() == Vector2(initialPosInMiddle, initialPosInMiddle))
@@ -120,14 +133,14 @@ class KeepsAwayTest extends AnyFreeSpec with KeepsAwayModelFixture {
           s"max speed ($maxSpeed,$maxSpeed) should" - {
             "be moving" in {
               val updatedModel: MyKeepsAwayModel = modelAway
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               assert(updatedModel.isMoving() == true)
             }
             "move by $maxSpeed" in {
               val updatedModel: MyKeepsAwayModel = modelAway
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val distance = updatedModel.getPosition().distanceTo(Vector2(initialPosAway, initialPosAway))
@@ -135,7 +148,7 @@ class KeepsAwayTest extends AnyFreeSpec with KeepsAwayModelFixture {
             }
             s"move in direction (-1,-1)" in {
               val updatedModel: MyKeepsAwayModel = modelAway
-                .update(getContext(1))(room)(character)
+                .update(getContext(1))(gameContext)
                 .getOrElse(fail("Undefined Model"))
 
               val direction = (updatedModel.getPosition() - Vector2(initialPosAway, initialPosAway)).normalise

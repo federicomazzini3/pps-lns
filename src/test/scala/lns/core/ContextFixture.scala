@@ -8,6 +8,7 @@ import indigo.shared.subsystems.SubSystemFrameContext
 import indigo.shared.time.{ GameTime, Seconds }
 import indigo.shared.{ AnimationsRegister, BoundaryLocator, FontRegister, FrameContext }
 import lns.StartupData
+import lns.scenes.game.GameContext
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.character.CharacterModel
 import org.scalatest.Suite
@@ -24,6 +25,7 @@ trait ContextFixture {
   val roomCenterX     = Assets.Rooms.floorSize / 2
   val roomCenterY     = Assets.Rooms.floorSize / 2
   val character       = CharacterModel.initial
+  val gameContext     = GameContext(room, character)
 
   def getContext(timeDelta: Double, inputState: InputState = InputState.default): FrameContext[StartupData] =
     new FrameContext[StartupData](

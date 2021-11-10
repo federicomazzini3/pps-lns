@@ -8,13 +8,14 @@ import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
-import lns.scenes.game.room.RoomModel
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.{ BeforeAndAfterEach, Suite }
+import lns.scenes.game.GameContext
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyDynamicModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     stats: Stats,
     nextSpeed: Vector2,
@@ -25,7 +26,7 @@ case class MyDynamicModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyDynamicModel = copyMacro
   def withStats(stats: Stats): Model                                        = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel) = nextSpeed
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext) = nextSpeed
 }
 
 trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
@@ -36,8 +37,9 @@ trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this:
   val stats = Stats(MaxSpeed -> 300)
 
   override def beforeEach() = {
-    model = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
-    movingModel = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
+    model = new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
+    movingModel =
+      new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
 
     super.beforeEach()
   }
@@ -50,7 +52,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
       "time delta 1s having" - {
         "null speed should dont move" in {
           val updatedModel = model
-            .update(getContext(1))(room)(character)
+            .update(getContext(1))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY)
@@ -58,7 +60,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
         }
         "costant speed (2,2) should move by 2,2" in {
           val updatedModel = movingModel
-            .update(getContext(1))(room)(character)
+            .update(getContext(1))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == roomCenterX + 2 && updatedModel.boundingBox.y == roomCenterY + 2)
@@ -68,7 +70,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
       "time delta 2s having" - {
         "null speed should dont move" in {
           val updatedModel = model
-            .update(getContext(2))(room)(character)
+            .update(getContext(2))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY)
@@ -76,7 +78,7 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
         }
         "costant speed (2,2) should move by (4,4)" in {
           val updatedModel = movingModel
-            .update(getContext(2))(room)(character)
+            .update(getContext(2))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
           assert(updatedModel.boundingBox.x == roomCenterX + 4 && updatedModel.boundingBox.y == roomCenterY + 4)
@@ -88,20 +90,20 @@ class DynamicModelTest extends AnyFreeSpec with DynamicModelFixture {
       "time delta 1s having" - {
         "null speed should dont move" in {
           val updatedModel: MyDynamicModel = model
-            .update(getContext(1))(room)(character)
+            .update(getContext(1))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
-          val updatedModel2 = updatedModel.update(getContext(1))(room)(character).unsafeGet
+          val updatedModel2 = updatedModel.update(getContext(1))(gameContext).unsafeGet
 
           assert(updatedModel2.boundingBox.x == roomCenterX && updatedModel2.boundingBox.y == roomCenterY)
           assert(updatedModel.isMoving() == false)
         }
         "costant speed (2,2) should move by (4,4)" in {
           val updatedModel: MyDynamicModel = movingModel
-            .update(getContext(1))(room)(character)
+            .update(getContext(1))(gameContext)
             .getOrElse(fail("Undefined Model"))
 
-          val updatedModel2 = updatedModel.update(getContext(1))(room)(character).unsafeGet
+          val updatedModel2 = updatedModel.update(getContext(1))(gameContext).unsafeGet
 
           assert(updatedModel2.boundingBox.x == roomCenterX + 4 && updatedModel2.boundingBox.y == roomCenterY + 4)
           assert(updatedModel.isMoving() == true)
