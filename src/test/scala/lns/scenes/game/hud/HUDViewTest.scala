@@ -1,8 +1,8 @@
-package lns.scenes.game.HUD
+package lns.scenes.game.hud
 
 import org.scalatest.freespec.AnyFreeSpec
-import lns.scenes.game.HUD.HUDView.*
-import lns.scenes.game.HUD.HUDView.HeartStatus.*
+import lns.scenes.game.hud.HUDView.*
+import lns.scenes.game.hud.HUDView.HeartStatus.*
 
 class HUDViewTest extends AnyFreeSpec {
   "In the HUD" - {

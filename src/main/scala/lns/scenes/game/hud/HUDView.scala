@@ -1,4 +1,4 @@
-package lns.scenes.game.HUD
+package lns.scenes.game.hud
 
 import scala.language.implicitConversions
 import indigo.*

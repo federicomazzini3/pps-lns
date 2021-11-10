@@ -8,7 +8,7 @@ import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
-import lns.scenes.game.HUD.HUDView
+import lns.scenes.game.hud.HUDView
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
