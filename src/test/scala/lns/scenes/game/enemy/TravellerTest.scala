@@ -19,9 +19,10 @@ import scala.collection.immutable.Queue
 
 case class MyTravellerModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0),
@@ -53,8 +54,8 @@ trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { thi
     CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
   override def beforeEach() = {
-    stoppedModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), stats)
-    movingModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), stats, path = path)
+    stoppedModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats)
+    movingModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats, path = path)
 
     super.beforeEach()
   }

@@ -6,11 +6,11 @@ import lns.scenes.game.anything.{ AnythingModel, SolidModel }
 
 import java.util.UUID
 
-case class StoneModel(val boundingBox: BoundingBox) extends SolidModel {
+case class StoneModel(val boundingBox: BoundingBox, val shotAreaOffset: Int) extends SolidModel {
 
   type Model = StoneModel
 
-  val enabled = true
+  val crossable = false
 }
 
 object ElementModel {
@@ -24,6 +24,11 @@ object ElementModel {
       )
     )*/
 
+  def defaultArea(i: Int, j: Int): BoundingBox = BoundingBox(
+    Vertex(Rooms.cellSize * i, Rooms.cellSize * j),
+    Vertex(Stone.withScale(Stone.width), Stone.withScale(Stone.height - Stone.offsetY))
+  )
+
   def stone(): Map[UUID, AnythingModel] =
     val stones =
       for {
@@ -33,7 +38,8 @@ object ElementModel {
         BoundingBox(
           Vertex(Rooms.cellSize * i, Rooms.cellSize * j),
           Vertex(Stone.withScale(Stone.width), Stone.withScale(Stone.height - Stone.offsetY))
-        )
+        ),
+        shotAreaOffset = 0
       )
 
     stones.toMap

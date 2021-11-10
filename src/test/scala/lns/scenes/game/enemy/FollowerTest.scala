@@ -19,9 +19,10 @@ import scala.collection.immutable.Queue
 
 case class MyFollowerModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -48,7 +49,7 @@ trait FollowerModelFixture extends ContextFixture with BeforeAndAfterEach { this
     CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
   override def beforeEach() = {
-    model = new MyFollowerModel(BoundingBox(initialPos, initialPos, 10, 10), stats)
+    model = new MyFollowerModel(BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
 
     super.beforeEach()
   }

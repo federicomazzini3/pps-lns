@@ -38,9 +38,10 @@ import scala.collection.immutable.Queue
  */
 case class MaskModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,
@@ -76,6 +77,7 @@ object MaskModel {
         withScale(height - offsetY)
       )
     ),
+    shotAreaOffset = offsetY,
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

@@ -34,6 +34,7 @@ import scala.language.implicitConversions
  */
 case class ShotModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     direction: Vector2,
     speed: Vector2 = Vector2(0, 0),
@@ -46,7 +47,7 @@ case class ShotModel(
 
   type Model = ShotModel
 
-  val enabled = true
+  val crossable = false
 
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
@@ -72,6 +73,7 @@ object ShotModel {
       position,
       Vertex(40, 40)
     ),
+    shotAreaOffset = 0,
     Stats.Shot,
     direction
   )

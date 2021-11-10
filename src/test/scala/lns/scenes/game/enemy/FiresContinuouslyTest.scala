@@ -21,9 +21,10 @@ import scala.collection.immutable.Queue
 
 case class MyFiringModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life:Int = 0,
     invincibilityTimer:Double = 0,
     fireRateTimer: Double = 0,
@@ -60,7 +61,7 @@ trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: 
     )
 
   override def beforeEach() = {
-    model = new MyFiringModel(BoundingBox(initialPos, initialPos, 10, 10), stats)
+    model = new MyFiringModel(BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
 
     super.beforeEach()
   }

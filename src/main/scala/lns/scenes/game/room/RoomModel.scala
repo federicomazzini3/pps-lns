@@ -12,8 +12,8 @@ import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.EnemyModel
-import java.util.UUID
 
+import java.util.UUID
 import scala.language.implicitConversions
 
 type Door           = (Location, DoorState)
@@ -57,17 +57,58 @@ trait RoomModel {
    * @return
    *   the bounded character's position
    */
-  def boundPosition(anything: BoundingBox): BoundingBox =
+  def boundPosition(model: AnythingModel, position: BoundingBox)(character: CharacterModel): BoundingBox =
     def differentBB(bb1: BoundingBox, bb2: BoundingBox) =
       bb1.left != bb2.left && bb1.right != bb2.right &&
         bb1.top != bb2.top && bb1.bottom != bb2.bottom
 
-    val anyBounded = Boundary.containerBound(floor, anything)
+    val positionBounded = Boundary.containerBound(floor, position)
+
+  /*val posBounded = Boundary.containerBound(floor, position)
+    model match {
+      case s: SolidModel =>
+        val shotArea = s.generateNewShotArea(posBounded)
+        anythings.values
+          .collect {
+            case a: SolidModel if !a.crossable && (s match {
+                  case a: ShotModel => differentBB(a.shotArea, posBounded)
+                  case _            => differentBB(a.boundingBox, posBounded)
+                }) =>
+              a
+          }
+          .foldLeft(posBounded)((anything, element) =>
+            (model, element) match {
+              case (elem1: SolidModel, elem2: ShotModel) =>
+                Boundary.elementBound(element.shotArea, elem2.boundingBox)
+              case (elem1: ShotModel, elem2: SolidModel) =>
+                Boundary.elementBound(element.boundingBox, anything)
+            }
+          )
+      case _ => posBounded
+    }
+
     anythings.values
       .collect {
-        case a: SolidModel if a.enabled && differentBB(a.boundingBox, anyBounded) => a
+
+        case a: SolidModel if !a.crossable && (model match {
+              case a: ShotModel => differentBB(a.shotArea, posBounded)
+              case _            => differentBB(a.boundingBox, posBounded)
+            }) =>
+          a
       }
-      .foldLeft(anyBounded)((anything, element) => Boundary.elementBound(element.boundingBox, anything))
+
+      model match {
+        case a: ShotModel => .foldLeft(posBounded)((anything, element) =>
+        case : => .foldLeft(shotArea)((anything, element) =>
+      }
+      .foldLeft(posBounded)((anything, element) =>
+        model match {
+          case a: ShotModel =>
+            Boundary.elementBound(element.shotArea, anything)
+          case _ =>
+            Boundary.elementBound(element.boundingBox, anything)
+        }
+      )*/
 
   /**
    * Add a shot to the shot list

@@ -1,14 +1,13 @@
 package lns.scenes.game.character
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -33,6 +32,7 @@ import lns.scenes.game.stats.PropertyName.*
  */
 case class CharacterModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     life: Int = 0,
     speed: Vector2 = Vector2(0, 0),
@@ -42,10 +42,11 @@ case class CharacterModel(
 ) extends AliveModel
     with DynamicModel
     with FireModel
-    with DamageModel {
+    with DamageModel
+    with SolidModel {
 
   type Model = CharacterModel
-
+  val crossable       = false
   val shotOffset: Int = -8
 
   // TODO: Builder pattern -> usare Require qui oppure sui Trait
@@ -95,6 +96,7 @@ object CharacterModel {
       Vertex(floorSize / 2, floorSize / 2),
       Vertex(withScale(width), withScale(height - offsetY))
     ),
+    shotAreaOffset = withScale(-offsetY),
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

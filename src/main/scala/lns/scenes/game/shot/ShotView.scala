@@ -15,6 +15,7 @@ case class ShotView() extends AnythingView {
   type View      = Group
 
   val scale: Int = 1
+  //val offsetY: Int = 50
 
   def shot(model: Model): Shape =
     Shape

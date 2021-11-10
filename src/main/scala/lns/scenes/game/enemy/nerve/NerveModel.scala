@@ -31,9 +31,10 @@ import scala.collection.immutable.Queue
  */
 case class NerveModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {
@@ -59,6 +60,7 @@ object NerveModel {
         withScale(height - offsetY)
       )
     ),
+    shotAreaOffset = offsetY,
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

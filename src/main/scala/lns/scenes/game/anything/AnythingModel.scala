@@ -5,6 +5,7 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.*
@@ -59,7 +60,7 @@ trait AnythingModel {
    * @return
    *   the Outcome of the updated model
    */
-  def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
     Outcome(this)
 }
 
@@ -158,7 +159,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * @return
    *   the speed vector
    */
-  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Vector2
+  def computeSpeed(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Vector2
 
   /**
    * @param context
@@ -171,7 +172,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
    *   a Tuple2 representing the computed speed and the moved boundingBox
    */
   def computeMove(context: FrameContext[StartupData])(room: RoomModel)(
-      character: AnythingModel
+      character: CharacterModel
   ): (Vector2, BoundingBox) =
     val speed: Vector2 = computeSpeed(context)(room)(character)
     (speed, boundingBox.moveBy(speed * context.gameTime.delta.toDouble))
@@ -186,11 +187,11 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * @return
    *   the Outcome of the updated model wich is moved by its speed vector data normalized on gameTime.delta
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)(character)
       (newSpeed, newPosition) = computeMove(context)(room)(character)
-      boundLocation           = room.boundPosition(newPosition)
+      boundLocation           = room.boundPosition(this, newPosition)(character)
       newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
@@ -234,7 +235,7 @@ trait AliveModel extends AnythingModel with StatsModel {
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
     for {
       superObj <- super.update(context)(room)(character)
       newObj =
@@ -323,7 +324,7 @@ trait FireModel extends AnythingModel with StatsModel {
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: AnythingModel): Outcome[Model] =
+  override def update(context: FrameContext[StartupData])(room: RoomModel)(character: CharacterModel): Outcome[Model] =
     val newFireRateTimer = fireRateTimer.elapsed(context.gameTime.delta.toDouble)
     val newShot          = computeFire(context)(character)
 
@@ -343,5 +344,14 @@ trait FireModel extends AnythingModel with StatsModel {
 
 trait SolidModel extends AnythingModel {
   type Model >: this.type <: SolidModel
-  val enabled: Boolean
+
+  val crossable: Boolean
+
+  val shotAreaOffset: Int
+
+  val shotArea: BoundingBox = generateNewShotArea(boundingBox)
+
+  def generateNewShotArea(boundingBox: BoundingBox) = boundingBox
+    .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
+    .moveBy(0, shotAreaOffset)
 }

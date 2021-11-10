@@ -19,10 +19,11 @@ import scala.collection.immutable.Queue
 
 case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     range: (Int, Int),
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     life: Int = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -50,12 +51,13 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   val initialPosInMiddle = 400
   val initialPosAway     = 700
 
-  override val character: CharacterModel = CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
+  override val character: CharacterModel =
+    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
 
   override def beforeEach() = {
-    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), stats, range)
-    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), stats, range)
-    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), stats, range)
+    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), 10, stats, range)
+    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), 10, stats, range)
+    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), 10, stats, range)
 
     super.beforeEach()
   }

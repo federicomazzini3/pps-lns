@@ -36,9 +36,10 @@ import scala.language.implicitConversions
  */
 case class ParabiteModel(
     boundingBox: BoundingBox,
+    shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
-    val enabled: Boolean = true,
+    val crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     life: Int = 0,
     invincibilityTimer: Timer = 0,
@@ -86,6 +87,7 @@ object ParabiteModel {
         withScale(height - offsetY)
       )
     ),
+    shotAreaOffset = offsetY,
     stats = Stats.Isaac +++ (MaxSpeed -> 600),
     life = MaxLife @@ Stats.Isaac
   )
