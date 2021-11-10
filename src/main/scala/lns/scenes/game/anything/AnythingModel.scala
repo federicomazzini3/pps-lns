@@ -353,9 +353,7 @@ trait SolidModel extends AnythingModel {
 
   val shotAreaOffset: Int
 
-  val shotArea: BoundingBox = generateNewShotArea(boundingBox)
-
-  def generateNewShotArea(boundingBox: BoundingBox) = boundingBox
+  val shotArea: BoundingBox = boundingBox
     .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
     .moveBy(0, shotAreaOffset)
 }
