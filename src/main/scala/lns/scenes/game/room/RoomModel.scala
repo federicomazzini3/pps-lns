@@ -60,58 +60,33 @@ trait RoomModel {
    *   the bounded character's position
    */
   def boundPosition(model: AnythingModel, position: BoundingBox)(character: CharacterModel): BoundingBox =
-    def differentBB(bb1: BoundingBox, bb2: BoundingBox) =
-      bb1.left != bb2.left && bb1.right != bb2.right &&
-        bb1.top != bb2.top && bb1.bottom != bb2.bottom
-
-    val positionBounded = Boundary.containerBound(floor, position)
-    positionBounded
-
-  /*val posBounded = Boundary.containerBound(floor, position)
+    val posBounded = Boundary.containerBound(floor, position)
     model match {
-      case s: SolidModel =>
-        val shotArea = s.generateNewShotArea(posBounded)
-        anythings.values
+      case solid: SolidModel =>
+        val gameAnythings = anythings + (character.id -> character)
+
+        gameAnythings.values
           .collect {
-            case a: SolidModel if !a.crossable && (s match {
-                  case a: ShotModel => differentBB(a.shotArea, posBounded)
-                  case _            => differentBB(a.boundingBox, posBounded)
-                }) =>
-              a
+            case el: SolidModel if !el.crossable && el.id != solid.id => el
           }
-          .foldLeft(posBounded)((anything, element) =>
-            (model, element) match {
-              case (elem1: SolidModel, elem2: ShotModel) =>
-                Boundary.elementBound(element.shotArea, elem2.boundingBox)
-              case (elem1: ShotModel, elem2: SolidModel) =>
-                Boundary.elementBound(element.boundingBox, anything)
+          .filter(el =>
+            (solid, el) match {
+              case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
+              case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
+              case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
+              case _                                                  => true
+            }
+          )
+          .foldLeft(posBounded)((pos, el) =>
+            solid match {
+              case a: ShotModel =>
+                Boundary.elementBound(el.shotArea, pos)
+              case _ =>
+                Boundary.elementBound(el.boundingBox, pos)
             }
           )
       case _ => posBounded
     }
-
-    anythings.values
-      .collect {
-
-        case a: SolidModel if !a.crossable && (model match {
-              case a: ShotModel => differentBB(a.shotArea, posBounded)
-              case _            => differentBB(a.boundingBox, posBounded)
-            }) =>
-          a
-      }
-
-      model match {
-        case a: ShotModel => .foldLeft(posBounded)((anything, element) =>
-        case : => .foldLeft(shotArea)((anything, element) =>
-      }
-      .foldLeft(posBounded)((anything, element) =>
-        model match {
-          case a: ShotModel =>
-            Boundary.elementBound(element.shotArea, anything)
-          case _ =>
-            Boundary.elementBound(element.boundingBox, anything)
-        }
-      )*/
 
   /**
    * Add a shot to the shot list
