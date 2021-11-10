@@ -77,7 +77,7 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
           "fire a shot in character direction" in {
             val outcome: Outcome[MyFiringModel] = model.update(getContext(1))(GameContext(room, test._1))
 
-            assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
+            assert(outcome.globalEventsOrNil == List(ShotEvent(model.id,model.boundingBox.center.toVector2, test._2)))
           }
           s"and after 0.5s should" - {
             "not fire a shot " in {
@@ -104,7 +104,7 @@ class FiresContinuouslyTest extends AnyFreeSpec with FiringModelFixture {
                 .update(getContext(1))(GameContext(room, test._1)).getOrElse(fail("Undefined Model"))
 
               val outcome: Outcome[MyFiringModel] = updatedModel.update(getContext(1.5))(GameContext(room, test._1))
-              assert(outcome.globalEventsOrNil == List(ShotEvent(model.boundingBox.center.toVector2, test._2)))
+              assert(outcome.globalEventsOrNil == List(ShotEvent(model.id,model.boundingBox.center.toVector2, test._2)))
             }
           }
         }

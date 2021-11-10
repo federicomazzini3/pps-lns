@@ -315,7 +315,7 @@ trait FireModel extends AnythingModel with StatsModel {
    *   ShotEvent
    */
   def createEvent(direction: Vector2): ShotEvent =
-    ShotEvent(Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset), direction)
+    ShotEvent(id, Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset), direction)
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer

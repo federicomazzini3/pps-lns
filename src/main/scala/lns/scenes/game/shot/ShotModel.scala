@@ -34,6 +34,7 @@ import scala.language.implicitConversions
 case class ShotModel(
     id: AnythingId,
     boundingBox: BoundingBox,
+    owner: AnythingId,
     shotAreaOffset: Int,
     stats: Stats,
     direction: Vector2,
@@ -60,18 +61,19 @@ case class ShotModel(
 /**
  * Extends [[GlobalEvent]] and can be intercepted by the [[GameView]] to create a new [[ShotModel]]
  */
-case class ShotEvent(position: Vector2, direction: Vector2) extends GlobalEvent
+case class ShotEvent(owner: AnythingId, position: Vector2, direction: Vector2) extends GlobalEvent
 
 /**
  * Factory of [[ShotModel]]
  */
 object ShotModel {
-  def apply(position: Vector2, direction: Vector2): ShotModel = ShotModel(
+  def apply(owner: AnythingId, position: Vector2, direction: Vector2): ShotModel = ShotModel(
     AnythingId.generate,
     BoundingBox(
       position,
       Vertex(40, 40)
     ),
+    owner,
     shotAreaOffset = 0,
     Stats.Shot,
     direction

@@ -100,6 +100,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             assert(
               updatedModelOutcome.globalEventsOrNil == List(
                 ShotEvent(
+                  updatedModel.id,
                   Vector2(
                     updatedModel.boundingBox.horizontalCenter,
                     updatedModel.boundingBox.top + updatedModel.shotOffset
@@ -153,6 +154,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             assert(
               updatedModelOutcome.globalEventsOrNil == List(
                 ShotEvent(
+                  updatedModel.id,
                   Vector2(
                     updatedModel.boundingBox.horizontalCenter,
                     updatedModel.boundingBox.top + updatedModel.shotOffset

@@ -139,7 +139,9 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
             val updatedPosition =
               Vector2(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.top + updatedModel.shotOffset)
 
-            assert(updatedModelOutcome.globalEventsOrNil == List(ShotEvent(updatedPosition, keys._2._2)))
+            assert(
+              updatedModelOutcome.globalEventsOrNil == List(ShotEvent(updatedModel.id, updatedPosition, keys._2._2))
+            )
           }
         }
       }
