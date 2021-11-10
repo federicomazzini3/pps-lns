@@ -17,7 +17,7 @@ object GameViewModel {
   def start(model: GameModel.Started) = Started(
     DungeonViewModel.initial(model.dungeon),
     RoomViewModel.initial(model.room),
-    CharacterViewModel.initial
+    CharacterViewModel.initial(model.character)
   )
 
 }

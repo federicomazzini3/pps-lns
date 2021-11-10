@@ -14,6 +14,7 @@ import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
 case class MyAliveModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     stats: Stats,
     life: Int,
@@ -46,12 +47,14 @@ trait AliveModelFixture extends ContextFixture with BeforeAndAfterEach { this: S
 
   override def beforeEach() = {
     model = new MyAliveModel(
+      AnythingId.generate,
       BoundingBox(roomCenterX, roomCenterY, 10, 10),
       stats,
       MaxLife @@ stats
     )
 
     noInvincibilityModel = new MyAliveModel(
+      AnythingId.generate,
       BoundingBox(roomCenterX, roomCenterY, 10, 10),
       statsNoInvincibility,
       MaxLife @@ statsNoInvincibility

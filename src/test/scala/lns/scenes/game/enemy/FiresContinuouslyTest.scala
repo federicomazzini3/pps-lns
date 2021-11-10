@@ -1,15 +1,14 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
+
 import indigo.*
-import indigo.shared.FrameContext
-import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{AnythingModel, FireModel}
+import lns.scenes.game.anything.{AnythingId, AnythingModel, FireModel}
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
@@ -21,6 +20,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
 import scala.collection.immutable.Queue
 
 case class MyFiringModel(
+    id:AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -62,7 +62,7 @@ trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: 
     )
 
   override def beforeEach() = {
-    model = new MyFiringModel(BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
+    model = new MyFiringModel(AnythingId.generate,BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
 
     super.beforeEach()
   }

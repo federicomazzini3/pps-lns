@@ -4,10 +4,9 @@ import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import org.scalajs.dom.raw.Position
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ SolidModel, given_Conversion_Vector2_Vertex, * }
-import lns.scenes.game.stats.*
+import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
 import scala.language.implicitConversions
@@ -33,6 +32,7 @@ import scala.language.implicitConversions
  *   [[AliveModel]] invincibilityTimer, default 0
  */
 case class ShotModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -67,6 +67,7 @@ case class ShotEvent(position: Vector2, direction: Vector2) extends GlobalEvent
  */
 object ShotModel {
   def apply(position: Vector2, direction: Vector2): ShotModel = ShotModel(
+    AnythingId.generate,
     BoundingBox(
       position,
       Vertex(40, 40)

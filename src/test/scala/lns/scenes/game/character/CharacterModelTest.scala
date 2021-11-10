@@ -1,17 +1,17 @@
 package lns.scenes.game.character
 
 import scala.language.implicitConversions
-import indigo.shared.Outcome
+import indigo.*
+import indigoextras.geometry.BoundingBox
 import indigo.shared.constants.Key
 import indigo.shared.events.{ InputState, KeyboardEvent }
 import indigo.shared.input.*
 import indigo.shared.events.KeyboardEvent.KeyDown
-import indigoextras.geometry.{ BoundingBox, Vertex }
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
 import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
+import lns.scenes.game.anything.AnythingId
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
@@ -38,7 +38,7 @@ trait CharacterModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   val invincibility = 2
 
   override def beforeEach() = {
-    model = new CharacterModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), 0, Stats.Isaac)
+    model = new CharacterModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), 0, Stats.Isaac)
 
     super.beforeEach()
   }

@@ -1,14 +1,14 @@
 package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
+
 import indigo.*
-import indigo.shared.FrameContext
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ AnythingModel, DynamicModel }
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicModel }
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -19,6 +19,7 @@ import org.scalatest.{ BeforeAndAfterEach, Suite }
 import scala.collection.immutable.Queue
 
 case class MyKeepsAwayModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -58,9 +59,16 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   override val gameContext: GameContext = GameContext(room, character)
 
   override def beforeEach() = {
-    model = new MyKeepsAwayModel(BoundingBox(initialPos, initialPos, 10, 10), 10, stats, range)
-    modelInMiddle = new MyKeepsAwayModel(BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10), 10, stats, range)
-    modelAway = new MyKeepsAwayModel(BoundingBox(initialPosAway, initialPosAway, 10, 10), 10, stats, range)
+    model = new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 10, stats, range)
+    modelInMiddle = new MyKeepsAwayModel(
+      AnythingId.generate,
+      BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10),
+      10,
+      stats,
+      range
+    )
+    modelAway =
+      new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPosAway, initialPosAway, 10, 10), 10, stats, range)
 
     super.beforeEach()
   }

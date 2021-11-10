@@ -2,14 +2,13 @@ package lns.scenes.game.enemy
 
 import scala.language.implicitConversions
 
-import indigo.shared.FrameContext
-import indigo.shared.datatypes.Vector2
+import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
 import lns.core.ContextFixture
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ AnythingModel, DynamicModel }
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicModel }
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -19,6 +18,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyTravellerModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -57,8 +57,9 @@ trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   override val gameContext: GameContext = GameContext(room, character)
 
   override def beforeEach() = {
-    stoppedModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats)
-    movingModel = new MyTravellerModel(BoundingBox(initialPos, initialPos, 10, 10), 0, stats, path = path)
+    stoppedModel = new MyTravellerModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 0, stats)
+    movingModel =
+      new MyTravellerModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 0, stats, path = path)
 
     super.beforeEach()
   }

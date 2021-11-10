@@ -2,12 +2,12 @@ package lns.scenes.game.enemy.boney
 
 import scala.language.implicitConversions
 import indigo.*
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -33,6 +33,7 @@ import scala.collection.immutable.Queue
  *   [[AliveModel]] invincibilityTimer, default 0
  */
 case class BoneyModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -60,14 +61,15 @@ object BoneyModel {
   import Assets.Enemies.Boney.*
 
   def initial: BoneyModel = BoneyModel(
+    AnythingId.generate,
     boundingBox = BoundingBox(
-      Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vertex(
+      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
+      Vector2(
         withScale(width),
         withScale(height - offsetY)
       )
     ),
-    shotAreaOffset = offsetY,
+    shotAreaOffset = withScale(-offsetY),
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

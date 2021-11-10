@@ -15,6 +15,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyDynamicModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     stats: Stats,
     nextSpeed: Vector2,
@@ -36,8 +37,9 @@ trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this:
   val stats = Stats(MaxSpeed -> 300)
 
   override def beforeEach() = {
-    model = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
-    movingModel = new MyDynamicModel(BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
+    model = new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
+    movingModel =
+      new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
 
     super.beforeEach()
   }

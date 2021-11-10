@@ -14,6 +14,11 @@ import lns.scenes.game.stats.PropertyName.*
 
 import java.util.UUID
 
+type AnythingId = UUID
+object AnythingId {
+  def generate: AnythingId = UUID.randomUUID()
+}
+
 given Conversion[Vector2, Vertex] with
   def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 
@@ -21,9 +26,9 @@ given Conversion[Set[Outcome[AnythingModel]], Outcome[Set[AnythingModel]]] with
   def apply(set: Set[Outcome[AnythingModel]]): Outcome[Set[AnythingModel]] =
     set.foldLeft(Outcome(Set[AnythingModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
 
-given Conversion[Map[UUID, Outcome[AnythingModel]], Outcome[Map[UUID, AnythingModel]]] with
-  def apply(set: Map[UUID, Outcome[AnythingModel]]): Outcome[Map[UUID, AnythingModel]] =
-    set.foldLeft(Outcome(Map[UUID, AnythingModel]().empty))((acc, el) =>
+given Conversion[Map[AnythingId, Outcome[AnythingModel]], Outcome[Map[AnythingId, AnythingModel]]] with
+  def apply(set: Map[AnythingId, Outcome[AnythingModel]]): Outcome[Map[AnythingId, AnythingModel]] =
+    set.foldLeft(Outcome(Map[AnythingId, AnythingModel]().empty))((acc, el) =>
       acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
     )
 
@@ -40,6 +45,8 @@ extension (timer: Timer)
  */
 trait AnythingModel {
   type Model >: this.type <: AnythingModel
+
+  val id: AnythingId
 
   /**
    * Represents the position and the box size of the Anything, expressed in pixels

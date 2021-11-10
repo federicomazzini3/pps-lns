@@ -1,23 +1,21 @@
 package lns.scenes.game.dungeon
 
-import indigo.shared.datatypes.Rectangle
+import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
-import lns.scenes.game.anything.AnythingModel
+import lns.scenes.game.anything.{ AnythingId, AnythingModel }
 import lns.scenes.game.enemy.boney.BoneyModel
 import lns.scenes.game.enemy.mask.MaskModel
 import lns.scenes.game.enemy.nerve.NerveModel
 import lns.scenes.game.enemy.parabite.ParabiteModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
-import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
 import lns.scenes.game.stats.*
-
-import scala.collection.immutable.HashMap
-import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.element.ElementModel
 
-import java.util.UUID
+import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
+
+import scala.collection.immutable.HashMap
 
 object Generator {
 
@@ -34,11 +32,11 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
       case RoomType.Arena =>
-        val enemyTest = UUID.randomUUID() -> NerveModel.initial
+        val enemyTest = NerveModel.initial
         RoomModel.arenaRoom(
           position,
           generateDoors(grid, position),
-          Map(enemyTest) ++ generateBlockingElements()
+          Map(enemyTest.id -> enemyTest) ++ generateBlockingElements()
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
@@ -48,7 +46,7 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateBlockingElements(): Map[UUID, AnythingModel] = ElementModel.stone()
+  def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stone()
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

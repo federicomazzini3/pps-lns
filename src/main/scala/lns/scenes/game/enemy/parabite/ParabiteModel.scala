@@ -2,12 +2,12 @@ package lns.scenes.game.enemy.parabite
 
 import indigo.*
 import indigo.shared.FrameContext
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.enemy.{ *, given }
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -35,6 +35,7 @@ import scala.language.implicitConversions
  *   [[Traveller]] path, default Queue.empty
  */
 case class ParabiteModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -80,14 +81,15 @@ case class ParabiteModel(
 object ParabiteModel {
   import Assets.Enemies.Parabite.*
   def initial: ParabiteModel = ParabiteModel(
+    AnythingId.generate,
     boundingBox = BoundingBox(
-      Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vertex(
+      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
+      Vector2(
         withScale(width),
         withScale(height - offsetY)
       )
     ),
-    shotAreaOffset = offsetY,
+    shotAreaOffset = withScale(-offsetY),
     stats = Stats.Isaac +++ (MaxSpeed -> 600),
     life = MaxLife @@ Stats.Isaac
   )

@@ -4,11 +4,12 @@ import scala.language.implicitConversions
 
 import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Vector2
-import indigoextras.geometry.{ BoundingBox, Vertex }
+import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
+import lns.scenes.game.anything.AnythingId
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -16,6 +17,7 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyFireModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     stats: Stats,
     fireDirection: Option[Vector2],
@@ -43,19 +45,21 @@ trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
   )
 
   val fireRate      = FireRate @@ stats
-  val position      = Vertex(roomCenterX, roomCenterY)
-  val size          = Vertex(10, 10)
+  val position      = Vector2(roomCenterX, roomCenterY)
+  val size          = Vector2(10, 10)
   val fireDirection = Vector2(1, 0);
 
   override def beforeEach() = {
     ShootingModel = new MyFireModel(
-      BoundingBox(position.x, position.y, size.x, size.y),
+      AnythingId.generate,
+      BoundingBox(position, size),
       stats,
       Some(fireDirection)
     )
 
     NotShootingModel = new MyFireModel(
-      BoundingBox(position.x, position.y, size.x, size.y),
+      AnythingId.generate,
+      BoundingBox(position, size),
       stats,
       None
     )
@@ -96,7 +100,10 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             assert(
               updatedModelOutcome.globalEventsOrNil == List(
                 ShotEvent(
-                  Vector2(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.verticalCenter),
+                  Vector2(
+                    updatedModel.boundingBox.horizontalCenter,
+                    updatedModel.boundingBox.top + updatedModel.shotOffset
+                  ),
                   fireDirection
                 )
               )
@@ -146,7 +153,10 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
             assert(
               updatedModelOutcome.globalEventsOrNil == List(
                 ShotEvent(
-                  Vector2(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.verticalCenter),
+                  Vector2(
+                    updatedModel.boundingBox.horizontalCenter,
+                    updatedModel.boundingBox.top + updatedModel.shotOffset
+                  ),
                   fireDirection
                 )
               )
@@ -173,7 +183,7 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
       ).foreach { keys =>
         s"${keys._1} have correct FireState" in {
           val updatedModel =
-            new MyFireModel(BoundingBox(position.x, position.y, 10, 10), stats, Some(keys._2))
+            new MyFireModel(AnythingId.generate, BoundingBox(position.x, position.y, 10, 10), stats, Some(keys._2))
               .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 

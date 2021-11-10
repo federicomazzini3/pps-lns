@@ -29,6 +29,8 @@ trait AnythingViewModel {
   type ViewModel >: this.type <: AnythingViewModel
   type Model <: AnythingModel
 
+  val id: AnythingId
+
   /**
    * Update request called during game loop on every frame
    * @param context

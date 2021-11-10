@@ -7,7 +7,7 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ SolidModel, * }
+import lns.scenes.game.anything.*
 import lns.scenes.game.shot.ShotEvent
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -31,6 +31,7 @@ import lns.scenes.game.stats.PropertyName.*
  *   [[FireModel]] shot, default None
  */
 case class CharacterModel(
+    id: AnythingId,
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -93,6 +94,7 @@ object CharacterModel {
   import Assets.Rooms.*
   import Assets.Character.*
   def initial: CharacterModel = CharacterModel(
+    id = AnythingId.generate,
     boundingBox = BoundingBox(
       Vertex(floorSize / 2, floorSize / 2),
       Vertex(withScale(width), withScale(height - offsetY))

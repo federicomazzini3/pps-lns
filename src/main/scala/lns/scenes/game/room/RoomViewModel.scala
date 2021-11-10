@@ -2,10 +2,7 @@ package lns.scenes.game.room
 
 import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
-import lns.scenes.game.anything.AnythingViewModel
-import lns.scenes.game.anything.given
-import lns.scenes.game.anything.vmInversionMap
-import lns.scenes.game.anything.vmInverionsSet
+import lns.scenes.game.anything.{ AnythingId, Timer, AnythingViewModel, given }
 import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel }
 
 import java.util.UUID
@@ -43,7 +40,7 @@ object RoomViewModel {
         .collect { case (id, e: ParabiteModel) => (id -> e) }
         .map((id, any) =>
           (id -> (any match {
-            case a: ParabiteModel => println("VIEW MODEL CREATO"); ParabiteViewModel()
+            case a: ParabiteModel => ParabiteViewModel.initial(a) //TODO: RISOLVERE! println("VIEW MODEL CREATO");
           }))
         )
     )
