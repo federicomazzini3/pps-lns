@@ -23,6 +23,8 @@ case class MyFireModel(
 ) extends FireModel {
   type Model = MyFireModel
 
+  val shotOffset = 0
+
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): MyFireModel = copyMacro
   def withStats(stats: Stats): Model                                      = copyMacro
 

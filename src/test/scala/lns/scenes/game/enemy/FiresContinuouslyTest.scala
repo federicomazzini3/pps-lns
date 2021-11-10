@@ -33,6 +33,8 @@ case class MyFiringModel(
     with FiresContinuously {
   type Model = MyFiringModel
 
+  val shotOffset = 5
+
   def withStats(stats: Stats): Model                                 = copyMacro
   def withStatus(status: Queue[EnemyStatus] ): Model                        = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro

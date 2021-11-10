@@ -269,6 +269,7 @@ trait FireModel extends AnythingModel with StatsModel {
 
   val shot: Option[Vector2]
   val fireRateTimer: Double
+  val shotOffset: Int
 
   def withFire(fireRateTimer: Timer, shot: Option[Vector2]): Model
 
@@ -309,7 +310,7 @@ trait FireModel extends AnythingModel with StatsModel {
    *   ShotEvent
    */
   def createEvent(direction: Vector2): ShotEvent =
-    ShotEvent(Vector2(boundingBox.horizontalCenter, boundingBox.verticalCenter), direction)
+    ShotEvent(Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset), direction)
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer

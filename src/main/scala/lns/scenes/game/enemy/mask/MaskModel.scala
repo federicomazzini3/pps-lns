@@ -54,6 +54,8 @@ case class MaskModel(
 
   type Model = MaskModel
 
+  val shotOffset = boundingBox.height / 2
+
   def withStats(stats: Stats): Model                                = copyMacro
   def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
   def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro

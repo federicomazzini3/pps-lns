@@ -46,6 +46,8 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
+  val shotOffset: Int = -8
+
   // TODO: Builder pattern -> usare Require qui oppure sui Trait
   //  require ( life > 0 , " Incorrect life ")
 
