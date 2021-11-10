@@ -29,6 +29,5 @@ case class ShotView() extends AnythingView {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
       .addChild(shot(model))
-      .withRef(model.boundingBox.width.toInt / 2, model.boundingBox.height.toInt / 2)
       .withScale(Vector2(scale, scale))
 }
