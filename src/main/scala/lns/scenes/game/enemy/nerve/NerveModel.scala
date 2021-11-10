@@ -63,7 +63,7 @@ object NerveModel {
       )
     ),
     shotAreaOffset = withScale(-offsetY),
-    stats = Stats.Isaac,
-    life = MaxLife @@ Stats.Isaac
+    stats = Stats.Nerve,
+    life = MaxLife @@ Stats.Nerve
   )
 }

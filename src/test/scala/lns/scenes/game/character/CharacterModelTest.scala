@@ -69,7 +69,7 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
     }
 
     "if the direction keys are pressed " - {
-      List(1, 2).map(second =>
+      List(0.5, 1).map(second =>
         s"after one frame update with time delta = ${second}s" - {
           Map(
             "Left + Up"    -> List(KeyDown(Key.KEY_A), KeyDown(Key.KEY_W)),

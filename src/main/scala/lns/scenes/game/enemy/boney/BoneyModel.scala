@@ -70,7 +70,7 @@ object BoneyModel {
       )
     ),
     shotAreaOffset = withScale(-offsetY),
-    stats = Stats.Isaac,
-    life = MaxLife @@ Stats.Isaac
+    stats = Stats.Boney,
+    life = MaxLife @@ Stats.Boney
   )
 }

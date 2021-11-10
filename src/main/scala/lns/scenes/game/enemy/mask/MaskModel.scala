@@ -80,7 +80,7 @@ object MaskModel {
       )
     ),
     shotAreaOffset = withScale(-offsetY),
-    stats = Stats.Isaac,
-    life = MaxLife @@ Stats.Isaac
+    stats = Stats.Mask,
+    life = MaxLife @@ Stats.Mask
   )
 }

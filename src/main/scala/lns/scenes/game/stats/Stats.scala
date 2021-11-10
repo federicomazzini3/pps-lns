@@ -49,11 +49,41 @@ object Stats {
   def Isaac = Stats(
     MaxLife       -> 3,
     Invincibility -> 1.5,
-    MaxSpeed      -> 300,
+    MaxSpeed      -> 400,
     Damage        -> 0,
-    FireDamage    -> 3.0,
+    FireDamage    -> 1,
     FireRange     -> 500,
     FireRate      -> 0.4
+  )
+
+  def Boney = Stats(
+    MaxLife       -> 5,
+    Invincibility -> 0,
+    MaxSpeed      -> 300,
+    Damage        -> 0.5,
+    FireDamage    -> 0,
+    FireRange     -> 0,
+    FireRate      -> 0
+  )
+
+  def Mask = Stats(
+    MaxLife       -> 4,
+    Invincibility -> 0,
+    MaxSpeed      -> 200,
+    Damage        -> 0.5,
+    FireDamage    -> 0.5,
+    FireRange     -> 300,
+    FireRate      -> 1
+  )
+
+  def Nerve = Stats(
+    MaxLife       -> 6,
+    Invincibility -> 0,
+    MaxSpeed      -> 0,
+    Damage        -> 1,
+    FireDamage    -> 0,
+    FireRange     -> 0,
+    FireRate      -> 0
   )
 
   def Shot = Stats(
