@@ -55,4 +55,14 @@ object Stats {
     FireRange     -> 500,
     FireRate      -> 0.4
   )
+
+  def Shot = Stats(
+    MaxLife       -> 3,
+    Invincibility -> 1.5,
+    MaxSpeed      -> 50,
+    Damage        -> 0,
+    FireDamage    -> 3.0,
+    FireRange     -> 500,
+    FireRate      -> 0.4
+  )
 }

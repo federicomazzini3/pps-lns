@@ -21,11 +21,17 @@ case class ElementView() extends AnythingView {
       .addChild(
         model match {
           case StoneModel(_) =>
-            ElementGraphic
-              .stone()
+            Group()
+              .addChild(
+                ElementGraphic
+                  .stone()
+                  .withScale(Vector2(1, 1.40))
+              )
               .withRef(0, Assets.Elements.Stone.offsetY)
         }
       )
+      .addChild(ElementGraphic.boundingModel)
+      .withScale(Vector2(Assets.Elements.Stone.scale, Assets.Elements.Stone.scale))
 }
 
 case object ElementGraphic {
@@ -41,4 +47,10 @@ case object ElementGraphic {
     1,
     Material.Bitmap(name)
   )
+
+  val boundingModel: Shape =
+    Shape.Box(
+      Rectangle(Point(0, 0), Size(width, height - offsetY)),
+      Fill.Color(RGBA(1, 1, 1, 0.5))
+    )
 }

@@ -1,6 +1,7 @@
 package lns.scenes.game.element
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
+import lns.core.Assets.Rooms
 import lns.scenes.game.anything.{ AnythingModel, SolidModel }
 
 import java.util.UUID
@@ -24,30 +25,16 @@ object ElementModel {
     )*/
 
   def stone(): Map[UUID, AnythingModel] =
-    Map(
-      UUID.randomUUID() -> StoneModel(
+    val stones =
+      for {
+        i <- 0 until 9 if i != 4
+        j <- 0 until 2
+      } yield UUID.randomUUID() -> StoneModel(
         BoundingBox(
-          Vertex(470, 300),
-          Vertex(Stone.width, Stone.height - Stone.offsetY)
-        )
-      ),
-      UUID.randomUUID() -> StoneModel(
-        BoundingBox(
-          Vertex(470 + Stone.width, 300),
-          Vertex(Stone.width, Stone.height - Stone.offsetY)
-        )
-      ),
-      UUID.randomUUID() -> StoneModel(
-        BoundingBox(
-          Vertex(470 + Stone.width * 2, 300),
-          Vertex(Stone.width, Stone.height - Stone.offsetY)
-        )
-      ),
-      UUID.randomUUID() -> StoneModel(
-        BoundingBox(
-          Vertex(470 + Stone.width * 2, 300 + Stone.height - Stone.offsetY),
-          Vertex(Stone.width, Stone.height - Stone.offsetY)
+          Vertex(Rooms.cellSize * i, Rooms.cellSize * j),
+          Vertex(Stone.withScale(Stone.width), Stone.withScale(Stone.height - Stone.offsetY))
         )
       )
-    )
+
+    stones.toMap
 }

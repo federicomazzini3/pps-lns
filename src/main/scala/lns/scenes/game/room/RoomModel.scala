@@ -58,10 +58,16 @@ trait RoomModel {
    *   the bounded character's position
    */
   def boundPosition(anything: BoundingBox): BoundingBox =
-    val characterBounded = Boundary.containerBound(floor, anything)
+    def differentBB(bb1: BoundingBox, bb2: BoundingBox) =
+      bb1.left != bb2.left && bb1.right != bb2.right &&
+        bb1.top != bb2.top && bb1.bottom != bb2.bottom
+
+    val anyBounded = Boundary.containerBound(floor, anything)
     anythings.values
-      .collect { case a: SolidModel if a.enabled => a }
-      .foldLeft(characterBounded)((character, element) => Boundary.elementBound(element.boundingBox, character))
+      .collect {
+        case a: SolidModel if a.enabled && differentBB(a.boundingBox, anyBounded) => a
+      }
+      .foldLeft(anyBounded)((anything, element) => Boundary.elementBound(element.boundingBox, anything))
 
   /**
    * Add a shot to the shot list
