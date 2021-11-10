@@ -39,7 +39,7 @@ case class ShotModel(
     stats: Stats,
     direction: Vector2,
     speed: Vector2 = Vector2(0, 0),
-    life: Int = 1,
+    life: Double = 1,
     invincibilityTimer: Double = 0
 ) extends AliveModel
     with DynamicModel
@@ -50,7 +50,7 @@ case class ShotModel(
 
   val crossable = false
 
-  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withStats(stats: Stats): Model                               = copyMacro
 

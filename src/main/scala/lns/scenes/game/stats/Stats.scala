@@ -86,6 +86,16 @@ object Stats {
     FireRate      -> 0
   )
 
+  def Parabite = Stats(
+    MaxLife       -> 3,
+    Invincibility -> 0,
+    MaxSpeed      -> 600,
+    Damage        -> 1,
+    FireDamage    -> 0,
+    FireRange     -> 0,
+    FireRate      -> 0
+  )
+
   def Shot = Stats(
     MaxLife       -> 3,
     Invincibility -> 1.5,

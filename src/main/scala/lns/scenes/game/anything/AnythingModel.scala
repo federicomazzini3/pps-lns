@@ -208,10 +208,10 @@ trait DynamicModel extends AnythingModel with StatsModel {
 trait AliveModel extends AnythingModel with StatsModel {
   type Model >: this.type <: AliveModel
 
-  val life: Int
+  val life: Double
   val invincibilityTimer: Timer
 
-  def withAlive(life: Int, invincibilityTimer: Timer): Model
+  def withAlive(life: Double, invincibilityTimer: Timer): Model
 
   /**
    * Hit the object causing some damage to its life and starting a countdown timer during which it can't be hitted again
@@ -222,7 +222,7 @@ trait AliveModel extends AnythingModel with StatsModel {
    * @return
    *   the Outcome of the updated model
    */
-  def hit(context: FrameContext[StartupData], damage: Int): Outcome[Model] = invincibilityTimer match {
+  def hit(context: FrameContext[StartupData], damage: Double): Outcome[Model] = invincibilityTimer match {
     case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats))
     case 0                      => Outcome(withAlive(0, 0))
     case _                      => Outcome(this)

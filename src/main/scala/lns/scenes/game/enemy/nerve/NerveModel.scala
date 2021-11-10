@@ -36,15 +36,15 @@ case class NerveModel(
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     val crossable: Boolean = false,
-    life: Int = 0,
+    life: Double = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {
 
   type Model = NerveModel
 
-  def withStats(stats: Stats): Model                          = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model           = copyMacro
-  def withAlive(life: Int, invincibilityTimer: Double): Model = copyMacro
+  def withStats(stats: Stats): Model                             = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model              = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model = copyMacro
 }
 
 /**

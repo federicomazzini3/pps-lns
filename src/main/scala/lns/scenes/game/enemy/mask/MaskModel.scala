@@ -44,7 +44,7 @@ case class MaskModel(
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     val crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
-    life: Int = 0,
+    life: Double = 0,
     invincibilityTimer: Timer = 0,
     fireRateTimer: Timer = 0,
     shot: Option[Vector2] = None
@@ -60,7 +60,7 @@ case class MaskModel(
 
   def withStats(stats: Stats): Model                                = copyMacro
   def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
-  def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
 }
