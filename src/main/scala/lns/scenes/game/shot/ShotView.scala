@@ -30,4 +30,9 @@ case class ShotView() extends AnythingView {
     Group()
       .addChild(shot(model))
       .withScale(Vector2(scale, scale))
+
+  override protected def depth(model: Model): Depth = model.direction.y match {
+    case x if x < 0 => super.depth(model)
+    case _          => Depth(Int.MinValue)
+  }
 }
