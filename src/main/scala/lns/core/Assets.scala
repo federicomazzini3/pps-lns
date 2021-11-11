@@ -303,6 +303,7 @@ object Assets {
       val FireDamage: Graphic[Material.Bitmap] = getIcon(28, 26)
       val FireRate: Graphic[Material.Bitmap]   = getIcon(56, 26)
       val FireRange: Graphic[Material.Bitmap]  = getIcon(84, 26)
+      val FireSpeed: Graphic[Material.Bitmap]  = getIcon(112, 26)
     }
 
     val assets: Set[AssetType] = Set(

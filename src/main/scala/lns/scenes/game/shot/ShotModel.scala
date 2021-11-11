@@ -61,13 +61,13 @@ case class ShotModel(
 /**
  * Extends [[GlobalEvent]] and can be intercepted by the [[GameView]] to create a new [[ShotModel]]
  */
-case class ShotEvent(owner: AnythingId, position: Vector2, direction: Vector2) extends GlobalEvent
+case class ShotEvent(shot: ShotModel) extends GlobalEvent
 
 /**
  * Factory of [[ShotModel]]
  */
 object ShotModel {
-  def apply(owner: AnythingId, position: Vector2, direction: Vector2): ShotModel = ShotModel(
+  def apply(owner: AnythingId, position: Vector2, direction: Vector2, stats: Stats): ShotModel = ShotModel(
     AnythingId.generate,
     BoundingBox(
       position,
@@ -75,7 +75,7 @@ object ShotModel {
     ),
     owner,
     shotAreaOffset = 0,
-    Stats.Shot,
+    stats,
     direction
   )
 }

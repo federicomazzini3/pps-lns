@@ -8,7 +8,7 @@ import lns.StartupData
 import lns.scenes.game.GameContext
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.{ ShotEvent, ShotModel }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
@@ -315,7 +315,14 @@ trait FireModel extends AnythingModel with StatsModel {
    *   ShotEvent
    */
   def createEvent(direction: Vector2): ShotEvent =
-    ShotEvent(id, Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset), direction)
+    ShotEvent(
+      ShotModel(
+        id,
+        Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset),
+        direction,
+        Stats.createShot(stats)
+      )
+    )
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer

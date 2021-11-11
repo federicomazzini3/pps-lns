@@ -1,7 +1,7 @@
 package lns.scenes.game.stats
 
 enum PropertyName:
-  case MaxLife, Invincibility, MaxSpeed, Damage, FireDamage, FireRange, FireRate
+  case MaxLife, Invincibility, MaxSpeed, Range, Damage, FireDamage, FireRange, FireRate, FireSpeed
 
 import PropertyName.*
 
@@ -46,63 +46,55 @@ extension (stats: Stats) {
 object Stats {
   def apply(args: StatProperty*): Stats = Map(args*)
 
-  def Isaac = Stats(
+  def createShot(stats: Stats): Stats =
+    Stats(
+      MaxLife       -> 1,
+      Invincibility -> 0,
+      MaxSpeed      -> FireSpeed @@ stats,
+      Range         -> FireRange @@ stats,
+      Damage        -> FireDamage @@ stats
+    )
+
+  def Isaac: Stats = Stats(
     MaxLife       -> 3,
     Invincibility -> 1.5,
     MaxSpeed      -> 400,
     Damage        -> 0,
     FireDamage    -> 1,
     FireRange     -> 500,
-    FireRate      -> 0.4
+    FireRate      -> 0.4,
+    FireSpeed     -> 800
   )
 
-  def Boney = Stats(
+  def Boney: Stats = Stats(
     MaxLife       -> 5,
     Invincibility -> 0,
     MaxSpeed      -> 300,
-    Damage        -> 0.5,
-    FireDamage    -> 0,
-    FireRange     -> 0,
-    FireRate      -> 0
+    Damage        -> 0.5
   )
 
-  def Mask = Stats(
+  def Mask: Stats = Stats(
     MaxLife       -> 4,
     Invincibility -> 0,
     MaxSpeed      -> 200,
     Damage        -> 0.5,
     FireDamage    -> 0.5,
     FireRange     -> 300,
-    FireRate      -> 1
+    FireRate      -> 1,
+    FireSpeed     -> 600
   )
 
-  def Nerve = Stats(
+  def Nerve: Stats = Stats(
     MaxLife       -> 6,
     Invincibility -> 0,
     MaxSpeed      -> 0,
-    Damage        -> 1,
-    FireDamage    -> 0,
-    FireRange     -> 0,
-    FireRate      -> 0
+    Damage        -> 1
   )
 
-  def Parabite = Stats(
+  def Parabite: Stats = Stats(
     MaxLife       -> 3,
     Invincibility -> 0,
     MaxSpeed      -> 600,
-    Damage        -> 1,
-    FireDamage    -> 0,
-    FireRange     -> 0,
-    FireRate      -> 0
-  )
-
-  def Shot = Stats(
-    MaxLife       -> 3,
-    Invincibility -> 1.5,
-    MaxSpeed      -> 50,
-    Damage        -> 0,
-    FireDamage    -> 3.0,
-    FireRange     -> 500,
-    FireRate      -> 0.4
+    Damage        -> 1
   )
 }

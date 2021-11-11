@@ -52,6 +52,8 @@ object HUDView {
       .addChild(drawStatsText(FireRange @@ character.stats, 30, 106))
       .addChild(Assets.HUD.Graphics.FireRate.moveTo(0, 130))
       .addChild(drawStatsText(FireRate @@ character.stats, 30, 136))
+      .addChild(Assets.HUD.Graphics.FireSpeed.moveTo(0, 160))
+      .addChild(drawStatsText(FireSpeed @@ character.stats, 30, 166))
 
   def draw(context: FrameContext[StartupData], character: CharacterModel): Group =
     Group()

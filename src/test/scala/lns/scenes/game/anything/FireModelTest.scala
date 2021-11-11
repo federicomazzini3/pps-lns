@@ -4,14 +4,14 @@ import scala.language.implicitConversions
 
 import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Vector2
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.ContextFixture
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.AnythingId
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
@@ -41,9 +41,11 @@ trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
   val stats = Stats(
     FireDamage -> 3.5,
     FireRange  -> 500,
-    FireRate   -> 2
+    FireRate   -> 2,
+    FireSpeed  -> 800
   )
 
+  val shotStats     = Stats.createShot(stats)
   val fireRate      = FireRate @@ stats
   val position      = Vector2(roomCenterX, roomCenterY)
   val size          = Vector2(10, 10)
@@ -94,21 +96,21 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
           "create ShotEvent" in {
             val updatedModelOutcome = ShootingModel
               .update(getContext(1))(gameContext)
+            val updatedModel =
+              updatedModelOutcome.getOrElse(fail("Undefined Model"))
+            val updatedPosition =
+              Vertex(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.top + updatedModel.shotOffset)
+            val result = updatedModelOutcome.globalEventsOrNil
 
-            val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
-
-            assert(
-              updatedModelOutcome.globalEventsOrNil == List(
-                ShotEvent(
-                  updatedModel.id,
-                  Vector2(
-                    updatedModel.boundingBox.horizontalCenter,
-                    updatedModel.boundingBox.top + updatedModel.shotOffset
-                  ),
-                  fireDirection
-                )
-              )
-            )
+            assert(result.length == 1)
+            result.foreach {
+              case ShotEvent(shot) =>
+                assert(shot.boundingBox.position == updatedPosition)
+                assert(shot.direction == fireDirection)
+                assert(shot.owner == updatedModel.id)
+                assert(shot.stats == shotStats)
+              case _ => fail("Undefined Shotevent")
+            }
           }
           "start a fireRateTimer countdown" in {
             val updatedModel = ShootingModel
@@ -148,21 +150,21 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
               .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
               .update(getContext(fireRate + 2))(gameContext)
+            val updatedModel =
+              updatedModelOutcome.getOrElse(fail("Undefined Model"))
+            val updatedPosition =
+              Vertex(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.top + updatedModel.shotOffset)
+            val result = updatedModelOutcome.globalEventsOrNil
 
-            val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
-
-            assert(
-              updatedModelOutcome.globalEventsOrNil == List(
-                ShotEvent(
-                  updatedModel.id,
-                  Vector2(
-                    updatedModel.boundingBox.horizontalCenter,
-                    updatedModel.boundingBox.top + updatedModel.shotOffset
-                  ),
-                  fireDirection
-                )
-              )
-            )
+            assert(result.length == 1)
+            result.foreach {
+              case ShotEvent(shot) =>
+                assert(shot.boundingBox.position == updatedPosition)
+                assert(shot.direction == fireDirection)
+                assert(shot.owner == updatedModel.id)
+                assert(shot.stats == shotStats)
+              case _ => fail("Undefined Shotevent")
+            }
           }
           "start new fireRateTimer countdown" in {
             val updatedModel = ShootingModel
