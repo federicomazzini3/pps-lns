@@ -61,9 +61,9 @@ object Stats {
     MaxSpeed      -> 400,
     Damage        -> 0,
     FireDamage    -> 1,
-    FireRange     -> 500,
+    FireRange     -> 800,
     FireRate      -> 0.4,
-    FireSpeed     -> 800
+    FireSpeed     -> 600
   )
 
   def Boney: Stats = Stats(
