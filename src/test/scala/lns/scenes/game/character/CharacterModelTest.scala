@@ -1,8 +1,9 @@
 package lns.scenes.game.character
 
 import scala.language.implicitConversions
+
 import indigo.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import indigo.shared.constants.Key
 import indigo.shared.events.{ InputState, KeyboardEvent }
 import indigo.shared.input.*
@@ -15,7 +16,7 @@ import lns.scenes.game.anything.AnythingId
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.character.*
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.{ ShotEvent, ShotModel }
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 import org.scalatest.freespec.AnyFreeSpec
@@ -30,8 +31,8 @@ trait CharacterModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   )
 
   var model: CharacterModel = _
-  // var noInvincibilityModel: CharacterModel = _
 
+  val shotStats     = Stats.createShot(Stats.Isaac)
   val startLife     = 100
   val hitDamage1    = 50
   val hitDamage2    = 150
@@ -60,16 +61,14 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
             .update(getContext(1))(GameContext(room, model))
             .getOrElse(fail("Undefined Model"))
 
-          assert(
-            updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY
-          )
+          assert(updatedModel.boundingBox.x == roomCenterX && updatedModel.boundingBox.y == roomCenterY)
           assert(updatedModel.isMoving() == false)
         }
       }
     }
 
     "if the direction keys are pressed " - {
-      List(1, 2).map(second =>
+      List(0.5, 1).map(second =>
         s"after one frame update with time delta = ${second}s" - {
           Map(
             "Left + Up"    -> List(KeyDown(Key.KEY_A), KeyDown(Key.KEY_W)),
@@ -131,17 +130,26 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
           "Left"  -> (List(KeyDown(Key.LEFT_ARROW)), Vector2(-1, 0))
         ).foreach { keys =>
           s"with keys '${keys._1}' should fire correctly generating ShotEvent" in {
-            val updatedModelOutcome = model
-              .update(getContext(1, inputKeys(keys._2._1)))(GameContext(room, model))
+            val updatedModelOutcome =
+              model.update(getContext(1, inputKeys(keys._2._1)))(GameContext(room, model))
+            val updatedModel =
+              updatedModelOutcome.getOrElse(fail("Undefined Model"))
 
-            val updatedModel = updatedModelOutcome.getOrElse(fail("Undefined Model"))
-
-            val updatedPosition =
-              Vector2(updatedModel.boundingBox.horizontalCenter, updatedModel.boundingBox.top + updatedModel.shotOffset)
-
-            assert(
-              updatedModelOutcome.globalEventsOrNil == List(ShotEvent(updatedModel.id, updatedPosition, keys._2._2))
+            val updatedPosition = Vertex(
+              updatedModel.boundingBox.horizontalCenter,
+              updatedModel.boundingBox.top + updatedModel.shotOffset
             )
+            val result = updatedModelOutcome.globalEventsOrNil
+
+            assert(result.length == 1)
+            result.foreach {
+              case ShotEvent(shot) =>
+                assert(shot.boundingBox.position == updatedPosition)
+                assert(shot.direction == keys._2._2)
+                assert(shot.owner == updatedModel.id)
+                assert(shot.stats == shotStats)
+              case _ => fail("Undefined Shotevent")
+            }
           }
         }
       }
@@ -165,7 +173,8 @@ class CharacterModelTest extends AnyFreeSpec with CharacterModelFixture {
           Damage        -> 1,
           FireDamage    -> 6.0,
           FireRange     -> 1000,
-          FireRate      -> 0.8
+          FireRate      -> 0.8,
+          FireSpeed     -> 800
         )
         val updatedModel = model.changeStats(getContext(1), newStats).getOrElse(fail("Undefined Model"))
 

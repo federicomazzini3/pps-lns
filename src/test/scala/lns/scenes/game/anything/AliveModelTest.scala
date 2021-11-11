@@ -17,13 +17,13 @@ case class MyAliveModel(
     id: AnythingId,
     boundingBox: BoundingBox,
     stats: Stats,
-    life: Int,
+    life: Double,
     invincibilityTimer: Double = 0
 ) extends AliveModel {
   type Model = MyAliveModel
 
-  def withAlive(life: Int, invincibilityTimer: Double): MyAliveModel = copyMacro
-  def withStats(stats: Stats): Model                                 = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): MyAliveModel = copyMacro
+  def withStats(stats: Stats): Model                                    = copyMacro
 }
 
 trait AliveModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

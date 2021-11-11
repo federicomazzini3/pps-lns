@@ -42,7 +42,7 @@ case class ParabiteModel(
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
     val crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
-    life: Int = 0,
+    life: Double = 0,
     invincibilityTimer: Timer = 0,
     path: Queue[Vector2] = Queue.empty
 ) extends EnemyModel
@@ -53,7 +53,7 @@ case class ParabiteModel(
 
   def withStats(stats: Stats): Model                               = copyMacro
   def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
-  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
 
@@ -90,7 +90,7 @@ object ParabiteModel {
       )
     ),
     shotAreaOffset = withScale(-offsetY),
-    stats = Stats.Isaac +++ (MaxSpeed -> 600),
-    life = MaxLife @@ Stats.Isaac
+    stats = Stats.Parabite,
+    life = MaxLife @@ Stats.Parabite
   )
 }

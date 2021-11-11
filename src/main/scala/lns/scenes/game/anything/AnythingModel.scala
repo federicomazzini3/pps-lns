@@ -8,7 +8,7 @@ import lns.StartupData
 import lns.scenes.game.GameContext
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.{ ShotEvent, ShotModel }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
@@ -208,10 +208,10 @@ trait DynamicModel extends AnythingModel with StatsModel {
 trait AliveModel extends AnythingModel with StatsModel {
   type Model >: this.type <: AliveModel
 
-  val life: Int
+  val life: Double
   val invincibilityTimer: Timer
 
-  def withAlive(life: Int, invincibilityTimer: Timer): Model
+  def withAlive(life: Double, invincibilityTimer: Timer): Model
 
   /**
    * Hit the object causing some damage to its life and starting a countdown timer during which it can't be hitted again
@@ -222,7 +222,7 @@ trait AliveModel extends AnythingModel with StatsModel {
    * @return
    *   the Outcome of the updated model
    */
-  def hit(context: FrameContext[StartupData], damage: Int): Outcome[Model] = invincibilityTimer match {
+  def hit(context: FrameContext[StartupData], damage: Double): Outcome[Model] = invincibilityTimer match {
     case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats))
     case 0                      => Outcome(withAlive(0, 0))
     case _                      => Outcome(this)
@@ -315,7 +315,14 @@ trait FireModel extends AnythingModel with StatsModel {
    *   ShotEvent
    */
   def createEvent(direction: Vector2): ShotEvent =
-    ShotEvent(id, Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset), direction)
+    ShotEvent(
+      ShotModel(
+        id,
+        Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset),
+        direction,
+        Stats.createShot(stats)
+      )
+    )
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer
