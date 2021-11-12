@@ -17,7 +17,7 @@ case class CharacterView() extends AnythingView with Isaac {
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
-      .addChild(boundingModel)
+      //.addChild(boundingModel)
       .addChild(
         Group()
           .withRef(0, offsetY)

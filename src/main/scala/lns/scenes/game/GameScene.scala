@@ -47,7 +47,7 @@ final case class GameScene() extends EmptyScene {
     case ShotEvent(shot) =>
       model match {
         case model @ GameModel.Started(_, room, _) =>
-          model.updateCurrentRoom(room => model.currentRoom.addShot(ShotModel(o, p, d)))
+          model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
         case _ => Outcome(model)
       }
 
