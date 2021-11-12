@@ -8,14 +8,16 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicState, SolidModel, given }
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicState, SolidModel }
 import lns.scenes.game.room.door.{ Door, DoorImplicit, DoorState, Location }
 import lns.scenes.game.shot.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.enemy.EnemyModel
 import lns.scenes.game.enemy.nerve.NerveModel
+import lns.scenes.game.anything.given
 
+import java.util.UUID
 import scala.language.implicitConversions
 
 type Door           = (Location, DoorState)
@@ -59,34 +61,8 @@ trait RoomModel {
    * @return
    *   the bounded character's position
    */
-  def boundPosition(model: AnythingModel, position: BoundingBox)(character: CharacterModel): BoundingBox =
-    val posBounded = Boundary.containerBound(floor, position)
-    model match {
-      case solid: SolidModel =>
-        val gameAnythings = anythings + (character.id -> character)
-
-        gameAnythings.values
-          .collect {
-            case el: SolidModel if !el.crossable && el.id != solid.id => el
-          }
-          .filter(el =>
-            (solid, el) match {
-              case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
-              case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
-              case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
-              case _                                                  => true
-            }
-          )
-          .foldLeft(posBounded)((pos, el) =>
-            solid match {
-              case a: ShotModel =>
-                Boundary.elementBound(el.shotArea, pos)
-              case _ =>
-                Boundary.elementBound(el.boundingBox, pos)
-            }
-          )
-      case _ => posBounded
-    }
+  def boundPosition(position: BoundingBox): BoundingBox =
+    Boundary.containerBound(floor, position)
 
   /**
    * Add a shot to the shot list
@@ -96,31 +72,26 @@ trait RoomModel {
    *   a new room with the new shot added
    */
   def addShot(shot: ShotModel): RoomModel =
-    val updatedAnythings = anythings + (shot.id -> shot)
+    updateAnythings(anythings => anythings + (shot.id -> shot))
+
+  def removeAnythings(anything: AnythingModel): RoomModel =
+    updateAnythings(anythings => anythings.removed(anything.id))
+
+  def updateEachAnything(f: AnythingModel => AnythingModel): RoomModel =
+    updateAnythings(anythings => anythings.map(a => (a._1 -> f(a._2))))
+
+  def updateAnythings(f: Map[AnythingId, AnythingModel] => Map[AnythingId, AnythingModel]): RoomModel =
     this match {
       case room: EmptyRoom =>
-        room.copy(anythings = updatedAnythings)
+        room.copy(anythings = f(anythings))
       case room: ItemRoom =>
-        room.copy(anythings = updatedAnythings)
+        room.copy(anythings = f(anythings))
       case room: ArenaRoom =>
-        room.copy(anythings = updatedAnythings)
+        room.copy(anythings = f(anythings))
       case room: BossRoom =>
-        room.copy(anythings = updatedAnythings)
+        room.copy(anythings = f(anythings))
       case _ => this
     }
-
-  /**
-   * Call the method update in all of anythings in a room. Can be override from subclasses for more specific behavior
-   * @param context
-   * @return
-   *   a new updated set of anything model
-   */
-  def updateAnythings(
-      context: FrameContext[StartupData]
-  )(character: CharacterModel): Outcome[Map[AnythingId, AnythingModel]] =
-    val gameContext = GameContext(this, character)
-    anythings
-      .map((id, any) => id -> any.update(context)(gameContext))
 
   /**
    * Update the shot based on FrameContext
@@ -130,17 +101,20 @@ trait RoomModel {
    *   a new room with the shot updated
    */
   def update(context: FrameContext[StartupData])(character: CharacterModel): Outcome[RoomModel] =
-    val out = updateAnythings(context)(character)
+
+    val updatedAnythings: Outcome[Map[AnythingId, AnythingModel]] =
+      anythings
+        .map((id, any) => id -> any.update(context)(GameContext(this, character)))
 
     this match {
       case room: EmptyRoom =>
-        out.map(anythings => room.copy(anythings = anythings))
+        updatedAnythings.map(anythings => room.copy(anythings = anythings))
       case room: ItemRoom =>
-        out.map(anythings => room.copy(anythings = anythings))
+        updatedAnythings.map(anythings => room.copy(anythings = anythings))
       case room: ArenaRoom =>
-        out.map(anythings => room.copy(anythings = anythings))
+        updatedAnythings.map(anythings => room.copy(anythings = anythings))
       case room: BossRoom =>
-        out.map(anythings => room.copy(anythings = anythings))
+        updatedAnythings.map(anythings => room.copy(anythings = anythings))
       case _ => Outcome(this)
     }
 }

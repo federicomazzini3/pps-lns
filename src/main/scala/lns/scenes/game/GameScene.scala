@@ -11,13 +11,16 @@ import lns.scenes.game.GameViewModel
 import lns.scenes.game.HUD.HUDView
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
+import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
-import lns.scenes.game.room.{ Boundary, Passage, RoomView }
+import lns.scenes.game.room.{ Boundary, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.character.*
 import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.shot.*
 import lns.subsystems.prolog.PrologEvent
+import lns.scenes.game.room.*
+import lns.scenes.game.updater.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions
@@ -44,20 +47,27 @@ final case class GameScene() extends EmptyScene {
     case ShotEvent(o, p, d) =>
       model match {
         case model @ GameModel.Started(_, room, _) =>
-          Outcome(model.copy(room = room.addShot(ShotModel(o, p, d))))
+          model.updateCurrentRoom(room => model.currentRoom.addShot(ShotModel(o, p, d)))
         case _ => Outcome(model)
       }
 
     case FrameTick =>
       model match {
 
-        case model @ GameModel.Started(dungeon, room, character) =>
-          val gameContext = GameContext(room, character)
+        case model @ GameModel.Started(dungeon, roomIndex, character) =>
+          val gameContext = GameContext(model.currentRoom, character)
           for {
-            character <- character.update(context)(gameContext)
-            room      <- room.update(context)(character)
-            (newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
-          } yield model.copy(character = newCharacter, room = newRoom)
+            updatedCharacter <- character.update(context)(gameContext)
+            updatedRoom      <- model.currentRoom.update(context)(character)
+            //model     <- model.updateCurrentRoom(room)
+            //model     <- model.updateCharacter(character)
+            //(newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
+          } yield model
+            .updateCharacter(character => updatedCharacter)
+            .updateCurrentRoom(room => updatedRoom)
+            .updateWithPassage
+            .updateStatsAfterCollision(context)
+            .updateMovementAfterCollision
 
         case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
@@ -95,10 +105,10 @@ final case class GameScene() extends EmptyScene {
           for {
             updatedCharacter <- viewModel.character.update(context, model.character)
             newRoom =
-              if (room.positionInDungeon != model.room.positionInDungeon)
-                viewModel.dungeon.content(model.room.positionInDungeon)
+              if (room.positionInDungeon != model.currentRoomPosition)
+                viewModel.dungeon.content(model.currentRoomPosition)
               else room
-            updatedRoom <- newRoom.update(context, model.room)
+            updatedRoom <- newRoom.update(context, model.currentRoom)
           } yield viewModel.copy(character = updatedCharacter, room = updatedRoom)
 
         case (model: GameModel.Started, _) => Outcome(GameViewModel.start(model))
@@ -117,12 +127,12 @@ final case class GameScene() extends EmptyScene {
   ): Outcome[SceneUpdateFragment] =
     (model, viewModel) match {
 
-      case (GameModel.Started(dungeon, room, character), viewModel: GameViewModel.Started) =>
+      case (model @ GameModel.Started(dungeon, room, character), viewModel: GameViewModel.Started) =>
         SceneUpdateFragment.empty
           .addLayers(
             Layer(
               BindingKey("game"),
-              (RoomView.draw(context, room, viewModel.room) |+|
+              (RoomView.draw(context, model.currentRoom, viewModel.room) |+|
                 CharacterView().draw(context, character, viewModel.character))
                 .fitToScreen(context)(Assets.Rooms.roomSize)
             ),

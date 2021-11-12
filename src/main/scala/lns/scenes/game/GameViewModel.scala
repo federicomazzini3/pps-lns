@@ -4,6 +4,7 @@ import lns.StartupData
 import lns.scenes.game.character.CharacterViewModel
 import lns.scenes.game.dungeon.DungeonViewModel
 import lns.scenes.game.room.RoomViewModel
+import lns.scenes.game.dungeon.*
 
 sealed trait GameViewModel
 
@@ -16,7 +17,7 @@ object GameViewModel {
 
   def start(model: GameModel.Started) = Started(
     DungeonViewModel.initial(model.dungeon),
-    RoomViewModel.initial(model.room),
+    RoomViewModel.initial(model.currentRoom), //TODO da rivedere
     CharacterViewModel.initial(model.character)
   )
 
