@@ -35,7 +35,7 @@ case class CharacterModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    life: Int = 0,
+    life: Double = 0,
     speed: Vector2 = Vector2(0, 0),
     invincibilityTimer: Double = 0,
     fireRateTimer: Double = 0,
@@ -67,7 +67,7 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.KEY_S)            -> Vector2(0.0d, maxSpeed)
     )
 
-  def withAlive(life: Int, invincibilityTimer: Double): Model       = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
   def withStats(stats: Stats): Model                                = copyMacro

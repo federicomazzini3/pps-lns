@@ -8,7 +8,7 @@ import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
-import lns.scenes.game.HUD.HUDView
+import lns.scenes.game.hud.HUDView
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.*
@@ -44,7 +44,7 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-    case ShotEvent(o, p, d) =>
+    case ShotEvent(shot) =>
       model match {
         case model @ GameModel.Started(_, room, _) =>
           model.updateCurrentRoom(room => model.currentRoom.addShot(ShotModel(o, p, d)))

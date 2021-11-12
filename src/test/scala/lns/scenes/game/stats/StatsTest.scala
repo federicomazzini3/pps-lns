@@ -17,7 +17,8 @@ trait StatsFixture extends BeforeAndAfterEach { this: Suite =>
       Damage        -> 0,
       FireDamage    -> 3.0,
       FireRange     -> 500,
-      FireRate      -> 0.4
+      FireRate      -> 0.4,
+      FireSpeed     -> 800
     )
 
     super.beforeEach()
