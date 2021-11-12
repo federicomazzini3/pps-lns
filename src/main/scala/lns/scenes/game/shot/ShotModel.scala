@@ -60,19 +60,18 @@ case class ShotModel(
   def withStats(stats: Stats): Model                               = copyMacro
   def withRange(range: Double): Model                              = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
-    direction.normalise * MaxSpeed @@ stats
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = {
+    val maxSpeed = MaxSpeed @@ stats * context.gameTime.delta.toDouble
+    val speed = range match {
+      case range if range - maxSpeed >= 0 => MaxSpeed @@ stats
+      case range if range > 1             => range / context.gameTime.delta.toDouble
+      case _                              => 0
+    }
+    direction.normalise * speed
+  }
 
   def rangeAvailable(range: Double, speed: Vector2, context: FrameContext[StartupData]): Double =
     range - (speed.abs.length * context.gameTime.delta.toDouble)
-
-  override def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
-    val speed: Vector2 = computeSpeed(context)(gameContext)
-    val retSpeed: Vector2 = rangeAvailable(range, speed, context) match {
-      case x if x <= 0 => Vector2.zero
-      case _           => speed
-    }
-    (retSpeed, boundingBox.moveBy(retSpeed * context.gameTime.delta.toDouble))
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
@@ -84,7 +83,9 @@ case class ShotModel(
       retObj = newObj.speed match {
         case Vector2.zero if range > 0 => newObj.withRange(0).asInstanceOf[Model]
         case Vector2.zero              => newObj
-        case _ => newObj.withRange(rangeAvailable(range, newObj.speed, context)).asInstanceOf[Model]
+        case _ if newObj.life > 0 =>
+          newObj.withRange(rangeAvailable(range, newObj.speed, context)).asInstanceOf[Model]
+        case _ => newObj
       }
     } yield retObj
 }
