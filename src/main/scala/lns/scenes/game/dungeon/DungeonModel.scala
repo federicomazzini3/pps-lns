@@ -7,6 +7,8 @@ import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
 import lns.scenes.game.room.{ EmptyRoom, RoomModel }
 
+type Position = (Int, Int)
+
 /**
  * Trait for a grid that represent the dungeon map. The grid is made up of rows and columns and contains the positions
  * where the rooms are present
@@ -15,8 +17,6 @@ trait Grid {
   type Room
   val content: Map[Position, Room]
 }
-
-type Position = (Int, Int)
 
 object Grid {
 

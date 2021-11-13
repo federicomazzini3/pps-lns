@@ -4,6 +4,7 @@ import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, Timer, AnythingViewModel, given }
 import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel }
+import lns.scenes.game.dungeon.*
 
 import scala.language.implicitConversions
 

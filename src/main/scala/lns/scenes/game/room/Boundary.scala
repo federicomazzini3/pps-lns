@@ -9,9 +9,18 @@ import org.scalajs.dom.raw.Position
 
 object Boundary {
 
+  /**
+   * Force a bounding box inside a container
+   * @param container
+   *   the container box
+   * @param elem
+   *   the element to force inside the container
+   * @return
+   *   a new Bounding Box forced inside the container
+   */
   def containerBound(container: BoundingBox, elem: BoundingBox): BoundingBox =
     val moves = Map(
-      Above -> (container.top),
+      Above -> container.top,
       Below -> (container.bottom - elem.height),
       Left  -> container.left,
       Right -> (container.right - elem.width)
@@ -27,6 +36,15 @@ object Boundary {
       case _ => elem
     }
 
+  /**
+   * Forces a bounding box not to intersect with another
+   * @param elem1
+   *   the first Bounding Box
+   * @param elem2
+   *   the second Bounding Box
+   * @return
+   *   a new Bounding Box moved the minimum necessary not to intersect with the other Bounding Box
+   */
   def elementBound(elem1: BoundingBox, elem2: BoundingBox): BoundingBox =
     val moves = Map(
       Below -> Vertex(elem2.x, elem1.top - elem2.height),
