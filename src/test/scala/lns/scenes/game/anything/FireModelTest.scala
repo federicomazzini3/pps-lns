@@ -6,7 +6,7 @@ import indigo.shared.{ FrameContext, Outcome }
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.ContextFixture
+import lns.core.{ ContextFixture, ViewMock }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.AnythingId
@@ -18,6 +18,7 @@ import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyFireModel(
     id: AnythingId,
+    view: () => ViewMock[MyFireModel],
     boundingBox: BoundingBox,
     stats: Stats,
     fireDirection: Option[Vector2],
@@ -54,6 +55,7 @@ trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
   override def beforeEach() = {
     ShootingModel = new MyFireModel(
       AnythingId.generate,
+      () => new ViewMock[MyFireModel],
       BoundingBox(position, size),
       stats,
       Some(fireDirection)
@@ -61,6 +63,7 @@ trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
 
     NotShootingModel = new MyFireModel(
       AnythingId.generate,
+      () => new ViewMock[MyFireModel],
       BoundingBox(position, size),
       stats,
       None
@@ -187,7 +190,13 @@ class FireModelTest extends AnyFreeSpec with FireModelFixture {
       ).foreach { keys =>
         s"${keys._1} have correct FireState" in {
           val updatedModel =
-            new MyFireModel(AnythingId.generate, BoundingBox(position.x, position.y, 10, 10), stats, Some(keys._2))
+            new MyFireModel(
+              AnythingId.generate,
+              () => new ViewMock[MyFireModel],
+              BoundingBox(position.x, position.y, 10, 10),
+              stats,
+              Some(keys._2)
+            )
               .update(getContext(1))(gameContext)
               .getOrElse(fail("Undefined Model"))
 

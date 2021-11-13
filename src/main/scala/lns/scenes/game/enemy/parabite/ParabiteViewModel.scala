@@ -4,9 +4,8 @@ import indigo.*
 import lns.StartupData
 import lns.core.Animations.*
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.{ AnythingId, Timer, AnythingViewModel }
+import lns.scenes.game.anything.{ AnythingId, AnythingViewModel, Timer, elapsed }
 import lns.scenes.game.enemy.EnemyState
-import lns.scenes.game.anything.elapsed
 
 /**
  * Parabite ViewModel to manage its animations
@@ -16,9 +15,8 @@ case class ParabiteViewModel(
     id: AnythingId,
     lastState: EnemyState = EnemyState.Idle,
     animationTimer: Timer = 0
-) extends AnythingViewModel {
+) extends AnythingViewModel[ParabiteModel] {
   type ViewModel = ParabiteViewModel
-  type Model     = ParabiteModel
 
   def withLastState(lastState: EnemyState, animationTimer: Timer): ViewModel = copyMacro
 
@@ -39,5 +37,5 @@ case class ParabiteViewModel(
 }
 
 object ParabiteViewModel {
-  def initial(model: ParabiteModel): ParabiteViewModel = ParabiteViewModel(model.id)
+  def initial(id: AnythingId): ParabiteViewModel = ParabiteViewModel(id)
 }

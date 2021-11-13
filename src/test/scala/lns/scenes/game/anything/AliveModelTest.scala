@@ -6,7 +6,7 @@ import indigo.shared.FrameContext
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
-import lns.core.ContextFixture
+import lns.core.{ ContextFixture, ViewMock }
 import lns.core.Macros.copyMacro
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.{ BeforeAndAfterEach, Suite }
@@ -15,6 +15,7 @@ import lns.scenes.game.stats.PropertyName.*
 
 case class MyAliveModel(
     id: AnythingId,
+    view: () => ViewMock[MyAliveModel],
     boundingBox: BoundingBox,
     stats: Stats,
     life: Double,
@@ -48,6 +49,7 @@ trait AliveModelFixture extends ContextFixture with BeforeAndAfterEach { this: S
   override def beforeEach() = {
     model = new MyAliveModel(
       AnythingId.generate,
+      () => new ViewMock[MyAliveModel],
       BoundingBox(roomCenterX, roomCenterY, 10, 10),
       stats,
       MaxLife @@ stats
@@ -55,6 +57,7 @@ trait AliveModelFixture extends ContextFixture with BeforeAndAfterEach { this: S
 
     noInvincibilityModel = new MyAliveModel(
       AnythingId.generate,
+      () => ViewMock[MyAliveModel],
       BoundingBox(roomCenterX, roomCenterY, 10, 10),
       statsNoInvincibility,
       MaxLife @@ statsNoInvincibility

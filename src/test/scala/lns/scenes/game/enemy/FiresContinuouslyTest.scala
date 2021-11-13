@@ -6,7 +6,7 @@ import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import lns.core.ContextFixture
+import lns.core.{ ContextFixture, ViewMock }
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, FireModel }
 import lns.scenes.game.character.CharacterModel
@@ -20,11 +20,12 @@ import scala.collection.immutable.Queue
 
 case class MyFiringModel(
     id: AnythingId,
+    view: () => ViewMock[MyFiringModel],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val crossable: Boolean = false,
+    crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,
     fireRateTimer: Double = 0,
@@ -65,7 +66,13 @@ trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: 
     )
 
   override def beforeEach() = {
-    model = new MyFiringModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 10, stats)
+    model = new MyFiringModel(
+      AnythingId.generate,
+      () => new ViewMock[MyFiringModel],
+      BoundingBox(initialPos, initialPos, 10, 10),
+      10,
+      stats
+    )
 
     super.beforeEach()
   }

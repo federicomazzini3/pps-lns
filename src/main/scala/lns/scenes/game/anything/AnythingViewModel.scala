@@ -1,6 +1,5 @@
 package lns.scenes.game.anything
 
-import scala.language.implicitConversions
 import indigo.*
 import indigo.shared.*
 import lns.StartupData
@@ -8,26 +7,27 @@ import lns.scenes.game.room.RoomModel
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
-import java.util.UUID
+import scala.language.implicitConversions
+import scala.annotation.targetName
+import scala.reflect.*
 
-given vmInverionsSet: Conversion[Set[Outcome[AnythingViewModel]], Outcome[Set[AnythingViewModel]]] with
-  def apply(set: Set[Outcome[AnythingViewModel]]): Outcome[Set[AnythingViewModel]] =
-    set.foldLeft(Outcome(Set[AnythingViewModel]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
+given vmInverionsSet: Conversion[Set[Outcome[AnythingViewModel[_]]], Outcome[Set[AnythingViewModel[_]]]] with
+  def apply(set: Set[Outcome[AnythingViewModel[_]]]): Outcome[Set[AnythingViewModel[_]]] =
+    set.foldLeft(Outcome(Set[AnythingViewModel[_]]().empty))((acc, el) => acc.merge(el)((set, el) => set + el))
 
-given vmInversionMap: Conversion[Map[UUID, Outcome[AnythingViewModel]], Outcome[Map[UUID, AnythingViewModel]]] with
-  def apply(set: Map[UUID, Outcome[AnythingViewModel]]): Outcome[Map[UUID, AnythingViewModel]] =
-    set.foldLeft(Outcome(Map[UUID, AnythingViewModel]().empty))((acc, el) =>
-      acc.merge[AnythingViewModel, Map[UUID, AnythingViewModel]](el._2)((set, el2) => set + (el._1 -> el2))
-    //acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
-    //acc.merge(el._2)((set, el._2) => set + el)
+given vmInversionMap
+    : Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[AnythingId, AnythingViewModel[_]]]] with
+  def apply(set: Map[AnythingId, Outcome[AnythingViewModel[_]]]): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
+    set.foldLeft(Outcome(Map[AnythingId, AnythingViewModel[_]]().empty))((acc, el) =>
+      acc.merge[AnythingViewModel[_], Map[AnythingId, AnythingViewModel[_]]](el._2)((set, el2) => set + (el._1 -> el2))
     )
 
 /**
  * Base viewModel for every thing placed inside a room
  */
-trait AnythingViewModel {
-  type ViewModel >: this.type <: AnythingViewModel
-  type Model <: AnythingModel
+trait AnythingViewModel[M <: AnythingModel: Typeable] {
+  type ViewModel >: this.type <: AnythingViewModel[M]
+  type Model = M
 
   val id: AnythingId
 
@@ -41,15 +41,21 @@ trait AnythingViewModel {
    *   the Outcome of the updated viewModel
    */
   def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] = Outcome(this)
+
+  @targetName("anyUpdate")
+  def update(contex: FrameContext[StartupData], model: AnythingModel | Matchable): Outcome[ViewModel] =
+    model match {
+      case m: Model => println("UPDATE OKKK"); update(contex, m)
+      case _        => println("UPDATE NOOO"); Outcome(this)
+    }
 }
 
 /**
  * Base model for every thing that can fire. It is designed to be extended or mixed with other [[AnythingViewModel]]
  * traits.
  */
-trait FireViewModel extends AnythingViewModel {
-  type ViewModel >: this.type <: FireViewModel
-  type Model <: FireModel
+trait FireViewModel[M <: FireModel] extends AnythingViewModel[M] {
+  type ViewModel >: this.type <: FireViewModel[M]
 
   val fireState: FireState
   val fireAnimationTimer: Timer

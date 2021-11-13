@@ -5,10 +5,9 @@ import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, Timer, AnythingViewModel, given }
 import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel }
 
-import java.util.UUID
 import scala.language.implicitConversions
 
-case class RoomViewModel(val positionInDungeon: Position, val anythings: Map[UUID, AnythingViewModel]) {
+case class RoomViewModel(val positionInDungeon: Position, val anythings: Map[AnythingId, AnythingViewModel[_]]) {
 
   /**
    * Call the method update in all of anythings in a room. Can be override from subclasses for more specific behavior
@@ -16,15 +15,11 @@ case class RoomViewModel(val positionInDungeon: Position, val anythings: Map[UUI
    * @return
    *   a new updated set of anything model
    */
-  def updateAnythings(context: FrameContext[StartupData], model: RoomModel): Outcome[Map[UUID, AnythingViewModel]] =
-    anythings
-      //.map((id, any) => id -> any.update(context, model.anythings(id)))
-      .map((id, any) =>
-        (id -> (any match {
-          case any: ParabiteViewModel =>
-            any.update(context, model.anythings(id).asInstanceOf[ParabiteModel]) //TODO: RISOLVERE!!!
-        }))
-      )
+  def updateAnythings(
+      context: FrameContext[StartupData],
+      model: RoomModel
+  ): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
+    anythings.map((id, any) => (id -> any.update(context, model.anythings.getOrElse(id, ()))))
 
   def update(context: FrameContext[StartupData], model: RoomModel): Outcome[RoomViewModel] =
     val out = updateAnythings(context, model)
@@ -36,13 +31,8 @@ object RoomViewModel {
   def initial(model: RoomModel): RoomViewModel =
     RoomViewModel(
       model.positionInDungeon,
-      model.anythings
-        .collect { case (id, e: ParabiteModel) => (id -> e) }
-        .map((id, any) =>
-          (id -> (any match {
-            case a: ParabiteModel => ParabiteViewModel.initial(a) //TODO: RISOLVERE! println("VIEW MODEL CREATO");
-          }))
-        )
+      model.anythings.map((id, any) => (id -> any.view().viewModel(id))).collect {
+        case (id, any: AnythingViewModel[_]) => id -> any
+      }
     )
-
 }

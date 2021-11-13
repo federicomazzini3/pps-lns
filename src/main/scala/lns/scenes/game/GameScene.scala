@@ -123,7 +123,7 @@ final case class GameScene() extends EmptyScene {
             Layer(
               BindingKey("game"),
               (RoomView.draw(context, room, viewModel.room) |+|
-                CharacterView().draw(context, character, viewModel.character))
+                CharacterView.draw(context, character)(viewModel.character))
                 .fitToScreen(context)(Assets.Rooms.roomSize)
             ),
             Layer(BindingKey("HUD"), (HUDView.draw(context, character)))
