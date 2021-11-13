@@ -47,6 +47,7 @@ trait AnythingModel {
   type Model >: this.type <: AnythingModel
 
   val id: AnythingId
+  val view: () => AnythingView[Model, _]
 
   /**
    * Represents the position and the box size of the Anything, expressed in pixels

@@ -1,13 +1,12 @@
 package lns.scenes.game.anything
 
 import scala.language.implicitConversions
-
 import indigo.shared.FrameContext
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import lns.core.ContextFixture
+import lns.core.{ ContextFixture, ViewMock }
 import lns.scenes.game.GameContext
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -16,6 +15,7 @@ import org.scalatest.{ BeforeAndAfterEach, Suite }
 
 case class MyDynamicModel(
     id: AnythingId,
+    view: () => ViewMock[MyDynamicModel],
     boundingBox: BoundingBox,
     stats: Stats,
     nextSpeed: Vector2,
@@ -37,9 +37,20 @@ trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this:
   val stats = Stats(MaxSpeed -> 300)
 
   override def beforeEach() = {
-    model = new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(0, 0))
-    movingModel =
-      new MyDynamicModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), stats, Vector2(2, 2))
+    model = new MyDynamicModel(
+      AnythingId.generate,
+      () => new ViewMock[MyDynamicModel],
+      BoundingBox(roomCenterX, roomCenterY, 10, 10),
+      stats,
+      Vector2(0, 0)
+    )
+    movingModel = new MyDynamicModel(
+      AnythingId.generate,
+      () => new ViewMock[MyDynamicModel],
+      BoundingBox(roomCenterX, roomCenterY, 10, 10),
+      stats,
+      Vector2(2, 2)
+    )
 
     super.beforeEach()
   }

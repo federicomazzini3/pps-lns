@@ -17,8 +17,8 @@ object GameViewModel {
 
   def start(model: GameModel.Started) = Started(
     DungeonViewModel.initial(model.dungeon),
-    RoomViewModel.initial(model.currentRoom), //TODO da rivedere
-    CharacterViewModel.initial(model.character)
+    RoomViewModel.initial(model.currentRoom),
+    CharacterViewModel.initial(model.character.id)
   )
 
 }

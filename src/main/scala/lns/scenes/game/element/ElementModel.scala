@@ -7,9 +7,8 @@ import indigoextras.geometry.BoundingBox
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel, given }
 
-import java.util.UUID
-
-case class StoneModel(val id: AnythingId, val boundingBox: BoundingBox, val shotAreaOffset: Int) extends SolidModel {
+case class StoneModel(id: AnythingId, view: () => StoneView[_], boundingBox: BoundingBox, shotAreaOffset: Int)
+    extends SolidModel {
 
   type Model = StoneModel
 
@@ -40,6 +39,7 @@ object ElementModel {
         id = AnythingId.generate
       } yield id -> StoneModel(
         id,
+        view = () => StoneView,
         BoundingBox(
           Vector2(Rooms.cellSize * i, Rooms.cellSize * j),
           Vector2(Stone.withScale(Stone.width), Stone.withScale(Stone.height - Stone.offsetY))

@@ -2,33 +2,29 @@ package lns.scenes.game.element
 
 import indigo.*
 import indigo.shared.FrameContext
-import indigo.shared.datatypes.{ Rectangle, Vector2 }
 import indigo.shared.materials.Material
 import indigo.shared.scenegraph.{ Graphic, Group }
 import lns.StartupData
 import lns.core.Assets
-import lns.scenes.game.anything.{ AnythingView, SolidModel }
+import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView, SolidModel }
 import lns.scenes.game.character.{ CharacterModel, CharacterViewModel }
 
-case class ElementView() extends AnythingView {
+trait StoneView[VM <: AnythingViewModel[StoneModel] | Unit] extends AnythingView[StoneModel, VM] {}
 
-  type Model     = SolidModel
-  type ViewModel = Unit
-  type View      = Group
+object StoneView extends StoneView[Unit] with SimpleAnythingView {
+
+  type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
       .addChild(
-        model match {
-          case s: StoneModel =>
-            Group()
-              .addChild(
-                ElementGraphic
-                  .stone()
-                  .withScale(Vector2(1, 1.40))
-              )
-              .withRef(0, Assets.Elements.Stone.offsetY)
-        }
+        Group()
+          .addChild(
+            ElementGraphic
+              .stone()
+              .withScale(Vector2(1, 1.40))
+          )
+          .withRef(0, Assets.Elements.Stone.offsetY)
       )
       //.addChild(ElementGraphic.boundingModel)
       .withScale(Vector2(Assets.Elements.Stone.scale, Assets.Elements.Stone.scale))

@@ -39,7 +39,13 @@ trait CharacterModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   val invincibility = 2
 
   override def beforeEach() = {
-    model = new CharacterModel(AnythingId.generate, BoundingBox(roomCenterX, roomCenterY, 10, 10), 0, Stats.Isaac)
+    model = new CharacterModel(
+      AnythingId.generate,
+      () => CharacterView,
+      BoundingBox(roomCenterX, roomCenterY, 10, 10),
+      0,
+      Stats.Isaac
+    )
 
     super.beforeEach()
   }

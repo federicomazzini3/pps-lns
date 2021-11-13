@@ -13,6 +13,9 @@ import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.*
 import lns.scenes.menu.MenuScene
+
+import scala.annotation.targetName
+import scala.reflect.*
 import scala.language.implicitConversions
 
 given Conversion[Vector2, Point] with
@@ -21,10 +24,12 @@ given Conversion[Vector2, Point] with
 /**
  * Base view for every thing placed inside a room
  */
-trait AnythingView {
-  type Model <: AnythingModel
-  type ViewModel <: AnythingViewModel | Unit
+trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
+  type Model     = M
+  type ViewModel = VM
   type View <: Group
+
+  def viewModel: (id: AnythingId) => ViewModel
 
   /**
    * Build the view object to be drawn based on model and viewModel data
@@ -52,9 +57,22 @@ trait AnythingView {
    * @return
    *   a SceneUpdateFragment with the view of the Anything to be drawn placed at its current position
    */
-  def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
+  def draw(contex: FrameContext[StartupData], model: Model)(viewModel: ViewModel): Group =
     view(contex, model, viewModel)
       .moveTo(model.getPosition())
       .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
-      .withDepth(depth(model))
+      //.withDepth(depth(model))
+      .withDepth(Depth(-model.boundingBox.top.toInt))
+
+  @targetName("anyDraw")
+  def draw(contex: FrameContext[StartupData], model: AnythingModel)(viewModel: AnythingViewModel[_] | Unit): Group =
+    (model, viewModel) match {
+      case (m: Model, vm: ViewModel) => println("OKKK"); draw(contex, m)(vm)
+      case _                         => println("NOOO"); Group()
+    }
+}
+
+trait SimpleAnythingView {
+  this: AnythingView[_, Unit] =>
+  def viewModel: (id: AnythingId) => ViewModel = _ => ()
 }

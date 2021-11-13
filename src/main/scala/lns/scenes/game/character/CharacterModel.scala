@@ -32,6 +32,7 @@ import lns.scenes.game.stats.PropertyName.*
  */
 case class CharacterModel(
     id: AnythingId,
+    view: () => CharacterView[_],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
@@ -95,6 +96,7 @@ object CharacterModel {
   import Assets.Character.*
   def initial: CharacterModel = CharacterModel(
     id = AnythingId.generate,
+    view = () => CharacterView,
     boundingBox = BoundingBox(
       Vertex(floorSize / 2, floorSize / 2),
       Vertex(withScale(width), withScale(height - offsetY))

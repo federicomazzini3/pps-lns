@@ -6,7 +6,7 @@ import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Macros.copyMacro
-import lns.core.ContextFixture
+import lns.core.{ ContextFixture, ViewMock }
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicModel }
 import lns.scenes.game.character.CharacterModel
@@ -20,12 +20,13 @@ import scala.collection.immutable.Queue
 
 case class MyKeepsAwayModel(
     id: AnythingId,
+    view: () => ViewMock[MyKeepsAwayModel],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
     range: (Int, Int),
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val crossable: Boolean = false,
+    crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
@@ -59,16 +60,30 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   override val gameContext: GameContext = GameContext(room, character)
 
   override def beforeEach() = {
-    model = new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPos, initialPos, 10, 10), 10, stats, range)
+    model = new MyKeepsAwayModel(
+      AnythingId.generate,
+      () => new ViewMock[MyKeepsAwayModel],
+      BoundingBox(initialPos, initialPos, 10, 10),
+      10,
+      stats,
+      range
+    )
     modelInMiddle = new MyKeepsAwayModel(
       AnythingId.generate,
+      () => new ViewMock[MyKeepsAwayModel],
       BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10),
       10,
       stats,
       range
     )
-    modelAway =
-      new MyKeepsAwayModel(AnythingId.generate, BoundingBox(initialPosAway, initialPosAway, 10, 10), 10, stats, range)
+    modelAway = new MyKeepsAwayModel(
+      AnythingId.generate,
+      () => new ViewMock[MyKeepsAwayModel],
+      BoundingBox(initialPosAway, initialPosAway, 10, 10),
+      10,
+      stats,
+      range
+    )
 
     super.beforeEach()
   }
