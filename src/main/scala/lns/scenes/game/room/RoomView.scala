@@ -12,12 +12,6 @@ import lns.core.Assets.*
 import lns.scenes.game.anything.SolidModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
-import lns.scenes.game.shot.{ ShotModel, ShotView }
-import lns.scenes.game.enemy.boney.{ BoneyModel, BoneyView }
-import lns.scenes.game.enemy.mask.{ MaskModel, MaskView }
-import lns.scenes.game.element.ElementView
-import lns.scenes.game.enemy.nerve.{ NerveModel, NerveView }
-import lns.scenes.game.enemy.parabite.{ ParabiteModel, ParabiteViewModel, ParabiteView }
 
 object RoomView {
 
@@ -36,17 +30,7 @@ object RoomView {
   def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
-        s2._2 match {
-          case shot: ShotModel   => ShotView.draw(context, shot, ())
-          case enemy: BoneyModel => BoneyView.draw(context, enemy, ())
-          case enemy: MaskModel  => MaskView.draw(context, enemy, ())
-          case enemy: NerveModel => NerveView.draw(context, enemy, ())
-          case enemy: ParabiteModel =>
-            ParabiteView
-              .draw(context, enemy, viewModel.anythings(s2._1).asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
-          case solid: SolidModel => ElementView.draw(context, solid, ())
-          case _                 => Group()
-        }
+        s2._2.view().draw(context, s2._2)(viewModel.anythings.getOrElse(s2._2.id, ()))
       )
     )
 }

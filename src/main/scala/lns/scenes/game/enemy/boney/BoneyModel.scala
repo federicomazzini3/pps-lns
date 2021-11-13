@@ -34,11 +34,12 @@ import scala.collection.immutable.Queue
  */
 case class BoneyModel(
     id: AnythingId,
+    view: () => BoneyView[_],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val crossable: Boolean = false,
+    crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     life: Double = 0,
     invincibilityTimer: Timer = 0
@@ -62,6 +63,7 @@ object BoneyModel {
 
   def initial: BoneyModel = BoneyModel(
     AnythingId.generate,
+    view = () => BoneyView,
     boundingBox = BoundingBox(
       Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vector2(

@@ -1,19 +1,20 @@
 package lns.scenes.game.character
 
 import indigo.*
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.scenes.game.anything.AnythingView
+import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
 import lns.core.Assets.Character.*
+
+trait CharacterView[VM <: AnythingViewModel[CharacterModel] | Unit] extends AnythingView[CharacterModel, VM] {}
 
 /**
  * Character Isaac view based on CharacterModel and built grouping its elements head, body and shadow
  */
-object CharacterView extends AnythingView with Isaac {
+object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
 
-  type Model     = CharacterModel
-  type ViewModel = CharacterViewModel
-  type View      = Group
+  type View = Group
+
+  def viewModel: (id: AnythingId) => ViewModel = CharacterViewModel.initial
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()

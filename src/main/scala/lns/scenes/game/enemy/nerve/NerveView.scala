@@ -1,19 +1,18 @@
 package lns.scenes.game.enemy.nerve
 
 import indigo.*
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.scenes.game.anything.AnythingView
+import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 import lns.core.Assets.Enemies.Nerve.*
+
+trait NerveView[VM <: AnythingViewModel[NerveModel] | Unit] extends AnythingView[NerveModel, VM] {}
 
 /**
  * Nerve view based on EnemyModel and built grouping its elements head and shadow
  */
-object NerveView extends AnythingView with Nerve {
+object NerveView extends NerveView[Unit] with SimpleAnythingView with Nerve {
 
-  type Model     = NerveModel
-  type ViewModel = Unit
-  type View      = Group
+  type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()

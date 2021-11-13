@@ -1,18 +1,19 @@
 package lns.scenes.game.enemy.parabite
 
 import indigo.*
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.scenes.game.anything.AnythingView
+import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
+
+trait ParabiteView[VM <: AnythingViewModel[ParabiteModel] | Unit] extends AnythingView[ParabiteModel, VM] {}
 
 /**
  * Parabite view based on EnemyModel and built grouping its elements head, body and shadow
  */
-object ParabiteView extends AnythingView with Parabite {
+object ParabiteView extends ParabiteView[ParabiteViewModel] with Parabite {
 
-  type Model     = ParabiteModel
-  type ViewModel = ParabiteViewModel
-  type View      = Group
+  type View = Group
+
+  def viewModel: (id: AnythingId) => ViewModel = ParabiteViewModel.initial
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()

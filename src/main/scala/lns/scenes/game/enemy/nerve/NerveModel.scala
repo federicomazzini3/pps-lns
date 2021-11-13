@@ -31,11 +31,12 @@ import scala.collection.immutable.Queue
  */
 case class NerveModel(
     id: AnythingId,
+    view: () => NerveView[_],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
-    val crossable: Boolean = false,
+    crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Timer = 0
 ) extends EnemyModel {
@@ -55,6 +56,7 @@ object NerveModel {
 
   def initial: NerveModel = NerveModel(
     AnythingId.generate,
+    view = () => NerveView,
     boundingBox = BoundingBox(
       Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vector2(

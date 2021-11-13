@@ -1,19 +1,18 @@
 package lns.scenes.game.enemy.mask
 
 import indigo.*
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.scenes.game.anything.AnythingView
+import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 import lns.core.Assets.Enemies.Mask.*
+
+trait MaskView[VM <: AnythingViewModel[MaskModel] | Unit] extends AnythingView[MaskModel, VM] {}
 
 /**
  * Boney view based on EnemyModel and built grouping its elements head, body and shadow
  */
-object MaskView extends AnythingView with Mask {
+object MaskView extends MaskView[Unit] with SimpleAnythingView with Mask {
 
-  type Model     = MaskModel
-  type ViewModel = Unit
-  type View      = Group
+  type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()

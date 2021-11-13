@@ -36,11 +36,12 @@ import scala.language.implicitConversions
  */
 case class ParabiteModel(
     id: AnythingId,
+    view: () => ParabiteView[_],
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
-    val crossable: Boolean = false,
+    crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     life: Double = 0,
     invincibilityTimer: Timer = 0,
@@ -82,6 +83,7 @@ object ParabiteModel {
   import Assets.Enemies.Parabite.*
   def initial: ParabiteModel = ParabiteModel(
     AnythingId.generate,
+    view = () => ParabiteView,
     boundingBox = BoundingBox(
       Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
       Vector2(

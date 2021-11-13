@@ -37,6 +37,7 @@ given Conversion[Vector2, Vertex] with
  */
 case class ShotModel(
     id: AnythingId,
+    view: () => ShotView[_],
     boundingBox: BoundingBox,
     owner: AnythingId,
     shotAreaOffset: Int,
@@ -101,6 +102,7 @@ case class ShotEvent(shot: ShotModel) extends GlobalEvent
 object ShotModel {
   def apply(owner: AnythingId, position: Vector2, direction: Vector2, stats: Stats): ShotModel = ShotModel(
     AnythingId.generate,
+    view = () => ShotView,
     BoundingBox(
       position,
       Vertex(40, 40)

@@ -12,13 +12,12 @@ case class CharacterViewModel(
     id: AnythingId,
     fireAnimationTimer: Timer = 0,
     fireState: FireState = FireState.NO_FIRE
-) extends FireViewModel {
+) extends FireViewModel[CharacterModel] {
   type ViewModel = CharacterViewModel
-  type Model     = CharacterModel
 
   def withFireTimer(fireAnimationTimer: Timer, fireState: FireState): ViewModel = copyMacro
 }
 
 object CharacterViewModel {
-  def initial(model: CharacterModel): CharacterViewModel = CharacterViewModel(model.id)
+  def initial(id: AnythingId): CharacterViewModel = CharacterViewModel(id)
 }

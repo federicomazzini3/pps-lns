@@ -1,19 +1,18 @@
 package lns.scenes.game.enemy.boney
 
 import indigo.*
-import indigo.shared.datatypes.Vector2
 import lns.StartupData
-import lns.scenes.game.anything.AnythingView
+import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 import lns.core.Assets.Enemies.Boney.*
+
+trait BoneyView[VM <: AnythingViewModel[BoneyModel] | Unit] extends AnythingView[BoneyModel, VM] {}
 
 /**
  * Boney view based on EnemyModel and built grouping its elements head, body and shadow
  */
-object BoneyView extends AnythingView with Boney {
+object BoneyView extends BoneyView[Unit] with SimpleAnythingView with Boney {
 
-  type Model     = BoneyModel
-  type ViewModel = Unit
-  type View      = Group
+  type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
