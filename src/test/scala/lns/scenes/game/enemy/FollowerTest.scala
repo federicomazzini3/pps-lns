@@ -25,7 +25,7 @@ case class MyFollowerModel(
     stats: Stats,
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     val crossable: Boolean = false,
-    life: Int = 0,
+    life: Double = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0)
 ) extends EnemyModel
@@ -35,7 +35,7 @@ case class MyFollowerModel(
 
   def withStats(stats: Stats): Model                               = copyMacro
   def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
-  def withAlive(life: Int, invincibilityTimer: Double): Model      = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
 }
 

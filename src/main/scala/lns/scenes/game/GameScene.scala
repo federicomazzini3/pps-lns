@@ -41,10 +41,10 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-    case ShotEvent(o, p, d) =>
+    case ShotEvent(shot) =>
       model match {
         case model @ GameModel.Started(_, room, _) =>
-          Outcome(model.copy(room = room.addShot(ShotModel(o, p, d))))
+          Outcome(model.copy(room = room.addShot(shot)))
         case _ => Outcome(model)
       }
 
