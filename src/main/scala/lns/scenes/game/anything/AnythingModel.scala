@@ -196,8 +196,9 @@ trait DynamicModel extends AnythingModel with StatsModel {
     for {
       superObj <- super.update(context)(gameContext)
       (newSpeed, newPosition) = computeMove(context)(gameContext)
-      boundLocation           = gameContext.room.boundPosition(this, newPosition)(gameContext.character)
-      newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
+      //boundLocation           = gameContext.room.boundPosition(this, newPosition)(gameContext.character)
+      boundLocation = gameContext.room.boundPosition(newPosition)
+      newObj        = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
 }

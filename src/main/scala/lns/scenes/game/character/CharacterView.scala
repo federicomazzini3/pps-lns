@@ -18,7 +18,7 @@ object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
-      .addChild(boundingModel)
+      //.addChild(boundingModel)
       .addChild(
         Group()
           .withRef(0, offsetY)

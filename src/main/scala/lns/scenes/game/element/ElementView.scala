@@ -26,7 +26,7 @@ object StoneView extends StoneView[Unit] with SimpleAnythingView {
           )
           .withRef(0, Assets.Elements.Stone.offsetY)
       )
-      .addChild(ElementGraphic.boundingModel)
+      //.addChild(ElementGraphic.boundingModel)
       .withScale(Vector2(Assets.Elements.Stone.scale, Assets.Elements.Stone.scale))
 }
 

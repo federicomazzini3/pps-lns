@@ -1,21 +1,15 @@
-package lns.scenes.game.room
+package lns.scenes.game.updater
 
-import indigoextras.geometry.{ BoundingBox, Vertex }
-import indigoextras.geometry.BoundingBox
-import lns.scenes.game.GameModel.Started
+import indigoextras.geometry.Vertex
+import lns.scenes.game.anything.DynamicState.{ MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, MOVE_UP }
 import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.anything.*
 import lns.scenes.game.dungeon.DungeonModel
-import lns.scenes.game.room.door.Door
-import lns.scenes.game.dungeon.DungeonModel.*
-import lns.scenes.game.room.door.Location.*
-import lns.scenes.game.room.door.Location
-import lns.scenes.game.room.door.DoorState.*
-import lns.scenes.game.dungeon.room
-import lns.scenes.game.room.door.LocationImplicit.opposite
-import DynamicState.*
+import lns.scenes.game.room.*
+import lns.scenes.game.room.door.Location.{ Above, Below, Left, Right }
+import lns.scenes.game.room.door.{ Door, Location }
+import lns.scenes.game.room.door.LocationImplicit.*
 
-object Passage {
+object PassageUpdater {
 
   /**
    * verifies the character's intention to pass through a door and modifies the model accordingly
@@ -25,7 +19,7 @@ object Passage {
    * @return
    *   the destination room and the character spwan in the right position (near the destination door)
    */
-  def verifyPassage(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): (RoomModel, CharacterModel) = {
+  def apply(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): ((Int, Int), CharacterModel) = {
 
     /**
      * change the current room based on location
@@ -35,8 +29,8 @@ object Passage {
      * @return
      *   the new current room of the game
      */
-    def changeRoom(locations: Location): RoomModel =
-      dungeon.room(room.positionInDungeon)(locations).getOrElse(room)
+    def changeRoom(locations: Location): (Int, Int) =
+      dungeon.nearPosition(room.positionInDungeon)(locations).getOrElse(room.positionInDungeon)
 
     /**
      * moving the character accordingly to the destination port
@@ -97,7 +91,7 @@ object Passage {
     doorToPass match {
       case Some(doorLocation) =>
         (changeRoom(doorLocation), moveCharacter(doorLocation.opposite))
-      case _ => (room, character)
+      case _ => (room.positionInDungeon, character)
     }
   }
 }

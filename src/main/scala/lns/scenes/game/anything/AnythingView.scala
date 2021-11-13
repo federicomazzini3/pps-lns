@@ -44,6 +44,8 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
    */
   protected def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View
 
+  protected def depth(model: Model): Depth = Depth(-model.boundingBox.top.toInt)
+
   /**
    * Draw request called during game loop on every frame
    * @param contex
@@ -59,6 +61,7 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
     view(contex, model, viewModel)
       .moveTo(model.getPosition())
       .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+      //.withDepth(depth(model))
       .withDepth(Depth(-model.boundingBox.top.toInt))
 
   @targetName("anyDraw")

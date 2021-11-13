@@ -1,6 +1,7 @@
 package lns.scenes.game.dungeon
 
 import lns.StartupData
+import lns.scenes.game.GameModel
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
@@ -28,7 +29,7 @@ object Grid {
    * @return
    *   a position if it's defined
    */
-  def nearPosition(grid: Grid)(position: Position)(location: Location): Option[Position] =
+  def nearPosition(position: Position)(location: Location): Option[Position] =
     location match {
       case Location.Left  => Option(position._1 - 1, position._2)
       case Location.Right => Option(position._1 + 1, position._2)
@@ -46,8 +47,10 @@ object Grid {
    *   a room if it's defined
    */
   def near(grid: Grid)(position: Position)(location: Location): Option[grid.Room] =
-    for (nearPosition <- nearPosition(grid)(position)(location) if grid.content.contains(nearPosition))
+    for (nearPosition <- nearPosition(position)(location) if grid.content.contains(nearPosition))
       yield grid.content(nearPosition)
+
+  def in(grid: Grid)(position: Position): Option[grid.Room] = grid.content.get(position)
 }
 
 enum RoomType:
@@ -66,19 +69,21 @@ case class BasicGrid(val content: Map[Position, RoomType]) extends Grid {
  */
 case class DungeonModel(val content: Map[Position, RoomModel]) extends Grid {
   override type Room = RoomModel
-}
 
-extension (dungeon: DungeonModel) {
+  def room(position: Position): Option[RoomModel] = Grid.in(this)(position)
 
-  def room(position: Position)(location: Location): Option[RoomModel] = Grid.near(dungeon)(position)(location)
+  def nearRoom(position: Position)(location: Location): Option[RoomModel] = Grid.near(this)(position)(location)
+
+  def nearPosition(position: Position)(location: Location): Option[(Int, Int)] =
+    Grid.nearPosition(position)(location)
 
   /**
    * Retrieve the empty room of the dungeon where the game has to start
    * @return
    *   the first room in dungeon
    */
-  def initialRoom: RoomModel = dungeon.content
-    .collect { case (pos, EmptyRoom(_, _, _, _)) => pos }
-    .map(pos => dungeon.content(pos))
-    .head
+  def initialRoom: Position = content.collect { case (pos, EmptyRoom(_, _, _, _)) => pos }.head
+
+  def updateRoom(position: Position)(updatedRoom: RoomModel): DungeonModel =
+    this.copy(content = content.updated(position, updatedRoom))
 }
