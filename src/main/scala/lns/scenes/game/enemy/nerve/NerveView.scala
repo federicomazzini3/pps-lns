@@ -9,7 +9,7 @@ import lns.core.Assets.Enemies.Nerve.*
 /**
  * Nerve view based on EnemyModel and built grouping its elements head and shadow
  */
-case class NerveView() extends AnythingView with Nerve {
+object NerveView extends AnythingView with Nerve {
 
   type Model     = NerveModel
   type ViewModel = Unit

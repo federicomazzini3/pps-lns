@@ -8,7 +8,7 @@ import lns.scenes.game.anything.AnythingView
 /**
  * Parabite view based on EnemyModel and built grouping its elements head, body and shadow
  */
-case class ParabiteView() extends AnythingView with Parabite {
+object ParabiteView extends AnythingView with Parabite {
 
   type Model     = ParabiteModel
   type ViewModel = ParabiteViewModel

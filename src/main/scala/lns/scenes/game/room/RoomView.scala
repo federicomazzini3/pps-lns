@@ -37,14 +37,14 @@ object RoomView {
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
         s2._2 match {
-          case shot: ShotModel   => ShotView().draw(context, shot, ())
-          case enemy: BoneyModel => BoneyView().draw(context, enemy, ())
-          case enemy: MaskModel  => MaskView().draw(context, enemy, ())
-          case enemy: NerveModel => NerveView().draw(context, enemy, ())
+          case shot: ShotModel   => ShotView.draw(context, shot, ())
+          case enemy: BoneyModel => BoneyView.draw(context, enemy, ())
+          case enemy: MaskModel  => MaskView.draw(context, enemy, ())
+          case enemy: NerveModel => NerveView.draw(context, enemy, ())
           case enemy: ParabiteModel =>
-            ParabiteView()
+            ParabiteView
               .draw(context, enemy, viewModel.anythings(s2._1).asInstanceOf[ParabiteViewModel]) // TODO: risolvere!
-          case solid: SolidModel => ElementView().draw(context, solid, ())
+          case solid: SolidModel => ElementView.draw(context, solid, ())
           case _                 => Group()
         }
       )

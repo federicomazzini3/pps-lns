@@ -9,7 +9,7 @@ import lns.core.Assets.Character.*
 /**
  * Character Isaac view based on CharacterModel and built grouping its elements head, body and shadow
  */
-case class CharacterView() extends AnythingView with Isaac {
+object CharacterView extends AnythingView with Isaac {
 
   type Model     = CharacterModel
   type ViewModel = CharacterViewModel

@@ -10,7 +10,7 @@ import lns.core.Assets
 import lns.scenes.game.anything.{ AnythingView, SolidModel }
 import lns.scenes.game.character.{ CharacterModel, CharacterViewModel }
 
-case class ElementView() extends AnythingView {
+object ElementView extends AnythingView {
 
   type Model     = SolidModel
   type ViewModel = Unit

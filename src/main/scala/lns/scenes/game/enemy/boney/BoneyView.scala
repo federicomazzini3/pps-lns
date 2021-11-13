@@ -9,7 +9,7 @@ import lns.core.Assets.Enemies.Boney.*
 /**
  * Boney view based on EnemyModel and built grouping its elements head, body and shadow
  */
-case class BoneyView() extends AnythingView with Boney {
+object BoneyView extends AnythingView with Boney {
 
   type Model     = BoneyModel
   type ViewModel = Unit
