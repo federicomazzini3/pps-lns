@@ -5,10 +5,16 @@ import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
 import lns.core.Assets.Character.*
 
+/**
+ * Base view for a [[CharacterModel]]
+ * @tparam VM
+ *   the [[AnythingViewModel]] required to draw elements on screen or [[Unit]] if the view works without a viewModel
+ */
 trait CharacterView[VM <: AnythingViewModel[CharacterModel] | Unit] extends AnythingView[CharacterModel, VM] {}
 
 /**
- * Character Isaac view based on CharacterModel and built grouping its elements head, body and shadow
+ * Character Isaac view. Designed for a [[CharacterModel]] using a [[CharacterViewModel]] for the view data. Built
+ * grouping its elements head, body and shadow
  */
 object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
 

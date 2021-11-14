@@ -29,24 +29,38 @@ trait AnythingViewModel[M <: AnythingModel: Typeable] {
   type ViewModel >: this.type <: AnythingViewModel[M]
   type Model = M
 
+  /**
+   * The unique identifier of the Anything instance. Need to match the [[AnythingModel]] id.
+   */
   val id: AnythingId
 
   /**
    * Update request called during game loop on every frame
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param model
+   *   the model of the Anything to which the viewModel is bound
    * @return
    *   the Outcome of the updated viewModel
    */
   def update(context: FrameContext[StartupData])(model: Model): Outcome[ViewModel] = Outcome(this)
 
+  /**
+   * Generic update that accepts every [[AnythingModel]] and checks for type correctness at runtime. Useful when you
+   * need to update the viewModel using an [[AnythingModel]] that you don't know its type. If the type is incorrect then
+   * the update is skipped
+   * @param contex
+   *   Indigo frame context data
+   * @param model
+   *   the model of the Anything to which the viewModel is bound, its type maybe not correct.
+   * @return
+   *   the Outcome of the updated viewModel or of the same viewModel if type check fails
+   */
   @targetName("anyUpdate")
   def update(contex: FrameContext[StartupData])(model: AnythingModel): Outcome[ViewModel] =
     model match {
-      case m: Model => println("UPDATE OKKK"); update(contex)(m)
-      case _        => println("UPDATE NOOO"); Outcome(this)
+      case m: Model => update(contex)(m)
+      case _        => Outcome(this)
     }
 }
 

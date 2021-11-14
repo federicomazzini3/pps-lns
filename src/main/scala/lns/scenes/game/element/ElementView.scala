@@ -9,8 +9,16 @@ import lns.core.Assets
 import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView, SolidModel }
 import lns.scenes.game.character.{ CharacterModel, CharacterViewModel }
 
+/**
+ * Base view for a [[StoneModel]]
+ * @tparam VM
+ *   the [[AnythingViewModel]] required to draw elements on screen or [[Unit]] if the view works without a viewModel
+ */
 trait StoneView[VM <: AnythingViewModel[StoneModel] | Unit] extends AnythingView[StoneModel, VM] {}
 
+/**
+ * Stone view. Designed for a [[StoneModel]] using no viewModel data. Built grouping its elements head, body and shadow
+ */
 object StoneView extends StoneView[Unit] with SimpleAnythingView {
 
   type View = Group
