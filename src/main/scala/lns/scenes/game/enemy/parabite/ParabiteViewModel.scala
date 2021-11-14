@@ -20,9 +20,9 @@ case class ParabiteViewModel(
 
   def withLastState(lastState: EnemyState, animationTimer: Timer): ViewModel = copyMacro
 
-  override def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] =
+  override def update(context: FrameContext[StartupData])(model: Model): Outcome[ViewModel] =
     for {
-      superObj <- super.update(context, model)
+      superObj <- super.update(context)(model)
       newObj = model.status.head._1 match {
         case state @ (EnemyState.Hiding | EnemyState.Idle) if lastState != state =>
           superObj.withLastState(state, Parabite.hideTime).asInstanceOf[ViewModel]

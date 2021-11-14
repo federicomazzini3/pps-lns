@@ -5,10 +5,15 @@ import lns.StartupData
 import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 import lns.core.Assets.Enemies.Mask.*
 
+/**
+ * Base view for a [[MaskModel]]
+ * @tparam VM
+ *   the [[AnythingViewModel]] required to draw elements on screen or [[Unit]] if the view works without a viewModel
+ */
 trait MaskView[VM <: AnythingViewModel[MaskModel] | Unit] extends AnythingView[MaskModel, VM] {}
 
 /**
- * Boney view based on EnemyModel and built grouping its elements head, body and shadow
+ * Boney view. Designed for a [[MaskModel]] using no viewModel data. Built grouping its elements head and shadow
  */
 object MaskView extends MaskView[Unit] with SimpleAnythingView with Mask {
 

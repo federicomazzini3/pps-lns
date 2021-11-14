@@ -13,6 +13,9 @@ import lns.scenes.game.room.RoomModel
 import lns.scenes.game.character.CharacterModel
 import org.scalatest.Suite
 
+/**
+ * Fixture that includes an Indigo context generator and a full basic [[GameContext]]
+ */
 trait ContextFixture {
   this: Suite =>
 

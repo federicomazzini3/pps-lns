@@ -103,7 +103,7 @@ final case class GameScene() extends EmptyScene {
       (model, viewModel) match {
         case (model: GameModel.Started, viewModel @ GameViewModel.Started(dungeon, room, character)) =>
           for {
-            updatedCharacter <- viewModel.character.update(context, model.character)
+            updatedCharacter <- viewModel.character.update(context)(model.character)
             newRoom =
               if (room.positionInDungeon != model.currentRoomPosition)
                 viewModel.dungeon.content(model.currentRoomPosition)
@@ -133,7 +133,7 @@ final case class GameScene() extends EmptyScene {
             Layer(
               BindingKey("game"),
               (RoomView.draw(context, model.currentRoom, viewModel.room) |+|
-                CharacterView.draw(context, character)(viewModel.character))
+                CharacterView.draw(context, character, viewModel.character))
                 .fitToScreen(context)(Assets.Rooms.roomSize)
             ),
             Layer(BindingKey("HUD"), (HUDView.draw(context, character)))

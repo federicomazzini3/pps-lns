@@ -5,7 +5,15 @@ import org.scalatest.freespec.AnyFreeSpec
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*
 
-class CheckCollisionTest extends AnyFreeSpec {
+class CollisionTest extends AnyFreeSpec {
+
+  def checkInside(cont: BoundingBox, elem: BoundingBox)    = assert(Collision.checkInside(cont, elem) == true)
+  def checkNotInside(cont: BoundingBox, elem: BoundingBox) = assert(Collision.checkInside(cont, elem) == false)
+  def checkContainerCollision(cont: BoundingBox, elem: BoundingBox)(
+      predicted: (Option[Location], Option[Location])
+  ) = assert(Collision.withContainer(cont, elem) == predicted)
+  def checkCollision(elem1: BoundingBox, elem2: BoundingBox)(predicted: Option[(Location, Location)]) =
+    assert(Collision.withElement(elem1, elem2) == predicted)
 
   "A bounding box" - {
     val elem1 = BoundingBox(0, 0, 100, 100)
@@ -22,15 +30,6 @@ class CheckCollisionTest extends AnyFreeSpec {
       }
     }
   }
-}
-
-class CheckInsideTest extends AnyFreeSpec {
-
-  def checkInside(cont: BoundingBox, elem: BoundingBox)    = assert(Collision.checkInside(cont, elem) == true)
-  def checkNotInside(cont: BoundingBox, elem: BoundingBox) = assert(Collision.checkInside(cont, elem) == false)
-  def checkContainerCollision(cont: BoundingBox, elem: BoundingBox)(
-      predicted: (Option[Location], Option[Location])
-  ) = assert(Collision.withContainer(cont, elem) == predicted)
 
   "A bounding box" - {
     val elem = BoundingBox(200, 200, 100, 100)
@@ -107,11 +106,6 @@ class CheckInsideTest extends AnyFreeSpec {
       }
     }
   }
-}
-
-class CollisionTest extends AnyFreeSpec {
-  def checkCollision(elem1: BoundingBox, elem2: BoundingBox)(predicted: Option[(Location, Location)]) =
-    assert(Collision.withElement(elem1, elem2) == predicted)
 
   "Two bounding box" - {
     val elem1 = BoundingBox(200, 200, 100, 100)

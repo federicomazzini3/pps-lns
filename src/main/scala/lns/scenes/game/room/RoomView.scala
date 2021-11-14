@@ -9,7 +9,7 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Assets.*
-import lns.scenes.game.anything.SolidModel
+import lns.scenes.game.anything.{ AnythingViewModel, SolidModel }
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, DoorView, Location }
 
@@ -30,7 +30,15 @@ object RoomView {
   def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
-        s2._2.view().draw(context, s2._2)(viewModel.anythings.getOrElse(s2._2.id, ()))
+        s2._2
+          .view()
+          .draw(
+            context,
+            s2._2,
+            viewModel.anythings
+              .get(s2._2.id)
+              .getOrElse[AnythingViewModel[_] | Unit](())
+          )
       )
     )
 }
