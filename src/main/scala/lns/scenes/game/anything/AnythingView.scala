@@ -61,8 +61,7 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
     view(contex, model, viewModel)
       .moveTo(model.getPosition())
       .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
-      //.withDepth(depth(model))
-      .withDepth(Depth(-model.boundingBox.top.toInt))
+      .withDepth(depth(model))
 
   @targetName("anyDraw")
   def draw(contex: FrameContext[StartupData], model: AnythingModel)(viewModel: AnythingViewModel[_] | Unit): Group =

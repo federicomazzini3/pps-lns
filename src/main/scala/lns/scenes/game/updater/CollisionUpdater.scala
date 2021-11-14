@@ -11,6 +11,15 @@ import scala.language.implicitConversions
 
 object CollisionUpdater {
 
+  /**
+   * Update an Anything, accordingly to a strategy, if there's a collision
+   * @param anything
+   * @param anythings
+   * @param f
+   *   function that set the strategy to update an anything
+   * @return
+   *   an updated AnythingModel
+   */
   def apply(anything: AnythingModel)(anythings: Map[AnythingId, AnythingModel])(
       f: (AnythingModel, AnythingModel) => AnythingModel
   ): AnythingModel =
@@ -32,6 +41,13 @@ object CollisionUpdater {
         f(anything, against)
       }
 
+  /**
+   * Update an anything position if there is a collision with another element
+   * @param anything
+   * @param against
+   * @return
+   *   an updated anything moved the minimum necessary not to collide with the other element
+   */
   def updateMove(anything: AnythingModel, against: AnythingModel): AnythingModel =
     (anything, against) match {
       case (anything: SolidModel with DynamicModel, against: SolidModel) =>
@@ -48,6 +64,14 @@ object CollisionUpdater {
       case _ => anything
     }
 
+  /**
+   * Update anything stats if there is a collision with another element
+   * @param context
+   * @param anything
+   * @param against
+   * @return
+   *   anything updated with new stats, based on the element's stats it collides with
+   */
   def updateLife(context: FrameContext[StartupData])(anything: AnythingModel, against: AnythingModel): AnythingModel =
     (anything, against) match {
       case (anything: SolidModel with AliveModel, against: SolidModel with DamageModel) =>

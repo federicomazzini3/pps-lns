@@ -5,65 +5,127 @@ import indigo.shared.FrameContext
 import indigoextras.geometry.Vertex
 import lns.StartupData
 import lns.core.PrologClient
-import lns.scenes.game.anything.AnythingModel
-import lns.scenes.game.anything.*
-import lns.scenes.game.character.*
-import lns.scenes.game.room.RoomModel
-import lns.scenes.game.dungeon.*
-import lns.scenes.game.dungeon.{ DungeonModel, Generator, RoomType, * }
-import lns.scenes.game.dungeon.RoomType.*
-import lns.scenes.game.room.*
-import lns.scenes.game
-import lns.scenes.game.shot.*
-import lns.scenes.game.updater.*
-import lns.scenes.game.updater.CollisionUpdater.*
-import lns.scenes.game.updater.PassageUpdater.*
+import lns.scenes.game.*
+import anything.*
+import character.*
+import dungeon.*
+import dungeon.RoomType.*
+import room.*
+import shot.*
+import updater.*
+import updater.CollisionUpdater.*
+import updater.PassageUpdater.*
 
 sealed trait GameModel
 
 object GameModel {
 
+  /**
+   * The game not started yet
+   * @param prologClient
+   */
   case class NotStarted(val prologClient: PrologClient) extends GameModel
 
+  /**
+   * The game started
+   * @param dungeon
+   *   the map that contains all room and their disposition
+   * @param currentRoomPosition
+   *   the current room where the character plays
+   * @param character
+   *   the character controlled by the player
+   */
   case class Started(
       val dungeon: DungeonModel,
       val currentRoomPosition: (Int, Int),
       val character: CharacterModel
   ) extends GameModel {
 
+    /**
+     * the extended anything collection with the current room's anything and the character
+     */
     val allAnythings: Map[AnythingId, AnythingModel] =
-      Map(character.id -> character) ++ currentRoom.anythings
+      currentRoom.anythings + (character.id -> character)
 
+    /**
+     * change the current room displayed by the game
+     * @param newCurrentRoom
+     *   the new room position
+     * @return
+     *   a new Game Model with current room updated
+     */
     def changeCurrentRoom(newCurrentRoom: (Int, Int)): Started =
       this.copy(currentRoomPosition = newCurrentRoom)
 
+    /**
+     * @return
+     *   the RoomModel of the current room
+     */
     def currentRoom: RoomModel = dungeon.room(currentRoomPosition).get
 
+    /**
+     * Update the GameModel with an updated current RoomModel
+     * @param f
+     *   function that set the strategy to update the room
+     * @return
+     *   a new GameModel with an updated current Room
+     */
     def updateCurrentRoom(f: RoomModel => RoomModel): Started =
       this.copy(dungeon = dungeon.updateRoom(currentRoomPosition)(f(currentRoom)))
 
+    /**
+     * Update the GameModel with an updated Character
+     * @param f
+     *   function that set the strategy to update the room
+     * @return
+     *   a new GameModel with an updated Character
+     */
     def updateCharacter(f: CharacterModel => CharacterModel): Started =
       this.copy(character = f(character))
 
+    /**
+     * Update the GameModel with an updated collection of anything
+     * @param f
+     *   function that set the strategy to update anythings
+     * @return
+     *   a new GameModel with an updated collection of anythings
+     */
     def updateEachAnythingsCurrentRoom(f: AnythingModel => AnythingModel): GameModel.Started =
       updateCurrentRoom(room => room.updateEachAnything(f))
 
+    /**
+     * Update the GameModel with an updated collection of anything
+     * @param f
+     *   function that set the strategy to update anythings
+     * @return
+     *   a new GameModel with an updated collection of anythings
+     */
     def updateAnythingsCurrentRoom(
         f: Map[AnythingId, AnythingModel] => Map[AnythingId, AnythingModel]
     ): GameModel.Started =
       updateCurrentRoom(room => room.updateAnythings(f))
 
+    /**
+     * Update the GameModel with a new current Room when the character pass through a door
+     * @return
+     *   a new GameModel with an updated current Room and an updated Character
+     */
     def updateWithPassage: Started =
-      val (newRoom, movedCharacter) = PassageUpdater.apply(dungeon, currentRoom, character)
+      val (newRoom, movedCharacter) = PassageUpdater(dungeon, currentRoom, character)
       this
         .changeCurrentRoom(newRoom)
         .updateCharacter(character => movedCharacter)
 
+    /**
+     * Update stats of anythings when they collide each other
+     * @param context
+     * @return
+     *   a new GameModel with an updated collection of anythings
+     */
     def updateStatsAfterCollision(context: FrameContext[StartupData]): GameModel.Started =
       this
         .updateCharacter(character =>
-          CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context))
-            .asInstanceOf[CharacterModel]
+          CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context)).asInstanceOf[CharacterModel]
         )
         .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateLife(context)))
         .updateAnythingsCurrentRoom(anythings =>
@@ -73,11 +135,15 @@ object GameModel {
           }
         )
 
+    /**
+     * Update position of anythings when they collide each other
+     * @return
+     *   a new GameModel with an updated collection of anythings
+     */
     def updateMovementAfterCollision: GameModel.Started =
       this
         .updateCharacter(character =>
-          CollisionUpdater(character)(this.currentRoom.anythings)(updateMove)
-            .asInstanceOf[CharacterModel]
+          CollisionUpdater(character)(this.currentRoom.anythings)(updateMove).asInstanceOf[CharacterModel]
         )
         .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateMove))
   }

@@ -12,9 +12,6 @@ import lns.scenes.game.room.door.*
 import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
 
-type Door  = (Location, DoorState)
-type Doors = Map[Location, DoorState]
-
 object DoorView {
   def view(startupData: StartupData, model: Doors, viewModel: Unit): Group =
     model.foldLeft(Group())((d1, d2) => d1.addChild(DoorGraphics(d2)))

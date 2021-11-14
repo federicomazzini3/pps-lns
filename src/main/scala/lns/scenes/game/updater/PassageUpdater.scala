@@ -12,33 +12,29 @@ import lns.scenes.game.room.door.LocationImplicit.*
 object PassageUpdater {
 
   /**
-   * verifies the character's intention to pass through a door and modifies the model accordingly
+   * Verifies the character's intention to pass through a door and modifies the model accordingly
    * @param dungeon
    * @param room
    * @param character
    * @return
-   *   the destination room and the character spwan in the right position (near the destination door)
+   *   The destination room and the character moved in the right position (near the destination door)
    */
   def apply(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): ((Int, Int), CharacterModel) = {
 
     /**
-     * change the current room based on location
-     * @param dungeon
-     * @param room
+     * Change the current room based on location
      * @param locations
      * @return
-     *   the new current room of the game
+     *   The new dungeon position of the current room of the game
      */
     def changeRoom(locations: Location): (Int, Int) =
       dungeon.nearPosition(room.positionInDungeon)(locations).getOrElse(room.positionInDungeon)
 
     /**
-     * moving the character accordingly to the destination port
-     * @param character
-     * @param floor
+     * Moving the character accordingly to the destination port
      * @param location
      * @return
-     *   a new character with updated position
+     *   A new character with updated position
      */
     def moveCharacter(location: Location): CharacterModel =
       val moves: Map[Location, Vertex] =
@@ -52,15 +48,11 @@ object PassageUpdater {
       character.copy(boundingBox = character.boundingBox.moveTo(moves(location)))
 
     /**
-     * Check, for an element, if it's center aligned in a specific edge of its container
-     * @param container
-     *   the element's container
-     * @param elem
-     *   the element inside
+     * Check if the character it's aligned on a door
      * @param location
-     *   the specific edge to check
+     *   the specific side to check
      * @return
-     *   if the element is center aligned
+     *   if the character it's aligned on a door
      */
     def characterOnDoor(location: Location): Boolean =
       val container = room.floor
@@ -70,6 +62,11 @@ object PassageUpdater {
         case Above | Below => container.horizontalCenter > elem.left && container.horizontalCenter < elem.right
       }
 
+    /**
+     * Verifies the character's intention to pass through a door and specify which
+     * @return
+     *   the location of the door to pass
+     */
     def doorToPass: Option[Location] =
       (Collision.withContainer(room.floor, character.boundingBox), character.getDynamicState()) match {
 
