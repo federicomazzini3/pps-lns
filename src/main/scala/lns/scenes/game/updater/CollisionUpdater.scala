@@ -75,14 +75,17 @@ object CollisionUpdater {
   def updateLife(context: FrameContext[StartupData])(anything: AnythingModel, against: AnythingModel): AnythingModel =
     (anything, against) match {
       case (anything: SolidModel with AliveModel, against: SolidModel with DamageModel) =>
-        against match {
-          case s: ShotModel =>
+        (anything, against) match {
+          case (_, s: ShotModel) =>
             Collision.withElement(against.boundingBox, anything.shotArea)
+          case (s: ShotModel, _) =>
+            Collision.withElement(against.shotArea, anything.boundingBox)
           case _ =>
             Collision.withElement(against.boundingBox, anything.boundingBox)
         } match {
-          case Some(_, _) => anything.hit(context, PropertyName.Damage @@ against.stats).unsafeGet
-          case _          => anything
+          case Some(a, b) =>
+            anything.hit(context, PropertyName.Damage @@ against.stats).unsafeGet
+          case _ => anything
         }
       case _ => anything
     }
