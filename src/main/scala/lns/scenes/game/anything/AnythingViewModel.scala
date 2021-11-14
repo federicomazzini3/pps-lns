@@ -40,12 +40,12 @@ trait AnythingViewModel[M <: AnythingModel: Typeable] {
    * @return
    *   the Outcome of the updated viewModel
    */
-  def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] = Outcome(this)
+  def update(context: FrameContext[StartupData])(model: Model): Outcome[ViewModel] = Outcome(this)
 
   @targetName("anyUpdate")
-  def update(contex: FrameContext[StartupData], model: AnythingModel | Matchable): Outcome[ViewModel] =
+  def update(contex: FrameContext[StartupData])(model: AnythingModel): Outcome[ViewModel] =
     model match {
-      case m: Model => println("UPDATE OKKK"); update(contex, m)
+      case m: Model => println("UPDATE OKKK"); update(contex)(m)
       case _        => println("UPDATE NOOO"); Outcome(this)
     }
 }
@@ -73,9 +73,9 @@ trait FireViewModel[M <: FireModel] extends AnythingViewModel[M] {
    * @return
    *   the Outcome of the updated model
    */
-  override def update(context: FrameContext[StartupData], model: Model): Outcome[ViewModel] =
+  override def update(context: FrameContext[StartupData])(model: Model): Outcome[ViewModel] =
     for {
-      superObj <- super.update(context, model)
+      superObj <- super.update(context)(model)
       newTimer = fireAnimationTimer.elapsed(context.gameTime.delta.toDouble)
       newObj = newTimer match {
         case 0 if model.isFiring() =>

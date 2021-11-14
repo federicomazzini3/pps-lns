@@ -103,7 +103,7 @@ final case class GameScene() extends EmptyScene {
       (model, viewModel) match {
         case (model: GameModel.Started, viewModel @ GameViewModel.Started(dungeon, room, character)) =>
           for {
-            updatedCharacter <- viewModel.character.update(context, model.character)
+            updatedCharacter <- viewModel.character.update(context)(model.character)
             newRoom =
               if (room.positionInDungeon != model.currentRoomPosition)
                 viewModel.dungeon.content(model.currentRoomPosition)
