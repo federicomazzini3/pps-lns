@@ -5,10 +5,15 @@ import lns.StartupData
 import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 import lns.core.Assets.Enemies.Boney.*
 
+/**
+ * Base view for a [[BoneyModel]]
+ * @tparam VM
+ *   the [[AnythingViewModel]] required to draw elements on screen or [[Unit]] if the view works without a viewModel
+ */
 trait BoneyView[VM <: AnythingViewModel[BoneyModel] | Unit] extends AnythingView[BoneyModel, VM] {}
 
 /**
- * Boney view based on EnemyModel and built grouping its elements head, body and shadow
+ * Boney view. Designed for a [[BoneyModel]] using no viewModel data. Built grouping its elements head, body and shadow
  */
 object BoneyView extends BoneyView[Unit] with SimpleAnythingView with Boney {
 

@@ -14,6 +14,9 @@ import lns.scenes.game.stats.PropertyName.*
 
 import java.util.UUID
 
+/**
+ * represents an unique identification string for an Anything instance
+ */
 type AnythingId = UUID
 object AnythingId {
   def generate: AnythingId = UUID.randomUUID()
@@ -32,9 +35,18 @@ given Conversion[Map[AnythingId, Outcome[AnythingModel]], Outcome[Map[AnythingId
       acc.merge(el._2)((set, el2) => set + (el._1 -> el2))
     )
 
+/**
+ * type alias of Double pimped with the elapsed method
+ */
 type Timer = Double
 extension (timer: Timer)
-  def elapsed(time: Double) = timer match {
+  /**
+   * @param time
+   *   quantity of time to subtract to the timer
+   * @return
+   *   a new Timer with time subtracted
+   */
+  def elapsed(time: Double): Timer = timer match {
     case 0                 => 0
     case x if x - time > 0 => x - time
     case _                 => 0
@@ -46,7 +58,14 @@ extension (timer: Timer)
 trait AnythingModel {
   type Model >: this.type <: AnythingModel
 
+  /**
+   * The unique identifier of the Anything instance.
+   */
   val id: AnythingId
+
+  /**
+   * The Anything's View factory. The View needs to be designed for the specific Model
+   */
   val view: () => AnythingView[Model, _]
 
   /**

@@ -32,7 +32,7 @@ object Generator {
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
       case RoomType.Arena =>
-        val enemyTest = MaskModel.initial
+        val enemyTest = ParabiteModel.initial
         RoomModel.arenaRoom(
           position,
           generateDoors(grid, position),

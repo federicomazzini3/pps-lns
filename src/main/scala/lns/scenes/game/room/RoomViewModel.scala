@@ -20,7 +20,11 @@ case class RoomViewModel(val positionInDungeon: Position, val anythings: Map[Any
       context: FrameContext[StartupData],
       model: RoomModel
   ): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
-    anythings.map((id, any) => (id -> any.update(context, model.anythings.getOrElse(id, ()))))
+    anythings.map((id, anyViewModel) =>
+      model.anythings
+        .get(id)
+        .fold(id -> Outcome(anyViewModel))(anyModel => id -> anyViewModel.update(context)(anyModel))
+    )
 
   def update(context: FrameContext[StartupData], model: RoomModel): Outcome[RoomViewModel] =
     val out = updateAnythings(context, model)
