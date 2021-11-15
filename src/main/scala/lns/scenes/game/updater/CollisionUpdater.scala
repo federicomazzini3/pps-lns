@@ -1,12 +1,13 @@
 package lns.scenes.game.updater
 
-import indigo.shared.FrameContext
+import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
 import lns.scenes.game.anything.*
 import lns.scenes.game.room.*
 import lns.scenes.game.shot.*
 import lns.scenes.game.stats.*
-import lns.scenes.game.stats.given
+import lns.scenes.game.stats
+
 import scala.language.implicitConversions
 
 object CollisionUpdater {
@@ -21,8 +22,8 @@ object CollisionUpdater {
    *   an updated AnythingModel
    */
   def apply(anything: AnythingModel)(anythings: Map[AnythingId, AnythingModel])(
-      f: (AnythingModel, AnythingModel) => AnythingModel
-  ): AnythingModel =
+      f: (AnythingModel, AnythingModel) => Outcome[AnythingModel]
+  ): Outcome[AnythingModel] =
     //prendo solo i solid che non sono crossable e diversi da me stesso
     anythings.values
       .collect {
@@ -37,8 +38,11 @@ object CollisionUpdater {
           case _                                                  => true
         }
       )
-      .foldLeft(anything) { (anything, against) =>
-        f(anything, against)
+      .foldLeft(Outcome(anything)) { (anything, against) =>
+        for {
+          an  <- anything
+          all <- f(an, against)
+        } yield all //f(an, against)
       }
 
   /**
@@ -48,20 +52,24 @@ object CollisionUpdater {
    * @return
    *   an updated anything moved the minimum necessary not to collide with the other element
    */
-  def updateMove(anything: AnythingModel, against: AnythingModel): AnythingModel =
+  def updateMove(anything: AnythingModel, against: AnythingModel): Outcome[AnythingModel] =
     (anything, against) match {
       case (anything: SolidModel with DynamicModel, against: SolidModel) =>
         anything match {
           case s: ShotModel =>
-            anything
-              .withDynamic(Boundary.elementBound(against.shotArea, anything.boundingBox), anything.speed)
-              .asInstanceOf[anything.Model]
+            Outcome(
+              anything
+                .withDynamic(Boundary.elementBound(against.shotArea, anything.boundingBox), anything.speed)
+                .asInstanceOf[anything.Model]
+            )
           case _ =>
-            anything
-              .withDynamic(Boundary.elementBound(against.boundingBox, anything.boundingBox), anything.speed)
-              .asInstanceOf[anything.Model]
+            Outcome(
+              anything
+                .withDynamic(Boundary.elementBound(against.boundingBox, anything.boundingBox), anything.speed)
+                .asInstanceOf[anything.Model]
+            )
         }
-      case _ => anything
+      case _ => Outcome(anything)
     }
 
   /**
@@ -72,7 +80,9 @@ object CollisionUpdater {
    * @return
    *   anything updated with new stats, based on the element's stats it collides with
    */
-  def updateLife(context: FrameContext[StartupData])(anything: AnythingModel, against: AnythingModel): AnythingModel =
+  def updateLife(
+      context: FrameContext[StartupData]
+  )(anything: AnythingModel, against: AnythingModel): Outcome[AnythingModel] =
     (anything, against) match {
       case (anything: SolidModel with AliveModel, against: SolidModel with DamageModel) =>
         (anything, against) match {
@@ -84,9 +94,9 @@ object CollisionUpdater {
             Collision.withElement(against.boundingBox, anything.boundingBox)
         } match {
           case Some(a, b) =>
-            anything.hit(context, PropertyName.Damage @@ against.stats).unsafeGet
-          case _ => anything
+            anything.hit(context, PropertyName.Damage @@ against.stats)
+          case _ => Outcome(anything)
         }
-      case _ => anything
+      case _ => Outcome(anything)
     }
 }

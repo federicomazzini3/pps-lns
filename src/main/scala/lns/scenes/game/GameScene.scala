@@ -9,7 +9,7 @@ import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
 import lns.scenes.game.hud.HUDView
-import lns.scenes.game.anything.FireModel
+import lns.scenes.game.anything.{ Dead, FireModel, Hit }
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
@@ -44,30 +44,18 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-    case ShotEvent(shot) =>
-      model match {
-        case model @ GameModel.Started(_, room, _) =>
-          model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
-        case _ => Outcome(model)
-      }
-
     case FrameTick =>
       model match {
 
         case model @ GameModel.Started(dungeon, roomIndex, character) =>
           val gameContext = GameContext(model.currentRoom, character)
           for {
-            updatedCharacter <- character.update(context)(gameContext)
-            updatedRoom      <- model.currentRoom.update(context)(character)
-            //model     <- model.updateCurrentRoom(room)
-            //model     <- model.updateCharacter(character)
-            //(newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
-          } yield model
-            .updateCharacter(character => updatedCharacter)
-            .updateCurrentRoom(room => updatedRoom)
-            .updateWithPassage
-            .updateStatsAfterCollision(context)
-            .updateMovementAfterCollision
+            updatedCharacter <- model.updateCharacter(c => character.update(context)(gameContext))
+            updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(context)(character))
+            withPassage      <- updatedRoom.updateWithPassage
+            withStats        <- withPassage.updateStatsAfterCollision(context)
+            withMovements    <- withStats.updateMovementAfterCollision
+          } yield withMovements
 
         case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
@@ -78,6 +66,21 @@ final case class GameScene() extends EmptyScene {
             .map(pi => model.copy(prologClient = pi))
         case _ => model
       }
+
+    case ShotEvent(shot) =>
+      model match {
+        case model @ GameModel.Started(_, room, _) =>
+          model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
+        case _ => Outcome(model)
+      }
+
+    case Hit(a) =>
+      println("HIT " + a);
+      Outcome(model)
+
+    case Dead(a) =>
+      println("DEAD " + a);
+      Outcome(model)
 
     case PrologEvent.Answer(queryId, substitution) =>
       model match {

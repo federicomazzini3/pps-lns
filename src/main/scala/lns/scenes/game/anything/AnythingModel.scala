@@ -244,8 +244,8 @@ trait AliveModel extends AnythingModel with StatsModel {
    *   the Outcome of the updated model
    */
   def hit(context: FrameContext[StartupData], damage: Double): Outcome[Model] = invincibilityTimer match {
-    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats))
-    case 0                      => Outcome(withAlive(0, 0))
+    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats)).addGlobalEvents(Hit(this))
+    case 0                      => Outcome(withAlive(0, 0)).addGlobalEvents(Dead(this))
     case _                      => Outcome(this)
   }
 
@@ -385,3 +385,6 @@ trait SolidModel extends AnythingModel {
     .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
     .moveBy(0, shotAreaOffset)
 }
+
+case class Hit(a: AnythingModel)  extends GlobalEvent
+case class Dead(a: AnythingModel) extends GlobalEvent

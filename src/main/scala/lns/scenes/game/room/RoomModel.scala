@@ -62,8 +62,8 @@ trait RoomModel {
    * @return
    *   a new room with the new shot added
    */
-  def addShot(shot: ShotModel): RoomModel =
-    updateAnythings(anythings => anythings + (shot.id -> shot))
+  def addShot(shot: ShotModel): Outcome[RoomModel] =
+    updateAnythings(anythings => Outcome(anythings + (shot.id -> shot)))
 
   /**
    * Remove an anyhthing from the room
@@ -71,8 +71,8 @@ trait RoomModel {
    * @return
    *   a new room without the specific anything
    */
-  def removeAnythings(anything: AnythingModel): RoomModel =
-    updateAnythings(anythings => anythings.removed(anything.id))
+  def removeAnythings(anything: AnythingModel): Outcome[RoomModel] =
+    updateAnythings(anythings => Outcome(anythings.removed(anything.id)))
 
   /**
    * Update the anythings of a room with a function
@@ -81,7 +81,7 @@ trait RoomModel {
    * @return
    *   a new room with anythings updated
    */
-  def updateEachAnything(updateFunc: AnythingModel => AnythingModel): RoomModel =
+  def updateEachAnything(updateFunc: AnythingModel => Outcome[AnythingModel]): Outcome[RoomModel] =
     updateAnythings(anythings => anythings.map(a => (a._1 -> updateFunc(a._2))))
 
   /**
@@ -91,18 +91,21 @@ trait RoomModel {
    * @return
    *   a new room with the anything updated
    */
-  def updateAnythings(updateFunc: Map[AnythingId, AnythingModel] => Map[AnythingId, AnythingModel]): RoomModel =
-    this match {
-      case room: EmptyRoom =>
-        room.copy(anythings = updateFunc(anythings))
-      case room: ItemRoom =>
-        room.copy(anythings = updateFunc(anythings))
-      case room: ArenaRoom =>
-        room.copy(anythings = updateFunc(anythings))
-      case room: BossRoom =>
-        room.copy(anythings = updateFunc(anythings))
-      case _ => this
-    }
+  def updateAnythings(
+      updateFunc: Map[AnythingId, AnythingModel] => Outcome[Map[AnythingId, AnythingModel]]
+  ): Outcome[RoomModel] =
+    for (ua <- updateFunc(anythings))
+      yield this match {
+        case room: EmptyRoom =>
+          room.copy(anythings = ua)
+        case room: ItemRoom =>
+          room.copy(anythings = ua)
+        case room: ArenaRoom =>
+          room.copy(anythings = ua)
+        case room: BossRoom =>
+          room.copy(anythings = ua)
+        case _ => this
+      }
 
   /**
    * Update the anyhthings state inside a room
@@ -114,12 +117,17 @@ trait RoomModel {
    *   a new room with the anything state updated
    */
   def update(context: FrameContext[StartupData])(character: CharacterModel): Outcome[RoomModel] =
-    val updatedAnythings: Outcome[Map[AnythingId, AnythingModel]] =
+    /*val updatedAnythings: Outcome[Map[AnythingId, AnythingModel]] =
       anythings
         .map((id, any) => id -> any.update(context)(GameContext(this, character)))
 
     for (updated <- updatedAnythings)
-      yield this.updateAnythings(anythings => updated)
+      yield this.updateAnythings(anythings => updated)*/
+
+    this.updateAnythings(anythings =>
+      anythings
+        .map((id, any) => id -> any.update(context)(GameContext(this, character)))
+    )
 }
 
 /**
