@@ -3,6 +3,7 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
+import lns.core.Assets.Enemies.Parabite.*
 
 /**
  * Base view for a [[ParabiteModel]]
@@ -24,6 +25,10 @@ object ParabiteView extends ParabiteView[ParabiteViewModel] with Parabite {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     Group()
       /* .addChild(boundingModel) */
-      .addChild(bodyView(model, viewModel))
+      .addChild(
+        Group()
+          .withRef(0, offsetY)
+          .addChild(bodyView(model, viewModel))
+      )
       .withScale(Vector2(5, 5))
 }

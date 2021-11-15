@@ -36,9 +36,10 @@ case class CharacterModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
+    crossable: Boolean = false,
     life: Double = 0,
-    speed: Vector2 = Vector2(0, 0),
     invincibilityTimer: Double = 0,
+    speed: Vector2 = Vector2(0, 0),
     fireRateTimer: Double = 0,
     shot: Option[Vector2] = None
 ) extends AliveModel
@@ -49,7 +50,6 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
-  val crossable       = false
   val shotOffset: Int = -40
 
   // TODO: Builder pattern -> usare Require qui oppure sui Trait
@@ -71,6 +71,7 @@ case class CharacterModel(
   def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                          = copyMacro
   def withStats(stats: Stats): Model                                = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =

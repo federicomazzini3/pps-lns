@@ -46,6 +46,7 @@ case class NerveModel(
   def withStats(stats: Stats): Model                             = copyMacro
   def withStatus(status: Queue[EnemyStatus]): Model              = copyMacro
   def withAlive(life: Double, invincibilityTimer: Double): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                       = copyMacro
 }
 
 /**

@@ -38,6 +38,7 @@ case class MyTravellerModel(
   def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
+  def withSolid(crossable: Boolean): Model                         = copyMacro
 }
 
 trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

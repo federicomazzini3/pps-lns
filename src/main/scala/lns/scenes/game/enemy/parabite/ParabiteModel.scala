@@ -57,6 +57,7 @@ case class ParabiteModel(
   def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
+  def withSolid(crossable: Boolean): Model                         = copyMacro
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
@@ -64,11 +65,14 @@ case class ParabiteModel(
       newObj = status.head match {
         case (EnemyState.Idle, 0) if getPosition().distanceTo(gameContext.character.getPosition()) >= 10 =>
           superObj
-            .withTraveller(Queue(gameContext.character.getPosition().clamp(0, Assets.Rooms.floorSize)))
+            .withTraveller(
+              Queue(gameContext.character.getPosition().clamp(0, Assets.Rooms.floorSize - boundingBox.height))
+            )
             .withStatus((EnemyState.Attacking, 0.0))
-            .asInstanceOf[Model] // TODO: togliere il clamp dopo refactor coordinate
+            .asInstanceOf[Model]
+        case (EnemyState.Idle, _) if crossable == true => superObj.withSolid(false)
         case (EnemyState.Attacking, _) if superObj.path.isEmpty == true =>
-          superObj.withStatus((EnemyState.Hiding, 2.0) :+ (EnemyState.Idle, 1.0)).asInstanceOf[Model]
+          superObj.withSolid(true).withStatus((EnemyState.Hiding, 2.0) :+ (EnemyState.Idle, 1.0)).asInstanceOf[Model]
         case _ => superObj
 
       }
