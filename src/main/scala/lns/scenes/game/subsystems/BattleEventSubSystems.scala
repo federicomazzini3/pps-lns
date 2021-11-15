@@ -5,24 +5,35 @@ import indigo.shared.datatypes.Vector2
 import lns.core.Assets
 import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.*
+import lns.scenes.game.shot.ShotModel
 
 case class BattleEventSubSystems(screenDimensions: Rectangle) extends SubSystem:
   type EventType      = GlobalEvent
-  type SubSystemModel = Set[BattleEvent]
+  type SubSystemModel = Set[BattleConsequence]
 
   val eventFilter: GlobalEvent => Option[EventType] = {
-    case e: Hit  => Option(e)
-    case e: Dead => Option(e)
-    case _       => None
+    case e: FrameTick => Option(e)
+    case e: Hit       => Option(e)
+    case e: Dead      => Option(e)
+    case _            => None
   }
 
   def initialModel: Outcome[SubSystemModel] =
     Outcome(Set.empty)
 
   def update(context: SubSystemFrameContext, model: SubSystemModel): GlobalEvent => Outcome[SubSystemModel] = {
-    case Hit(a)  => println("HIT " + a); Outcome(model + Hit(a))
-    case Dead(a) => println("DEAD " + a); Outcome(model + Dead(a))
-    case _       => Outcome(model)
+
+    case FrameTick =>
+      Outcome(
+        model
+          .filter(bc => bc.timeElapse(context.gameTime, Seconds(0.360)))
+      )
+
+    case Hit(a) => Outcome(model)
+
+    case Dead(a) => Outcome(model + Rip(a, context.gameTime))
+
+    case _ => Outcome(model)
   }
 
   def present(context: SubSystemFrameContext, model: SubSystemModel): Outcome[SceneUpdateFragment] = Outcome(
@@ -47,22 +58,55 @@ object BattleEventView {
       1.0 / edge * screenDimensions.height
     )
 
-  def draw(model: Set[BattleEvent]): Group = model.foldLeft(Group())((e1, e2) =>
-    e1.addChild(
-      Sprite(
-        BindingKey("nerve_body_sprite"),
-        e2.a.boundingBox.position.x.toInt,
-        e2.a.boundingBox.position.y.toInt,
-        1,
-        AnimationKey("nerve_body"),
-        Material.Bitmap(AssetName("nerve"))
-      ).changeCycle(CycleLabel("idle"))
-        .play()
-        .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+  def draw(model: Set[BattleConsequence]): Group =
+    model
+      .foldLeft(Group())((e1, e2) =>
+        e1.addChild(
+          anymation(e2)
+        )
+      )
+
+  def anymation(bc: BattleConsequence) =
+    bc match {
+      case Rip(a, _) =>
+        a match {
+          //case s: ShotModel => Group()
+          case _ => ripAnymation(bc)
+        }
+      case h: Hurt => Group()
+    }
+
+  def ripAnymation(bc: BattleConsequence) =
+    Sprite(
+      BindingKey("explosion_animation_sprite" + bc.gameTime.running),
+      bc.a.boundingBox.topLeft.x.toInt,
+      bc.a.boundingBox.topLeft.y.toInt,
+      1,
+      AnimationKey("explosion_animation"),
+      Material.Bitmap(AssetName("explosion"))
     )
-  )
+      .play()
+      .withRef(32, 32)
+      .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+      .withScale(adHocScale(bc))
+
+  def adHocScale(bc: BattleConsequence): Vector2 =
+    bc.a match {
+      case s: ShotModel => Vector2(2, 2)
+      case _            => Vector2(5, 5)
+    }
 }
 
 trait BattleEvent                 extends GlobalEvent { val a: AnythingModel }
 case class Hit(a: AnythingModel)  extends BattleEvent
 case class Dead(a: AnythingModel) extends BattleEvent
+
+trait BattleConsequence {
+  val a: AnythingModel
+  val gameTime: GameTime
+
+  def timeElapse(other: GameTime, seconds: Seconds): Boolean =
+    other.running.-(gameTime.running) < seconds
+}
+case class Hurt(a: AnythingModel, gameTime: GameTime) extends BattleConsequence
+case class Rip(a: AnythingModel, gameTime: GameTime)  extends BattleConsequence

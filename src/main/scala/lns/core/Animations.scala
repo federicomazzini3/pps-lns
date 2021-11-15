@@ -1,12 +1,14 @@
 package lns.core
 
 import indigo.*
+import lns.core.Animations.Explosion.size
 import lns.scenes.game.anything.{ DynamicState, FireState }
 import lns.scenes.game.enemy.EnemyState
 
 object Animations {
 
-  def apply(): List[Animation] = List(Character.head, Character.body, Boney.body, Nerve.body, Parabite.body)
+  def apply(): List[Animation] =
+    List(Character.head, Character.body, Boney.body, Nerve.body, Parabite.body, Explosion.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
@@ -144,6 +146,56 @@ object Animations {
       .addCycle(Cycle.create("hiding", generateHidingFrame))
       .addCycle(Cycle.create("wakeup", generateWakeupFrame))
       .addCycle(Cycle.create("idle", generateIdleFrame(0, 0)))
+  }
+
+  object Explosion {
+
+    val size: Int = 65
+
+    def generateBodyFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(size * 0, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 0, size, size), Millis(10)),
+          Frame(Rectangle(size * 0, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 1, size, size), Millis(10)),
+          Frame(Rectangle(size * 0, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 2, size, size), Millis(10)),
+          Frame(Rectangle(size * 0, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 3, size, size), Millis(10)),
+          Frame(Rectangle(size * 0, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 4, size, size), Millis(10)),
+          Frame(Rectangle(size * 0, size * 5, size, size), Millis(10)),
+          Frame(Rectangle(size * 1, size * 5, size, size), Millis(10)),
+          Frame(Rectangle(size * 2, size * 5, size, size), Millis(10)),
+          Frame(Rectangle(size * 3, size * 5, size, size), Millis(10)),
+          Frame(Rectangle(size * 4, size * 5, size, size), Millis(10)),
+          Frame(Rectangle(size * 5, size * 5, size, size), Millis(10))
+        )
+      )
+
+    val body: Animation = Animation
+      .create(AnimationKey("explosion_animation"), Cycle.create("idle", generateBodyFrame))
   }
 
 }
