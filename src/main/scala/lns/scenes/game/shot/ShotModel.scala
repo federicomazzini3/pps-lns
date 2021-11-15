@@ -46,7 +46,8 @@ case class ShotModel(
     range: Double,
     speed: Vector2 = Vector2(0, 0),
     life: Double = 1,
-    invincibilityTimer: Double = 0
+    invincibilityTimer: Double = 0,
+    crossable: Boolean = false
 ) extends AliveModel
     with DynamicModel
     with DamageModel
@@ -54,12 +55,11 @@ case class ShotModel(
 
   type Model = ShotModel
 
-  val crossable = false
-
   def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
   def withStats(stats: Stats): Model                               = copyMacro
   def withRange(range: Double): Model                              = copyMacro
+  def withSolid(crossable: Boolean): Model                         = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = {
     val maxSpeed = MaxSpeed @@ stats * context.gameTime.delta.toDouble

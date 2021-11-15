@@ -39,6 +39,7 @@ case class MyKeepsAwayModel(
   def withStatus(status: Queue[EnemyStatus]): Model                           = copyMacro
   def withAlive(life: Double, invincibilityTimer: Double): Model              = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyKeepsAwayModel = copyMacro
+  def withSolid(crossable: Boolean): Model                                    = copyMacro
 }
 
 trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

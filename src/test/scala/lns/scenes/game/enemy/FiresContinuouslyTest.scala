@@ -41,6 +41,7 @@ case class MyFiringModel(
   def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
   def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                          = copyMacro
 }
 
 trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
