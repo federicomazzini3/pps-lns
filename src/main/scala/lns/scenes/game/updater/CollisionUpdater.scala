@@ -2,11 +2,12 @@ package lns.scenes.game.updater
 
 import indigo.shared.FrameContext
 import lns.StartupData
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.room.*
 import lns.scenes.game.shot.*
 import lns.scenes.game.stats.*
-import lns.scenes.game.stats.given
+import lns.scenes.game.stats
+
 import scala.language.implicitConversions
 
 object CollisionUpdater {
@@ -24,22 +25,26 @@ object CollisionUpdater {
       f: (AnythingModel, AnythingModel) => AnythingModel
   ): AnythingModel =
     //prendo solo i solid che non sono crossable e diversi da me stesso
-    anythings.values
-      .collect {
-        case against: SolidModel if !against.crossable && against.id != anything.id => against
-      }
-      //uno shot non si scontra con un altro shot, uno shot non si scontra con il proprietario
-      .filter(against =>
-        (anything, against) match {
-          case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
-          case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
-          case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
-          case _                                                  => true
-        }
-      )
-      .foldLeft(anything) { (anything, against) =>
-        f(anything, against)
-      }
+    anything match {
+      case a: SolidModel if !a.crossable =>
+        anythings.values
+          .collect {
+            case against: SolidModel if !against.crossable && against.id != anything.id => against
+          }
+          //uno shot non si scontra con un altro shot, uno shot non si scontra con il proprietario
+          .filter(against =>
+            (anything, against) match {
+              case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
+              case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
+              case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
+              case _                                                  => true
+            }
+          )
+          .foldLeft(anything) { (anything, against) =>
+            f(anything, against)
+          }
+      case _ => anything
+    }
 
   /**
    * Update an anything position if there is a collision with another element
