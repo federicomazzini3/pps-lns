@@ -9,7 +9,7 @@ import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
 import lns.scenes.game.hud.HUDView
-import lns.scenes.game.anything.{ Dead, FireModel, Hit }
+import lns.scenes.game.anything.FireModel
 import lns.scenes.game.character.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
@@ -20,6 +20,7 @@ import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.shot.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.room.*
+import lns.scenes.game.subsystems.{ BattleEventSubSystems, Hit, Dead }
 import lns.scenes.game.updater.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
@@ -27,13 +28,18 @@ import scala.language.implicitConversions
 
 case class GameContext(room: RoomModel, character: CharacterModel)
 
-final case class GameScene() extends EmptyScene {
+final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
   type SceneModel     = GameModel
   type SceneViewModel = GameViewModel
 
   def name: SceneName = GameScene.name
 
   override def eventFilters: EventFilters = EventFilters.Permissive
+
+  override val subSystems: Set[SubSystem] =
+    Set(
+      BattleEventSubSystems(screenDimensions)
+    )
 
   def modelLens: Lens[Model, SceneModel] =
     Lens(m => m.game, (m, sm) => m.copy(game = sm))
@@ -73,14 +79,6 @@ final case class GameScene() extends EmptyScene {
           model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
         case _ => Outcome(model)
       }
-
-    case Hit(a) =>
-      println("HIT " + a);
-      Outcome(model)
-
-    case Dead(a) =>
-      println("DEAD " + a);
-      Outcome(model)
 
     case PrologEvent.Answer(queryId, substitution) =>
       model match {

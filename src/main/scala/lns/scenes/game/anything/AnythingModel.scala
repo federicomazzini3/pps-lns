@@ -11,6 +11,7 @@ import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.{ ShotEvent, ShotModel }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
+import lns.scenes.game.subsystems.*
 
 import java.util.UUID
 
@@ -385,6 +386,3 @@ trait SolidModel extends AnythingModel {
     .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
     .moveBy(0, shotAreaOffset)
 }
-
-case class Hit(a: AnythingModel)  extends GlobalEvent
-case class Dead(a: AnythingModel) extends GlobalEvent
