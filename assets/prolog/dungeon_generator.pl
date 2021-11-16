@@ -38,7 +38,7 @@ placeBoss(L,P,OL):- filterBossPlaces(L,P,BP), autoPlaceRoom(L,BP,b,OL,_).
 
 % randomType(-RT)
 randomType(i):- maybe(0.15), !.
-randomType(a):- maybe(0.55), !.
+randomType(a):- maybe(0.75), !.
 randomType(e).
 
 % generate(+N,+L,+P,-OL,-OP)

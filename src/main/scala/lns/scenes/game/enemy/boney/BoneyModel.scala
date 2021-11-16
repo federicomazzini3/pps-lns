@@ -53,6 +53,7 @@ case class BoneyModel(
   def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
   def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                         = copyMacro
 }
 
 /**

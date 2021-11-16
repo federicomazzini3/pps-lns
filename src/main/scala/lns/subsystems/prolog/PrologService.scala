@@ -5,6 +5,8 @@ import indigo.*
 import java.util.UUID
 import scala.collection.immutable.{ HashMap, Queue }
 
+import scala.language.implicitConversions
+
 type SessionId = String
 type QueryId   = String
 
@@ -27,51 +29,63 @@ case class Query(id: QueryId, goal: String)
  */
 trait Term {
   def toString: String
+  def toList: List[Term]
 }
 
-/**
- * Represents an atom Term in Prolog
- * @param id
- *   identifier as a string
- */
-case class Atom(val id: String) extends Term {
-  override def toString: String = id
-}
+object Term {
 
-given Conversion[String, Atom] with
-  def apply(s: String): Atom = Atom(s)
+  /**
+   * Represents an atom Term in Prolog
+   * @param id
+   *   identifier as a string
+   */
+  case class Atom(val id: String) extends TermImplementation
 
-/**
- * Represents numbers (integer or float) in Prolog.
- * @param value
- *   float number
- * @param isFloat
- */
-case class Num(val value: Float, val isFloat: Boolean) extends Term {
-  override def toString: String = isFloat match {
-    case true => value.toString
-    case _    => value.toInt.toString
+  given Conversion[String, Atom] with
+    def apply(s: String): Atom = Atom(s)
+
+  /**
+   * Represents numbers (integer or float) in Prolog.
+   * @param value
+   *   float number
+   * @param isFloat
+   */
+  case class Num(val value: Float, val isFloat: Boolean) extends TermImplementation
+
+  /**
+   * Represents a logical variables in Prolog
+   * @param id
+   *   identifier as a string
+   */
+  case class Var(val id: String) extends TermImplementation
+
+  /**
+   * Represents atoms and compound terms in Prolog
+   * @param id
+   *   identifier as a string
+   * @param args
+   *   arguments if term is compound
+   */
+  case class Struct(val atom: Atom, val args: Term*) extends TermImplementation
+
+  sealed trait TermImplementation extends Term {
+    override def toString: String = this match {
+      case Atom(id)            => id
+      case Var(id)             => id
+      case Num(value, true)    => value.toString
+      case Num(value, _)       => value.toInt.toString
+      case Struct(atom, args*) => atom.toString + "(" + args.mkString(", ") + ")";
+    }
+
+    override def toList: List[Term] = this match {
+      case Struct(Atom("."), h, t @ Struct(Atom("."), _, _)) => h :: t
+      case Struct(Atom("."), h, Atom("[]"))                  => h :: Nil
+      case _                                                 => Nil
+    }
   }
-}
 
-/**
- * Represents a logical variables in Prolog
- * @param id
- *   identifier as a string
- */
-case class Var(val id: String) extends Term {
-  override def toString: String = id
-}
+  implicit def toList(t: Term): List[Term] = t.toList
 
-/**
- * Represents atoms and compound terms in Prolog
- * @param id
- *   identifier as a string
- * @param args
- *   arguments if term is compound
- */
-case class Compound(val atom: Atom, val args: Term*) extends Term {
-  override def toString: String = atom.toString + "(" + args.toString + ")";
 }
 
 /**

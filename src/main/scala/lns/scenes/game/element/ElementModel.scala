@@ -6,13 +6,20 @@ import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel, given }
+import lns.core.Macros.copyMacro
 
-case class StoneModel(id: AnythingId, view: () => StoneView[_], boundingBox: BoundingBox, shotAreaOffset: Int)
-    extends SolidModel {
+case class StoneModel(
+    id: AnythingId,
+    view: () => StoneView[_],
+    boundingBox: BoundingBox,
+    shotAreaOffset: Int,
+    crossable: Boolean = false
+) extends SolidModel {
 
   type Model = StoneModel
 
-  val crossable = false
+  def withSolid(crossable: Boolean): Model = copyMacro
+
 }
 
 object ElementModel {

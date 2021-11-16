@@ -2,7 +2,7 @@ package lns.scenes.game.updater
 
 import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
-import lns.scenes.game.anything.*
+import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.room.*
 import lns.scenes.game.shot.*
 import lns.scenes.game.stats.*

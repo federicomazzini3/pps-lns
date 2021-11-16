@@ -216,9 +216,8 @@ trait DynamicModel extends AnythingModel with StatsModel {
     for {
       superObj <- super.update(context)(gameContext)
       (newSpeed, newPosition) = computeMove(context)(gameContext)
-      //boundLocation           = gameContext.room.boundPosition(this, newPosition)(gameContext.character)
-      boundLocation = gameContext.room.boundPosition(newPosition)
-      newObj        = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
+      boundLocation           = gameContext.room.boundPosition(newPosition)
+      newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
     } yield newObj
 
 }
@@ -379,10 +378,11 @@ trait SolidModel extends AnythingModel {
   type Model >: this.type <: SolidModel
 
   val crossable: Boolean
-
   val shotAreaOffset: Int
 
   val shotArea: BoundingBox = boundingBox
     .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
     .moveBy(0, shotAreaOffset)
+
+  def withSolid(crossable: Boolean): Model
 }
