@@ -15,7 +15,7 @@ object Assets {
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] =
-    AnythingAssets.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Elements.assets ++ Explosion.assets ++ Prolog.assets ++ HUD.assets
+    AnythingAssets.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Explosion.assets ++ Prolog.assets ++ HUD.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -208,27 +208,6 @@ object Assets {
       AssetType.Image(crateCovered, AssetPath(baseUrl + specificUrl + "crate-covered.png")),
       AssetType.Image(crateUncovered, AssetPath(baseUrl + specificUrl + "crate-uncovered.png")),
       AssetType.Image(key, AssetPath(baseUrl + specificUrl + "key.png"))
-    )
-
-  }
-
-  object Elements {
-
-    val specificUrl: String = "elements/"
-
-    object Stone {
-      val name: AssetName             = AssetName("stone")
-      val width                       = 145
-      val height                      = 180 //original dimension 128
-      val offsetY                     = 35
-      val scale                       = 1.048
-      val withScale: Double => Double = (size: Double) => size * 1.048
-      val size                        = withScale(width)
-    }
-
-    import Stone.*
-    val assets: Set[AssetType] = Set(
-      AssetType.Image(name, AssetPath(baseUrl + specificUrl + "stone.png"))
     )
   }
 

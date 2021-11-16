@@ -96,13 +96,22 @@ class ParabiteAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
+class StoneAsset extends AnythingAsset {
+  override val name: String  = "stone"
+  override val width: Int    = 145
+  override val height: Int   = 180 //original dimension 128
+  override val offsetY: Int  = 35
+  override val scale: Double = 1.048
+}
+
 object AnythingAssets {
   val assets: Set[AssetType] = Set(
     AssetType.Image(AssetName("character"), AssetPath(Assets.baseUrl + "characters/isaac.png")),
     AssetType.Image(AssetName("boney"), AssetPath(Assets.baseUrl + "enemies/boney.png")),
     AssetType.Image(AssetName("mask"), AssetPath(Assets.baseUrl + "enemies/mask.png")),
     AssetType.Image(AssetName("nerve"), AssetPath(Assets.baseUrl + "enemies/nerve.png")),
-    AssetType.Image(AssetName("parabite"), AssetPath(Assets.baseUrl + "enemies/parabite.png"))
+    AssetType.Image(AssetName("parabite"), AssetPath(Assets.baseUrl + "enemies/parabite.png")),
+    AssetType.Image(AssetName("stone"), AssetPath(Assets.baseUrl + "elements/stone.png"))
   )
 
   val character = new CharacterAsset()
@@ -110,4 +119,5 @@ object AnythingAssets {
   val mask      = new MaskAsset()
   val nerve     = new NerveAsset()
   val parabite  = new ParabiteAsset()
+  val stone     = new StoneAsset()
 }
