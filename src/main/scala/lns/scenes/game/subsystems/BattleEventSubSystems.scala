@@ -40,7 +40,7 @@ case class BattleEventSubSystems(screenDimensions: Rectangle) extends SubSystem:
     SceneUpdateFragment.empty
       .addLayers(
         Layer(
-          BindingKey("game"),
+          BindingKey("battle_consequences"),
           BattleEventView
             .draw(model)
             .withScale(Vector2(BattleEventView.scale(screenDimensions, Assets.Rooms.roomSize)))
@@ -70,7 +70,6 @@ object BattleEventView {
     bc match {
       case Rip(a, _) =>
         a match {
-          //case s: ShotModel => Group()
           case _ => ripAnymation(bc)
         }
       case h: Hurt => Group()

@@ -153,46 +153,11 @@ object Animations {
     val size: Int = 65
 
     def generateBodyFrame: NonEmptyList[Frame] =
-      generateFramesList(
-        List(
-          Frame(Rectangle(size * 0, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 0, size, size), Millis(10)),
-          Frame(Rectangle(size * 0, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 1, size, size), Millis(10)),
-          Frame(Rectangle(size * 0, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 2, size, size), Millis(10)),
-          Frame(Rectangle(size * 0, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 3, size, size), Millis(10)),
-          Frame(Rectangle(size * 0, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 4, size, size), Millis(10)),
-          Frame(Rectangle(size * 0, size * 5, size, size), Millis(10)),
-          Frame(Rectangle(size * 1, size * 5, size, size), Millis(10)),
-          Frame(Rectangle(size * 2, size * 5, size, size), Millis(10)),
-          Frame(Rectangle(size * 3, size * 5, size, size), Millis(10)),
-          Frame(Rectangle(size * 4, size * 5, size, size), Millis(10)),
-          Frame(Rectangle(size * 5, size * 5, size, size), Millis(10))
-        )
-      )
+      val frames = for {
+        i <- Range(0, 6)
+        j <- Range(0, 6)
+      } yield Frame(Rectangle(size * j, size * i, size, size), Millis(10))
+      generateFramesList(frames.toList)
 
     val body: Animation = Animation
       .create(AnimationKey("explosion_animation"), Cycle.create("idle", generateBodyFrame))
