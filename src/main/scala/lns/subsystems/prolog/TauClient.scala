@@ -4,6 +4,7 @@ import scala.collection.immutable.{ HashMap, Queue }
 import scala.language.implicitConversions
 import scala.scalajs.js
 import scala.scalajs.js.Dictionary
+import Term.*
 
 given Conversion[TauNum, Num] with
   def apply(n: TauNum): Num = Num(n.value, n.is_float)
@@ -15,7 +16,7 @@ given Conversion[TauTerm, Term] with
   def apply(t: TauTerm): Term = t.args.length match {
     case 0 => Atom(t.id)
     case _ =>
-      Compound(
+      Struct(
         Atom(t.id),
         t.args
           .map[Term](arg =>

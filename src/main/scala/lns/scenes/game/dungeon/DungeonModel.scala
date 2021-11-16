@@ -54,7 +54,7 @@ object Grid {
 }
 
 enum RoomType:
-  case Empty, Item, Arena, Boss
+  case Start, Empty, Item, Arena, Boss
 
 /**
  * Case class for the abstract dungeon developed by prolog. It stores a Map that contains all the room type and their
@@ -82,7 +82,7 @@ case class DungeonModel(val content: Map[Position, RoomModel]) extends Grid {
    * @return
    *   the first room in dungeon
    */
-  def initialRoom: Position = content.collect { case (pos, EmptyRoom(_, _, _, _)) => pos }.head
+  def initialRoom: Position = content.collect { case (pos, EmptyRoom(_, _, _, _)) => pos }.head //TODO: StartRoom
 
   def updateRoom(position: Position)(updatedRoom: RoomModel): DungeonModel =
     this.copy(content = content.updated(position, updatedRoom))

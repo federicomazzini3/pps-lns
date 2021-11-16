@@ -13,7 +13,8 @@ import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.stats.*
 import lns.scenes.game.element.ElementModel
 
-import lns.subsystems.prolog.{ Atom, Compound, Num, Substitution, Term }
+import lns.subsystems.prolog.{ Substitution, Term }
+import lns.subsystems.prolog.Term.*
 
 import scala.collection.immutable.HashMap
 
@@ -27,8 +28,6 @@ object Generator {
 
   def generateRoom(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
     roomType match {
-      case RoomType.Empty =>
-        RoomModel.emptyRoom(position, generateDoors(grid, position))
       case RoomType.Item =>
         RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
       case RoomType.Arena =>
@@ -40,6 +39,8 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
+      // case RoomType.Start => RoomModel.startRoom(position, generateDoors(grid, position)) //TODO: abilitare
+      case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
@@ -51,24 +52,23 @@ object Generator {
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)
    * @param sub
+   *   the prolog service [[Substitution]] produced
    * @return
+   *   a Map of [[Position]] -> [[RoomType]]
    */
-  def getDungeon(sub: Substitution) = getRooms(sub.links("L"))
+  def getDungeon(sub: Substitution): Map[Position, RoomType] = getRooms(sub.links("L"))
 
   private def getRoomType(roomType: String): RoomType = roomType match {
-    case "s" => RoomType.Empty
+    case "s" => RoomType.Empty // TODO: RoomType.Start
     case "a" => RoomType.Arena
     case "i" => RoomType.Item
-    case "e" => RoomType.Empty
     case "b" => RoomType.Boss
     case _   => RoomType.Empty
   }
 
-  private def getRooms(term: Term): Map[Position, RoomType] =
-    term match {
-      case Atom("[]") => HashMap[Position, RoomType]()
-      case Compound(a, Compound(Atom("room"), Num(x, false), Num(y, false), Atom(roomType)), next) =>
-        getRooms(next) + ((x.toInt, y.toInt) -> getRoomType(roomType))
-      case _ => HashMap[Position, RoomType]()
-    }
+  private def getRooms(terms: List[Term]): Map[Position, RoomType] = terms.collect {
+    case Struct(Atom("room"), Num(x, false), Num(y, false), Atom(roomType)) =>
+      (x.toInt, y.toInt) -> getRoomType(roomType)
+  }.toMap
+
 }
