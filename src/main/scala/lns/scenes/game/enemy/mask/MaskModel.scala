@@ -86,4 +86,19 @@ object MaskModel {
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask
   )
+
+  def initial2: MaskModel = MaskModel(
+    AnythingId.generate,
+    view = () => MaskView,
+    boundingBox = BoundingBox(
+      Vector2(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6),
+      Vector2(
+        withScale(width),
+        withScale(height - offsetY)
+      )
+    ),
+    shotAreaOffset = withScale(-offsetY),
+    stats = Stats.Mask,
+    life = MaxLife @@ Stats.Mask
+  )
 }

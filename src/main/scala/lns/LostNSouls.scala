@@ -40,7 +40,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def scenes(bootData: BootData): NonEmptyList[Scene[StartupData, Model, ViewModel]] = NonEmptyList(
     MenuScene(),
     LoadingScene(),
-    GameScene(),
+    GameScene(bootData.screenDimensions),
     EndScene()
   )
 

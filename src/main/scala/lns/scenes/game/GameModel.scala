@@ -70,8 +70,9 @@ object GameModel {
      * @return
      *   a new GameModel with an updated current Room
      */
-    def updateCurrentRoom(f: RoomModel => RoomModel): Started =
-      this.copy(dungeon = dungeon.updateRoom(currentRoomPosition)(f(currentRoom)))
+    def updateCurrentRoom(f: RoomModel => Outcome[RoomModel]): Outcome[Started] =
+      for (updatedRoom <- f(currentRoom))
+        yield this.copy(dungeon = dungeon.updateRoom(currentRoomPosition)(updatedRoom))
 
     /**
      * Update the GameModel with an updated Character
@@ -80,8 +81,9 @@ object GameModel {
      * @return
      *   a new GameModel with an updated Character
      */
-    def updateCharacter(f: CharacterModel => CharacterModel): Started =
-      this.copy(character = f(character))
+    def updateCharacter(f: CharacterModel => Outcome[CharacterModel]): Outcome[Started] =
+      for (updatedCharacter <- f(character))
+        yield this.copy(character = updatedCharacter)
 
     /**
      * Update the GameModel with an updated collection of anything
@@ -90,7 +92,7 @@ object GameModel {
      * @return
      *   a new GameModel with an updated collection of anythings
      */
-    def updateEachAnythingsCurrentRoom(f: AnythingModel => AnythingModel): GameModel.Started =
+    def updateEachAnythingsCurrentRoom(f: AnythingModel => Outcome[AnythingModel]): Outcome[GameModel.Started] =
       updateCurrentRoom(room => room.updateEachAnything(f))
 
     /**
@@ -101,8 +103,8 @@ object GameModel {
      *   a new GameModel with an updated collection of anythings
      */
     def updateAnythingsCurrentRoom(
-        f: Map[AnythingId, AnythingModel] => Map[AnythingId, AnythingModel]
-    ): GameModel.Started =
+        f: Map[AnythingId, AnythingModel] => Outcome[Map[AnythingId, AnythingModel]]
+    ): Outcome[GameModel.Started] =
       updateCurrentRoom(room => room.updateAnythings(f))
 
     /**
@@ -110,11 +112,11 @@ object GameModel {
      * @return
      *   a new GameModel with an updated current Room and an updated Character
      */
-    def updateWithPassage: Started =
+    def updateWithPassage: Outcome[Started] =
       val (newRoom, movedCharacter) = PassageUpdater(dungeon, currentRoom, character)
       this
         .changeCurrentRoom(newRoom)
-        .updateCharacter(character => movedCharacter)
+        .updateCharacter(character => Outcome(movedCharacter))
 
     /**
      * Update stats of anythings when they collide each other
@@ -122,30 +124,41 @@ object GameModel {
      * @return
      *   a new GameModel with an updated collection of anythings
      */
-    def updateStatsAfterCollision(context: FrameContext[StartupData]): GameModel.Started =
-      this
-        .updateCharacter(character =>
-          CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context)).asInstanceOf[CharacterModel]
+    def updateStatsAfterCollision(context: FrameContext[StartupData]): Outcome[GameModel.Started] =
+      for {
+        modelWithUpdatedCharacter <- this
+          .updateCharacter(character =>
+            CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context))
+              .map(c => c.asInstanceOf[CharacterModel])
+          )
+        modelWithUpdatedAnything <- modelWithUpdatedCharacter.updateEachAnythingsCurrentRoom(anything =>
+          for (a <- CollisionUpdater(anything)(this.allAnythings)(updateLife(context)))
+            yield a
         )
-        .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateLife(context)))
-        .updateAnythingsCurrentRoom(anythings =>
-          anythings.filter {
+        modelWithoutDeadAnythings <- modelWithUpdatedAnything.updateAnythingsCurrentRoom(anythings =>
+          Outcome(anythings.filter {
             case (id, elem: AliveModel) if elem.life <= 0 => false
             case _                                        => true
-          }
+          })
         )
+      } yield modelWithoutDeadAnythings
 
     /**
      * Update position of anythings when they collide each other
      * @return
      *   a new GameModel with an updated collection of anythings
      */
-    def updateMovementAfterCollision: GameModel.Started =
-      this
-        .updateCharacter(character =>
-          CollisionUpdater(character)(this.currentRoom.anythings)(updateMove).asInstanceOf[CharacterModel]
+    def updateMovementAfterCollision: Outcome[GameModel.Started] =
+      for {
+        modelWithUpdatedCharacter <- this
+          .updateCharacter(character =>
+            CollisionUpdater(character)(this.currentRoom.anythings)(updateMove)
+              .map(c => c.asInstanceOf[CharacterModel])
+          )
+        modelWithUpdatedAnythings <- modelWithUpdatedCharacter.updateEachAnythingsCurrentRoom(anything =>
+          CollisionUpdater(anything)(this.allAnythings)(updateMove)
         )
-        .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateMove))
+      } yield modelWithUpdatedAnythings
   }
 
   def initial: GameModel = NotStarted(PrologClient())

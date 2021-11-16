@@ -11,6 +11,7 @@ import lns.scenes.game.room.{ Boundary, RoomModel }
 import lns.scenes.game.shot.{ ShotEvent, ShotModel }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
+import lns.scenes.game.subsystems.*
 
 import java.util.UUID
 
@@ -243,8 +244,8 @@ trait AliveModel extends AnythingModel with StatsModel {
    *   the Outcome of the updated model
    */
   def hit(context: FrameContext[StartupData], damage: Double): Outcome[Model] = invincibilityTimer match {
-    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats))
-    case 0                      => Outcome(withAlive(0, 0))
+    case 0 if life - damage > 0 => Outcome(withAlive(life - damage, Invincibility @@ stats)).addGlobalEvents(Hit(this))
+    case 0                      => Outcome(withAlive(0, 0)).addGlobalEvents(Dead(this))
     case _                      => Outcome(this)
   }
 

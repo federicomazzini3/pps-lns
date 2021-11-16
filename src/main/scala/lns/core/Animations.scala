@@ -1,12 +1,14 @@
 package lns.core
 
 import indigo.*
+import lns.core.Animations.Explosion.size
 import lns.scenes.game.anything.{ DynamicState, FireState }
 import lns.scenes.game.enemy.EnemyState
 
 object Animations {
 
-  def apply(): List[Animation] = List(Character.head, Character.body, Boney.body, Nerve.body, Parabite.body)
+  def apply(): List[Animation] =
+    List(Character.head, Character.body, Boney.body, Nerve.body, Parabite.body, Explosion.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
@@ -144,6 +146,21 @@ object Animations {
       .addCycle(Cycle.create("hiding", generateHidingFrame))
       .addCycle(Cycle.create("wakeup", generateWakeupFrame))
       .addCycle(Cycle.create("idle", generateIdleFrame(0, 0)))
+  }
+
+  object Explosion {
+
+    val size: Int = 65
+
+    def generateBodyFrame: NonEmptyList[Frame] =
+      val frames = for {
+        i <- Range(0, 6)
+        j <- Range(0, 6)
+      } yield Frame(Rectangle(size * j, size * i, size, size), Millis(10))
+      generateFramesList(frames.toList)
+
+    val body: Animation = Animation
+      .create(AnimationKey("explosion_animation"), Cycle.create("idle", generateBodyFrame))
   }
 
 }

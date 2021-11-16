@@ -20,6 +20,7 @@ import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.shot.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.room.*
+import lns.scenes.game.subsystems.{ BattleEventSubSystems, Hit, Dead }
 import lns.scenes.game.updater.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
@@ -27,13 +28,18 @@ import scala.language.implicitConversions
 
 case class GameContext(room: RoomModel, character: CharacterModel)
 
-final case class GameScene() extends EmptyScene {
+final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
   type SceneModel     = GameModel
   type SceneViewModel = GameViewModel
 
   def name: SceneName = GameScene.name
 
   override def eventFilters: EventFilters = EventFilters.Permissive
+
+  override val subSystems: Set[SubSystem] =
+    Set(
+      BattleEventSubSystems(screenDimensions)
+    )
 
   def modelLens: Lens[Model, SceneModel] =
     Lens(m => m.game, (m, sm) => m.copy(game = sm))
@@ -44,30 +50,18 @@ final case class GameScene() extends EmptyScene {
       context: FrameContext[StartupData],
       model: SceneModel
   ): GlobalEvent => Outcome[SceneModel] = {
-    case ShotEvent(shot) =>
-      model match {
-        case model @ GameModel.Started(_, room, _) =>
-          model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
-        case _ => Outcome(model)
-      }
-
     case FrameTick =>
       model match {
 
         case model @ GameModel.Started(dungeon, roomIndex, character) =>
           val gameContext = GameContext(model.currentRoom, character)
           for {
-            updatedCharacter <- character.update(context)(gameContext)
-            updatedRoom      <- model.currentRoom.update(context)(character)
-            //model     <- model.updateCurrentRoom(room)
-            //model     <- model.updateCharacter(character)
-            //(newRoom, newCharacter) = Passage.verifyPassage(dungeon, room, character)
-          } yield model
-            .updateCharacter(character => updatedCharacter)
-            .updateCurrentRoom(room => updatedRoom)
-            .updateWithPassage
-            .updateStatsAfterCollision(context)
-            .updateMovementAfterCollision
+            updatedCharacter <- model.updateCharacter(c => character.update(context)(gameContext))
+            updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(context)(character))
+            withPassage      <- updatedRoom.updateWithPassage
+            withStats        <- withPassage.updateStatsAfterCollision(context)
+            withMovements    <- withStats.updateMovementAfterCollision
+          } yield withMovements
 
         case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
@@ -77,6 +71,13 @@ final case class GameScene() extends EmptyScene {
             )
             .map(pi => model.copy(prologClient = pi))
         case _ => model
+      }
+
+    case ShotEvent(shot) =>
+      model match {
+        case model @ GameModel.Started(_, room, _) =>
+          model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
+        case _ => Outcome(model)
       }
 
     case PrologEvent.Answer(queryId, substitution) =>
