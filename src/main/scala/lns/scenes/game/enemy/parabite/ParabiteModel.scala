@@ -2,7 +2,7 @@ package lns.scenes.game.enemy.parabite
 
 import indigo.*
 import indigo.shared.FrameContext
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
@@ -84,18 +84,13 @@ case class ParabiteModel(
  * Factory of [[ParabiteModel]]
  */
 object ParabiteModel {
-  import Assets.Enemies.Parabite.*
+  import lns.core.AnythingAssets.*
+
   def initial: ParabiteModel = ParabiteModel(
     AnythingId.generate,
     view = () => ParabiteView,
-    boundingBox = BoundingBox(
-      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vector2(
-        withScale(width),
-        withScale(height - offsetY)
-      )
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = parabite.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = parabite.shotAreaOffset,
     stats = Stats.Parabite,
     life = MaxLife @@ Stats.Parabite
   )

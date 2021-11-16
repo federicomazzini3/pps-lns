@@ -3,7 +3,6 @@ package lns.scenes.game.character
 import indigo.*
 import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
-import lns.core.Assets.Character.*
 
 /**
  * Base view for a [[CharacterModel]]
@@ -25,17 +24,7 @@ object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     model.life match {
       case 0 => Group()
-      case _ =>
-        Group()
-          //.addChild(boundingModel)
-          .addChild(
-            Group()
-              .withRef(0, offsetY)
-              .addChild(shadowModel)
-              .addChild(bodyView(model))
-              .addChild(headView(model, viewModel))
-          )
-          .withScale(Vector2(5, 5))
+      case _ => drawComponents(List(shadowModel, bodyView(model), headView(model, viewModel)))
     }
 
 }

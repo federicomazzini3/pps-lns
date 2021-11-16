@@ -9,7 +9,7 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
 import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
 /**
@@ -93,16 +93,13 @@ case class CharacterModel(
  * Factory of [[CharacterModel]]
  */
 object CharacterModel {
-  import Assets.Rooms.*
-  import Assets.Character.*
+  import lns.core.AnythingAssets.*
+
   def initial: CharacterModel = CharacterModel(
     id = AnythingId.generate,
     view = () => CharacterView,
-    boundingBox = BoundingBox(
-      Vertex(floorSize / 2, floorSize / 2),
-      Vertex(withScale(width), withScale(height - offsetY))
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = character.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = character.shotAreaOffset,
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

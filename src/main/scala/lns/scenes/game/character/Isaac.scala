@@ -2,8 +2,8 @@ package lns.scenes.game.character
 
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
-import lns.core.Assets
 import lns.core.Animations.*
+import lns.core.*
 import lns.scenes.game.anything.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
@@ -11,35 +11,34 @@ import lns.scenes.game.stats.PropertyName.*
 /**
  * Isaac Character view elements builder
  */
-trait Isaac {
-  import Assets.Character.*
+trait Isaac extends CharacterAsset {
 
-  val shadowModel: Shape =
-    Shape
-      .Circle(
-        center = Point(width / 2, height + width / 4),
-        radius = width / 3,
-        Fill.Color(RGBA(0, 0, 0, 0.4))
-      )
-      .scaleBy(1, 0.25)
+  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("character_body")
 
-  val boundingModel: Shape =
-    Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height - offsetY)),
-      Fill.Color(RGBA(1, 1, 1, 0.5))
-    )
+  /**
+   * Builds the head view
+   *
+   * @param model
+   *   the [[CharacterModel]]
+   * @return
+   *   head view Graphic
+   */
+  def headView(model: CharacterModel, viewModel: CharacterViewModel): Graphic[Material.Bitmap] =
+    Graphic(headAnimation(model, viewModel), 1, Material.Bitmap(asset))
+      .withRef(0, 0)
+      .moveTo(0, 0)
 
-  val bodySprite: Sprite[Material.Bitmap] =
-    Sprite(
-      BindingKey("character_body_sprite"),
-      0,
-      0,
-      1,
-      AnimationKey("character_body"),
-      Material.Bitmap(Assets.Character.character)
-    )
-
-  def headManualAnimation(model: CharacterModel, viewModel: CharacterViewModel): Rectangle =
+  /**
+   * Manual Animation for the head. The right frame is selected based on the FireState and DynamicState
+   *
+   * @param model
+   *   the [[CharacterModel]]
+   * @param viewModel
+   *   the [[CharacterViewModel]]
+   * @return
+   *   Cropped Rectangle of the asset
+   */
+  def headAnimation(model: CharacterModel, viewModel: CharacterViewModel): Rectangle =
     viewModel.fireAnimationTimer match {
       case x if x > 0 && x > FireRate @@ model.stats / 2 =>
         Character.headCrop(viewModel.fireState, false)
@@ -51,22 +50,18 @@ trait Isaac {
         }
     }
 
-  def headView(model: CharacterModel, viewModel: CharacterViewModel): Graphic[Material.Bitmap] =
-    Graphic(headManualAnimation(model, viewModel), 1, Material.Bitmap(Assets.Character.character))
-      .withRef(0, 0)
-      .moveTo(0, 0)
-
   /**
-   * Builds the body view Sprite
+   * Builds the body view
    * @param model
    *   the [[CharacterModel]]
    * @return
    *   body view Sprite
    */
-  def bodyView(model: CharacterModel): Sprite[Material.Bitmap] = bodyAnimation(model)
-    .withRef(Character.bodyWidth / 2, 0)
-    .flipHorizontal(bodyFlip(model))
-    .moveTo(width / 2, 20)
+  def bodyView(model: CharacterModel): Sprite[Material.Bitmap] =
+    bodyAnimation(model)
+      .withRef(Character.bodyWidth / 2, 0)
+      .flipHorizontal(bodyFlip(model))
+      .moveTo(width / 2, 20)
 
   /**
    * Plays the animation cycle if the character is moving
@@ -102,39 +97,4 @@ trait Isaac {
     case _                      => false
   }
 
-  /*
-   val headSprite: Sprite[Material.Bitmap] =
-     Sprite(
-       BindingKey("character_head_sprite"),
-       0,
-       0,
-       1,
-       AnimationKey("character_head"),
-       Material.Bitmap(Assets.Character.character)
-     )
-
-   def headAnimation(model: CharacterModel, viewModel: CharacterViewModel): Sprite[Material.Bitmap] =
-     viewModel.fireAnimationTimer match {
-       case x if x > 0 => headSprite.changeCycle(headAnimationFiringCycle(viewModel.fireState)).play()
-       case _ =>
-         model.isFiring() match {
-           case true => headSprite.changeCycle(headAnimationFiringCycle(model.getFireState())).jumpToFirstFrame().play()
-           case _    => headSprite.changeCycle(headAnimationMovingCycle(model.getDynamicState())).jumpToLastFrame()
-         }
-     }
-
-   def headAnimationFiringCycle(state: FireState): CycleLabel = state match {
-     case FireState.FIRE_UP    => CycleLabel("up_shot")
-     case FireState.FIRE_RIGHT => CycleLabel("right_shot")
-     case FireState.FIRE_LEFT  => CycleLabel("left_shot")
-     case _                    => CycleLabel("down_shot")
-   }
-
-   def headAnimationMovingCycle(state: DynamicState): CycleLabel = state match {
-     case DynamicState.MOVE_UP    => CycleLabel("up_shot")
-     case DynamicState.MOVE_RIGHT => CycleLabel("right_shot")
-     case DynamicState.MOVE_LEFT  => CycleLabel("left_shot")
-     case _                       => CycleLabel("down_shot")
-   }
-   */
 }
