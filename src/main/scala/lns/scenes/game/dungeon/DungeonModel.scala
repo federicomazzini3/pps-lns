@@ -16,6 +16,7 @@ type Position = (Int, Int)
 trait Grid {
   type Room
   val content: Map[Position, Room]
+  val initialRoom: Position
 }
 
 object Grid {
@@ -62,12 +63,14 @@ enum RoomType:
  */
 case class BasicGrid(val content: Map[Position, RoomType]) extends Grid {
   override type Room = RoomType
+
+  val initialRoom: Position = content.collect { case (pos, RoomType.Start) => pos }.head
 }
 
 /**
  * Case class of the entire Dungeon. It stores a Map that contains all the room and their position
  */
-case class DungeonModel(val content: Map[Position, RoomModel]) extends Grid {
+case class DungeonModel(val content: Map[Position, RoomModel], val initialRoom: Position) extends Grid {
   override type Room = RoomModel
 
   def room(position: Position): Option[RoomModel] = Grid.in(this)(position)
@@ -76,13 +79,6 @@ case class DungeonModel(val content: Map[Position, RoomModel]) extends Grid {
 
   def nearPosition(position: Position)(location: Location): Option[(Int, Int)] =
     Grid.nearPosition(position)(location)
-
-  /**
-   * Retrieve the empty room of the dungeon where the game has to start
-   * @return
-   *   the first room in dungeon
-   */
-  def initialRoom: Position = content.collect { case (pos, EmptyRoom(_, _, _, _)) => pos }.head //TODO: StartRoom
 
   def updateRoom(position: Position)(updatedRoom: RoomModel): DungeonModel =
     this.copy(content = content.updated(position, updatedRoom))

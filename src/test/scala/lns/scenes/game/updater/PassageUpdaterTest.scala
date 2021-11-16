@@ -25,7 +25,8 @@ class PassageUpdaterTest extends AnyFreeSpec {
       rightRoom.positionInDungeon   -> rightRoom,
       aboveRoom.positionInDungeon   -> aboveRoom,
       belowRoom.positionInDungeon   -> belowRoom
-    )
+    ),
+    initialRoom.positionInDungeon
   )
 
   object Speed {

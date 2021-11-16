@@ -23,7 +23,8 @@ object Generator {
   def apply(grid: BasicGrid): DungeonModel =
     DungeonModel(
       grid.content
-        .map((position, roomType) => (position, generateRoom(grid, position, roomType)))
+        .map((position, roomType) => (position, generateRoom(grid, position, roomType))),
+      grid.initialRoom
     )
 
   def generateRoom(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
@@ -39,7 +40,7 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      // case RoomType.Start => RoomModel.startRoom(position, generateDoors(grid, position)) //TODO: abilitare
+      //case RoomType.Start => RoomModel.startRoom(position, generateDoors(grid, position))
       case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
     }
 
@@ -59,7 +60,7 @@ object Generator {
   def getDungeon(sub: Substitution): Map[Position, RoomType] = getRooms(sub.links("L"))
 
   private def getRoomType(roomType: String): RoomType = roomType match {
-    case "s" => RoomType.Empty // TODO: RoomType.Start
+    case "s" => RoomType.Start
     case "a" => RoomType.Arena
     case "i" => RoomType.Item
     case "b" => RoomType.Boss
