@@ -23,14 +23,19 @@ object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
   def viewModel: (id: AnythingId) => ViewModel = CharacterViewModel.initial
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    Group()
-      //.addChild(boundingModel)
-      .addChild(
+    model.life match {
+      case 0 => Group()
+      case _ =>
         Group()
-          .withRef(0, offsetY)
-          .addChild(shadowModel)
-          .addChild(bodyView(model))
-          .addChild(headView(model, viewModel))
-      )
-      .withScale(Vector2(5, 5))
+          //.addChild(boundingModel)
+          .addChild(
+            Group()
+              .withRef(0, offsetY)
+              .addChild(shadowModel)
+              .addChild(bodyView(model))
+              .addChild(headView(model, viewModel))
+          )
+          .withScale(Vector2(5, 5))
+    }
+
 }

@@ -142,18 +142,6 @@ object GameModel {
           })
         )
       } yield modelWithoutDeadAnythings
-    /*this
-        .updateCharacter(character =>
-          for (c <- CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context)))
-            yield c.asInstanceOf[CharacterModel]
-        )
-        .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateLife(context)))
-        .updateAnythingsCurrentRoom(anythings =>
-          anythings.filter {
-            case (id, elem: AliveModel) if elem.life <= 0 => false
-            case _                                        => true
-          }
-        )*/
 
     /**
      * Update position of anythings when they collide each other
@@ -171,12 +159,6 @@ object GameModel {
           CollisionUpdater(anything)(this.allAnythings)(updateMove)
         )
       } yield modelWithUpdatedAnythings
-    /*this
-        .updateCharacter(character =>
-          CollisionUpdater(character)(this.currentRoom.anythings)(updateMove)
-            .map(c => c.asInstanceOf[CharacterModel])
-        )
-        .updateEachAnythingsCurrentRoom(anything => CollisionUpdater(anything)(this.allAnythings)(updateMove))*/
   }
 
   def initial: GameModel = NotStarted(PrologClient())
