@@ -93,8 +93,14 @@ object CollisionUpdater {
           case _ =>
             Collision.withElement(against.boundingBox, anything.boundingBox)
         } match {
-          case Some(a, b) =>
-            anything.hit(context, PropertyName.Damage @@ against.stats)
+          case Some(_, _) =>
+            anything.hit(
+              context,
+              anything match {
+                case s: ShotModel => s.life
+                case _            => PropertyName.Damage @@ against.stats
+              }
+            )
           case _ => Outcome(anything)
         }
       case _ => Outcome(anything)
