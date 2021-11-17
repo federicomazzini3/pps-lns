@@ -11,9 +11,9 @@ import lns.subsystems.prolog.AsyncSession
 import scala.collection.immutable.HashMap
 
 case class MockClient(
-    val theory: String,
-    val query: Option[Query],
-    val results: List[(QueryId, Substitution)] = List[(QueryId, Substitution)]()
+    theory: String,
+    query: Option[Query],
+    results: List[(QueryId, Substitution)] = List[(QueryId, Substitution)]()
 ) extends AsyncSession {
 
   def withResults(results: List[(QueryId, Substitution)]) = copy(results = results)
@@ -37,13 +37,13 @@ trait PrologSystemFixture extends ContextFixture with BeforeAndAfterEach { this:
   var system: PrologService            = _
   var systemWithResults: PrologService = _
 
-  object MockClientFactory extends AsyncSessionFactory {
-    def create(theory: String, query: Option[Query] = None): AsyncSession = new MockClient(theory, query)
+  object MockClientFactory extends ((String, Option[Query]) => AsyncSession) {
+    def apply(theory: String, query: Option[Query] = None): AsyncSession = MockClient(theory, query)
   }
 
-  object MockClientWithResultsFactory extends AsyncSessionFactory {
-    def create(theory: String, query: Option[Query] = None): AsyncSession =
-      new MockClient(theory, query).withResults(List((queryId, substitution)))
+  object MockClientWithResultsFactory extends ((String, Option[Query]) => AsyncSession) {
+    def apply(theory: String, query: Option[Query] = None): AsyncSession =
+      MockClient(theory, query).withResults(List((queryId, substitution)))
   }
 
   override def beforeEach() = {

@@ -89,7 +89,3 @@ case class TauClient(theory: String, query: Option[Query] = None) extends AsyncS
   } yield (queryId, result)
 
 }
-
-object TauClientFactory extends AsyncSessionFactory {
-  def create(theory: String, query: Option[Query] = None): TauClient = TauClient(theory, query)
-}

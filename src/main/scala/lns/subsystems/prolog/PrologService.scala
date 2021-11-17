@@ -134,12 +134,6 @@ trait AsyncSession {
   def getAllAnswersResults: List[(QueryId, Substitution)]
 }
 
-// TODO: Pattern strategy -> factories as functions
-//  (theory: String, query: Option[Query] = None) => AsyncSession
-trait AsyncSessionFactory {
-  def create(theory: String, query: Option[Query] = None): AsyncSession
-}
-
 /**
  * An Indigo SubSystem that represent a prolog query service. Like an autonomous actor intercepting messages/events of
  * type PrologCommand on every game loop cycle. Also, every FrameTick it checks every AsyncSession for an answer result
@@ -147,7 +141,7 @@ trait AsyncSessionFactory {
  * @param sessionFactory
  *   used to create an AsyncSession
  */
-case class PrologService(sessionFactory: AsyncSessionFactory) extends SubSystem:
+case class PrologService(sessionFactory: (theory: String, query: Option[Query]) => AsyncSession) extends SubSystem:
   type EventType      = GlobalEvent
   type SubSystemModel = Map[SessionId, AsyncSession]
 
@@ -162,7 +156,7 @@ case class PrologService(sessionFactory: AsyncSessionFactory) extends SubSystem:
 
   def update(context: SubSystemFrameContext, model: SubSystemModel): GlobalEvent => Outcome[SubSystemModel] = {
     case PrologCommand.Consult(sessionId, theory, query) if !model.isDefinedAt(sessionId) =>
-      Outcome(model + (sessionId -> sessionFactory.create(theory, query)))
+      Outcome(model + (sessionId -> sessionFactory(theory, query)))
 
     case FrameTick =>
       val newAnswerEvents = for {

@@ -9,7 +9,7 @@ import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
-import lns.subsystems.prolog.{ loadTauProlog, PrologService, TauClientFactory }
+import lns.subsystems.prolog.{ loadTauProlog, PrologService, TauClient }
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -59,7 +59,7 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
       BootResult(config, BootData(config.screenDimensions))
         .withAssets(Assets.initialAssets())
         .withFonts(Assets.initialFont())
-        .withSubSystems(PrologService(TauClientFactory))
+        .withSubSystems(PrologService(TauClient.apply))
     )
   }
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
