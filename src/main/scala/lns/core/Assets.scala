@@ -15,7 +15,7 @@ object Assets {
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] =
-    Character.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Elements.assets ++ Prolog.assets ++ Enemies.assets ++ Explosion.assets ++ HUD.assets
+    AnythingAssets.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Explosion.assets ++ Prolog.assets ++ HUD.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")
@@ -106,73 +106,6 @@ object Assets {
 
     val assets: Set[AssetType] = Set(
       AssetType.Text(dungeon, AssetPath(baseUrl + specificUrl + "dungeon_generator.pl"))
-    )
-  }
-
-  object Character {
-    val specificUrl: String = "characters/"
-
-    val width   = 28
-    val height  = 33
-    val offsetY = 18
-
-    val withScale: Int => Int = (size: Int) => size * 5
-
-    val character: AssetName = AssetName("character")
-
-    val assets: Set[AssetType] = Set(
-      AssetType.Image(character, AssetPath(baseUrl + specificUrl + "isaac.png"))
-    )
-  }
-
-  object Enemies {
-    val specificUrl: String = "enemies/"
-
-    object Boney {
-      val width                 = 28
-      val height                = 33
-      val offsetY               = 13
-      val withScale: Int => Int = (size: Int) => size * 5
-
-      val name = AssetName("boney")
-      val path = AssetPath(baseUrl + specificUrl + "boney.png")
-    }
-
-    object Mask {
-      val width                 = 28
-      val height                = 32
-      val offsetY               = 0
-      val withScale: Int => Int = (size: Int) => size * 5
-
-      val name = AssetName("mask")
-      val path = AssetPath(baseUrl + specificUrl + "mask.png")
-    }
-
-    object Nerve {
-      val width                 = 26
-      val height                = 50
-      val offsetY               = 30
-      val withScale: Int => Int = (size: Int) => size * 5
-
-      val name = AssetName("nerve")
-      val path = AssetPath(baseUrl + specificUrl + "nerve.png")
-    }
-
-    object Parabite {
-      val width                 = 26
-      val height                = 33
-      val offsetY               = 13
-      val withScale: Int => Int = (size: Int) => size * 5
-
-      val name = AssetName("parabite")
-      val path = AssetPath(baseUrl + specificUrl + "parabite.png")
-    }
-
-    val assets: Set[AssetType] = Set(
-      AssetType.Image(Boney.name, Boney.path),
-      AssetType.Image(Mask.name, Mask.path),
-      AssetType.Image(Nerve.name, Nerve.path),
-      AssetType.Image(Parabite.name, Parabite.path)
     )
   }
 
@@ -275,27 +208,6 @@ object Assets {
       AssetType.Image(crateCovered, AssetPath(baseUrl + specificUrl + "crate-covered.png")),
       AssetType.Image(crateUncovered, AssetPath(baseUrl + specificUrl + "crate-uncovered.png")),
       AssetType.Image(key, AssetPath(baseUrl + specificUrl + "key.png"))
-    )
-
-  }
-
-  object Elements {
-
-    val specificUrl: String = "elements/"
-
-    object Stone {
-      val name: AssetName             = AssetName("stone")
-      val width                       = 145
-      val height                      = 180 //original dimension 128
-      val offsetY                     = 35
-      val scale                       = 1.048
-      val withScale: Double => Double = (size: Double) => size * 1.048
-      val size                        = withScale(width)
-    }
-
-    import Stone.*
-    val assets: Set[AssetType] = Set(
-      AssetType.Image(name, AssetPath(baseUrl + specificUrl + "stone.png"))
     )
   }
 

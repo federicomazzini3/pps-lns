@@ -3,32 +3,30 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Parabite
-import lns.core.{ Animations, Assets }
+import lns.core.*
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.enemy.EnemyState
 
 /**
  * Isaac Character view elements builder
  */
-trait Parabite {
+trait Parabite extends ParabiteAsset {
 
-  import Assets.Enemies.Parabite.*
+  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("parabite_body")
 
-  val boundingModel: Shape =
-    Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height - offsetY)),
-      Fill.Color(RGBA(1, 1, 1, 0.5))
-    )
-
-  val bodySprite: Sprite[Material.Bitmap] =
-    Sprite(
-      BindingKey("parabite_body_sprite"),
-      0,
-      0,
-      1,
-      AnimationKey("parabite_body"),
-      Material.Bitmap(name)
-    )
+  /**
+   * Builds the body view
+   *
+   * @param model
+   *   the [[BoneyModel]]
+   * @return
+   *   body view Sprite
+   */
+  def bodyView(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
+    bodyAnimation(model, viewModel)
+      .withRef(Parabite.bodyWidth / 2, 0)
+      .flipHorizontal(toFlip(model))
+  // .moveTo(width / 2, 0)
 
   /**
    * An asset image may be represented only in right position instead of left + right. In this case we need to flip it
@@ -43,20 +41,6 @@ trait Parabite {
     case DynamicState.MOVE_LEFT => true
     case _                      => false
   }
-
-  /**
-   * Builds the body view Sprite
-   *
-   * @param model
-   *   the [[BoneyModel]]
-   * @return
-   *   body view Sprite
-   */
-  def bodyView(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
-    bodyAnimation(model, viewModel)
-      .withRef(Parabite.bodyWidth / 2, 0)
-      .flipHorizontal(toFlip(model))
-  // .moveTo(width / 2, 0)
 
   /**
    * Calculates current animation frame for the hiding animation

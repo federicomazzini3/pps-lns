@@ -65,7 +65,7 @@ object Animations {
   }
 
   object Boney {
-    /*Enemy head*/
+    /*Boney head*/
     val headWidth: Int  = 28
     val headHeight: Int = 25
 
@@ -80,7 +80,7 @@ object Animations {
         Rectangle(0, 0, headWidth, headHeight)
     }
 
-    /*Enemy body*/
+    /*Boney body*/
     val bodyWidth: Int  = 18
     val bodyHeight: Int = 13
 
@@ -94,8 +94,25 @@ object Animations {
       .addCycle(Cycle.create("walking_up_down", generateBodyFrame(0, 35)))
   }
 
-  object Nerve {
+  object Mask {
+    /*Mask head*/
+    val headWidth: Int  = 28
+    val headHeight: Int = 33
 
+    def headCrop(state: FireState | DynamicState): Rectangle = state match {
+      case FireState.FIRE_LEFT | DynamicState.MOVE_LEFT =>
+        Rectangle(2, 0, headWidth, headHeight)
+      case FireState.FIRE_RIGHT | DynamicState.MOVE_RIGHT =>
+        Rectangle(2, 32, headWidth, headHeight)
+      case FireState.FIRE_UP | DynamicState.MOVE_UP =>
+        Rectangle(34, 0, headWidth, headHeight)
+      case _ =>
+        Rectangle(34, 32, headWidth, headHeight)
+    }
+  }
+
+  object Nerve {
+    /*Nerve body*/
     val bodyWidth: Int  = 26
     val bodyHeight: Int = 50
 
@@ -109,7 +126,6 @@ object Animations {
   }
 
   object Parabite {
-
     /*Enemy body*/
     val offset                    = 309
     val bodyWidth: Int            = 26

@@ -3,33 +3,17 @@ package lns.scenes.game.enemy.nerve
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Nerve
-import lns.core.Assets
+import lns.core.*
 
 /**
  * Nerve Enemy view elements builder
  */
-trait Nerve {
+trait Nerve extends NerveAsset {
 
-  import Assets.Enemies.Nerve.*
-
-  val boundingModel: Shape =
-    Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height - offsetY)),
-      Fill.Color(RGBA(1, 1, 1, 0.5))
-    )
-
-  val bodySprite: Sprite[Material.Bitmap] =
-    Sprite(
-      BindingKey("nerve_body_sprite"),
-      0,
-      0,
-      1,
-      AnimationKey("nerve_body"),
-      Material.Bitmap(name)
-    )
+  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("nerve_body")
 
   /**
-   * Builds the body view Sprite
+   * Builds the body view
    *
    * @param model
    *   the [[NerveModel]]

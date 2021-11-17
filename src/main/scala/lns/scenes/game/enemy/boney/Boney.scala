@@ -3,45 +3,43 @@ package lns.scenes.game.enemy.boney
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Boney
-import lns.core.Assets
+import lns.core.*
 import lns.scenes.game.anything.DynamicState
 
 /**
  * Isaac Character view elements builder
  */
-trait Boney {
+trait Boney extends BoneyAsset {
 
-  import Assets.Enemies.Boney.*
+  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("boney_body")
 
-  val shadowModel: Shape =
-    Shape
-      .Circle(
-        center = Point(width / 2, height + width / 4),
-        radius = width / 3,
-        Fill.Color(RGBA(0, 0, 0, 0.4))
-      )
-      .scaleBy(1, 0.25)
-
-  val boundingModel: Shape =
-    Shape.Box(
-      Rectangle(Point(0, 0), Size(width, height - offsetY)),
-      Fill.Color(RGBA(1, 1, 1, 0.5))
-    )
-
-  val bodySprite: Sprite[Material.Bitmap] =
-    Sprite(
-      BindingKey("boney_body_sprite"),
-      0,
-      0,
-      1,
-      AnimationKey("boney_body"),
-      Material.Bitmap(name)
-    )
-
-  /*
-  def headManualAnimation(model: EnemyModel, viewModel: EnemyViewModel): Rectangle =
-    Boney.headCrop(model.getDynamicState())
+  /**
+   * Builds the head view
+   *
+   * @param model
+   *   the [[BoneyModel]]
+   * @return
+   *   head view Graphic
    */
+  def headView(model: BoneyModel): Graphic[Material.Bitmap] =
+    Graphic(Boney.headCrop(model.getDynamicState()), 1, Material.Bitmap(asset))
+      .withRef(0, 0)
+      .flipHorizontal(toFlip(model))
+      .moveTo(0, 0)
+
+  /**
+   * Builds the body view
+   *
+   * @param model
+   *   the [[BoneyModel]]
+   * @return
+   *   body view Sprite
+   */
+  def bodyView(model: BoneyModel): Sprite[Material.Bitmap] =
+    bodyAnimation(model)
+      .withRef(Boney.bodyWidth / 2, 0)
+      .flipHorizontal(toFlip(model))
+      .moveTo(width / 2, 20)
 
   /**
    * An asset image may be represented only in right position instead of left + right. In this case we need to flip it
@@ -56,25 +54,6 @@ trait Boney {
     case DynamicState.MOVE_LEFT => true
     case _                      => false
   }
-
-  def headView(model: BoneyModel): Graphic[Material.Bitmap] =
-    Graphic(Boney.headCrop(model.getDynamicState()), 1, Material.Bitmap(name))
-      .withRef(0, 0)
-      .flipHorizontal(toFlip(model))
-      .moveTo(0, 0)
-
-  /**
-   * Builds the body view Sprite
-   *
-   * @param model
-   *   the [[BoneyModel]]
-   * @return
-   *   body view Sprite
-   */
-  def bodyView(model: BoneyModel): Sprite[Material.Bitmap] = bodyAnimation(model)
-    .withRef(Boney.bodyWidth / 2, 0)
-    .flipHorizontal(toFlip(model))
-    .moveTo(width / 2, 20)
 
   /**
    * Plays the animation cycle if the character is moving
@@ -99,4 +78,5 @@ trait Boney {
     case DynamicState.MOVE_LEFT | DynamicState.MOVE_RIGHT => CycleLabel("walking_left_right")
     case _                                                => CycleLabel("walking_up_down")
   }
+
 }

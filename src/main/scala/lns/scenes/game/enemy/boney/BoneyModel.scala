@@ -2,14 +2,13 @@ package lns.scenes.game.enemy.boney
 
 import scala.language.implicitConversions
 import indigo.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.Assets
+import lns.core.{ Assets, BoneyAsset }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ *, given }
-import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.anything.*
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.enemy.{ EnemyModel, EnemyState, EnemyStatus, Follower }
 
@@ -60,19 +59,12 @@ case class BoneyModel(
  * Factory of [[BoneyModel]]
  */
 object BoneyModel {
-  import Assets.Enemies.Boney.*
 
   def initial: BoneyModel = BoneyModel(
     AnythingId.generate,
     view = () => BoneyView,
-    boundingBox = BoundingBox(
-      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vector2(
-        withScale(width),
-        withScale(height - offsetY)
-      )
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = BoneyView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = BoneyView.shotAreaOffset,
     stats = Stats.Boney,
     life = MaxLife @@ Stats.Boney
   )

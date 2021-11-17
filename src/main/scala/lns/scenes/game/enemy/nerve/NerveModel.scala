@@ -2,7 +2,7 @@ package lns.scenes.game.enemy.nerve
 
 import scala.language.implicitConversions
 import indigo.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
@@ -53,19 +53,12 @@ case class NerveModel(
  * Factory of [[NerveModel]]
  */
 object NerveModel {
-  import Assets.Enemies.Nerve.*
 
   def initial: NerveModel = NerveModel(
     AnythingId.generate,
     view = () => NerveView,
-    boundingBox = BoundingBox(
-      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vector2(
-        withScale(width),
-        withScale(height - offsetY)
-      )
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = NerveView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = NerveView.shotAreaOffset,
     stats = Stats.Nerve,
     life = MaxLife @@ Stats.Nerve
   )

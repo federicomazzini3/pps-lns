@@ -49,7 +49,7 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stone()
+  def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stones()
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

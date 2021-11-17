@@ -2,7 +2,7 @@ package lns.scenes.game.enemy.mask
 
 import scala.language.implicitConversions
 import indigo.*
-import indigoextras.geometry.BoundingBox
+import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
@@ -71,18 +71,12 @@ case class MaskModel(
  * Factory of [[MaskModel]]
  */
 object MaskModel {
-  import Assets.Enemies.Mask.*
+
   def initial: MaskModel = MaskModel(
     AnythingId.generate,
     view = () => MaskView,
-    boundingBox = BoundingBox(
-      Vector2(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2),
-      Vector2(
-        withScale(width),
-        withScale(height - offsetY)
-      )
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = MaskView.shotAreaOffset,
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask
   )
@@ -90,14 +84,8 @@ object MaskModel {
   def initial2: MaskModel = MaskModel(
     AnythingId.generate,
     view = () => MaskView,
-    boundingBox = BoundingBox(
-      Vector2(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6),
-      Vector2(
-        withScale(width),
-        withScale(height - offsetY)
-      )
-    ),
-    shotAreaOffset = withScale(-offsetY),
+    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6)),
+    shotAreaOffset = MaskView.shotAreaOffset,
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask
   )
