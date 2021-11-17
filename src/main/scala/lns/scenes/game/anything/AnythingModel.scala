@@ -374,15 +374,18 @@ trait FireModel extends AnythingModel with StatsModel {
     }
 }
 
+/**
+ * Base model for every solid object. It is designed to be extended or mixed with other [[AnythingModel]] traits.
+ */
 trait SolidModel extends AnythingModel {
   type Model >: this.type <: SolidModel
 
   val crossable: Boolean
   val shotAreaOffset: Int
 
+  def withSolid(crossable: Boolean): Model
+
   val shotArea: BoundingBox = boundingBox
     .resize(Vector2(boundingBox.size.x, boundingBox.size.y - shotAreaOffset))
     .moveBy(0, shotAreaOffset)
-
-  def withSolid(crossable: Boolean): Model
 }

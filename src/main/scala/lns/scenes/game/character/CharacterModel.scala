@@ -15,16 +15,24 @@ import lns.scenes.game.stats.PropertyName.*
 /**
  * Character model that is alive, it's dynamic by computing its speed and new position by user input, can fire computing
  * shot by user input and have stats
+ * @param id
+ *   [[AnythingId]] The unique identifier of the Anything instance.
+ * @param view
+ *   [[AnythingView]] The Anything's View factory function.
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
+ * @param shotAreaOffset
+ *   shotAreaOffset
  * @param stats
  *   Initial [[Stats]]
+ * @param crossable
+ *   crossable, default false
  * @param life
  *   [[AliveModel]] life, default 0
- * @param speed
- *   [[DynamicModel]] speed, default Vector2(0, 0)
  * @param invincibilityTimer
  *   [[AliveModel]] invincibilityTimer, default 0
+ * @param speed
+ *   [[DynamicModel]] speed, default Vector2(0, 0)
  * @param fireRateTimer
  *   [[FireModel]] fireRateTimer, default 0
  * @param shot

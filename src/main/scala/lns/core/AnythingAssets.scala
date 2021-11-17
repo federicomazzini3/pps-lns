@@ -18,6 +18,8 @@ trait AnythingAsset {
   val offsetY: Int
   val scale: Double
 
+  def asset: AssetName = AssetName(name)
+
   /**
    * Bounding Box
    *
@@ -51,17 +53,35 @@ trait AnythingAsset {
    */
   def withScale: Double => Double = (size: Double) => size * scale
 
-  def asset: AssetName = AssetName(name)
-
+  /**
+   * Method to screate default Sprite animation
+   *
+   * @param name
+   *   the name of animation
+   * @return
+   *   Sprite
+   */
   def spriteAnimation(name: String): Sprite[Material.Bitmap] =
     Sprite(BindingKey(name + "_sprite"), 0, 0, 1, AnimationKey(name), Material.Bitmap(asset))
 
+  /**
+   * Standard Shape to view on screen boundingBox
+   *
+   * @return
+   *   Shape
+   */
   def boudingView: Shape =
     Shape.Box(
       Rectangle(Point(0, 0), Size(width, height - offsetY)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
     )
 
+  /**
+   * Standard shape to view on screen shadow
+   *
+   * @return
+   *   Shape
+   */
   def shadowView: Shape = Shape
     .Circle(
       center = Point(width / 2, height + width / 4),
@@ -70,6 +90,15 @@ trait AnythingAsset {
     )
     .scaleBy(1, 0.25)
 
+  /**
+   * Method to draw on the screen the sprite composed of all its parts with the correct scaling, some by default, the
+   * others passed as parameters and customizable by the inheriting class
+   *
+   * @param components
+   *   A List of SceneNode
+   * @return
+   *   Group
+   */
   def drawComponents(components: List[SceneNode]): Group =
     Group()
       //.addChild(boudingView)
@@ -129,6 +158,22 @@ class StoneAsset extends AnythingAsset {
   override val scale: Double = 1.048
 }
 
+class AltarAsset extends AnythingAsset {
+  override val name: String  = "altar"
+  override val width: Int    = 27
+  override val height: Int   = 23
+  override val offsetY: Int  = 0
+  override val scale: Double = 5
+}
+
+class ArrowAsset extends AnythingAsset {
+  override val name: String  = "arrow"
+  override val width: Int    = 32
+  override val height: Int   = 32
+  override val offsetY: Int  = 0
+  override val scale: Double = 5
+}
+
 object AnythingAssets {
   val assets: Set[AssetType] = Set(
     AssetType.Image(AssetName("character"), AssetPath(Assets.baseUrl + "characters/isaac.png")),
@@ -136,6 +181,8 @@ object AnythingAssets {
     AssetType.Image(AssetName("mask"), AssetPath(Assets.baseUrl + "enemies/mask.png")),
     AssetType.Image(AssetName("nerve"), AssetPath(Assets.baseUrl + "enemies/nerve.png")),
     AssetType.Image(AssetName("parabite"), AssetPath(Assets.baseUrl + "enemies/parabite.png")),
-    AssetType.Image(AssetName("stone"), AssetPath(Assets.baseUrl + "elements/stone.png"))
+    AssetType.Image(AssetName("stone"), AssetPath(Assets.baseUrl + "elements/stone.png")),
+    AssetType.Image(AssetName("altar"), AssetPath(Assets.baseUrl + "items/altar.png")),
+    AssetType.Image(AssetName("arrow"), AssetPath(Assets.baseUrl + "items/arrow.png"))
   )
 }

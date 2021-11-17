@@ -17,13 +17,20 @@ import scala.collection.immutable.Queue
 
 /**
  * Enemy model that is alive and stay fixed in a position
- *
+ * @param id
+ *   [[AnythingId]] The unique identifier of the Anything instance.
+ * @param view
+ *   [[AnythingView]] The Anything's View factory function.
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
- * @param status
- *   Initial [[EnemyState]]
+ * @param shotAreaOffset
+ *   shotAreaOffset
  * @param stats
  *   Initial [[Stats]]
+ * @param status
+ *   Initial [[EnemyState]]
+ * @param crossable
+ *   crossable, default false
  * @param life
  *   [[AliveModel]] life, default 0
  * @param invincibilityTimer

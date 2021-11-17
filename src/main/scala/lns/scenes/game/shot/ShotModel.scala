@@ -18,22 +18,30 @@ given Conversion[Vector2, Vertex] with
 /**
  * Shot model that is alive, it's dynamic by computing its speed by initial direction and maxSpeed, and can damage other
  * objects
+ * @param id
+ *   [[AnythingId]] The unique identifier of the Anything instance.
+ * @param view
+ *   [[AnythingView]] The Anything's View factory function.
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
- * @param speed
- *   [[DynamicModel]] speed
- * @param maxSpeed
- *   maxSpeed to compute new speed
+ * @param owner
+ *   [[AnythingId]] The unique identifier of the Anything instance that create the ShotModel.
+ * @param shotAreaOffset
+ *   shotAreaOffset
+ * @param stats
+ *   Initial Shot [[Stats]]
  * @param direction
  *   direction to compute new speed
- * @param damage
- *   [[DamageModel]] damage
  * @param range
  *   to check the max distance shot and interrupt his movement
+ * @param speed
+ *   [[DynamicModel]] speed, defautl Vector2(0,0)
  * @param life
  *   [[AliveModel]] life, default 1
  * @param invincibilityTimer
  *   [[AliveModel]] invincibilityTimer, default 0
+ * @param crossable
+ *   crossable, default false
  */
 case class ShotModel(
     id: AnythingId,
