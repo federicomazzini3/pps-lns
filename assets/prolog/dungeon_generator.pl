@@ -6,6 +6,10 @@ dropFirst(_,[],[]):- !.
 dropFirst(X,[X|T],T):- !.
 dropFirst(X,[H|Xs],[H|L]):- dropFirst(X,Xs,L).
 
+% dropToLength(+N,+L,?O)
+dropToLength(N,L,L):- length(L,C), C=<N,!.
+dropToLength(N,L,O):- length(L,C), D is C-N, drop(D,L,O).
+
 % data una room in RX RY ottiene i possibili spazi liberi in termini di coordinate X Y intorno, in base alle room presenti in lista L
 freePlace(L,RX,Y,X,Y):- X is RX+1, \+(member(room(X,Y,_),L)).
 freePlace(L,RX,Y,X,Y):- X is RX-1, \+(member(room(X,Y,_),L)).
@@ -17,7 +21,7 @@ freePlace(L,X,RY,X,Y):- Y is RY-1, \+(member(room(X,Y,_),L)).
 addFreePlaces(L,P,RX,RY,OP):- findall(p(X,Y),freePlace(L,RX,RY,X,Y),P2), append(P,P2,P3), list_to_set(P3,OP).
 
 % placeRoom(+L,+P,+RX,+RY,+RT,-OL,-OP)
-placeRoom(L,P,RX,RY,RT,[room(RX,RY,RT)|L],OP):- dropFirst(p(RX,RY),P,P2), addFreePlaces(L,P2,RX,RY,OP).
+placeRoom(L,P,RX,RY,RT,[room(RX,RY,RT)|L],OP):- dropFirst(p(RX,RY),P,P2), addFreePlaces(L,P2,RX,RY,P3), dropToLength(6,P3,OP).
 
 % autoPlaceRoom(+L,+P,+RT,-OL,-OP)
 autoPlaceRoom(L,P,RT,OL,OP):- random_member(p(X,Y),P), placeRoom(L,P,X,Y,RT,OL,OP).
