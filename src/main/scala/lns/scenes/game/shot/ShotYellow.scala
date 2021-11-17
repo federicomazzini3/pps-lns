@@ -3,7 +3,7 @@ package lns.scenes.game.shot
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.*
-import lns.core.*
+import lns.core.anythingAssets.AnythingAsset
 import lns.scenes.game.anything.*
 
 /**

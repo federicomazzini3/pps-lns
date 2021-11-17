@@ -2,8 +2,7 @@ package lns.scenes.game.element
 
 import indigo.*
 import indigo.shared.scenegraph.Graphic
-import lns.core.Animations.*
-import lns.core.*
+import lns.core.anythingAssets.StoneAsset
 
 /**
  * Stone view elements builder

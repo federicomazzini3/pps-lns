@@ -2,6 +2,7 @@ package lns.core
 
 import indigo.*
 import indigoextras.ui.ButtonAssets
+import lns.core.anythingAssets.*
 
 /**
  * Factory for Assets
@@ -15,7 +16,7 @@ object Assets {
   def initialFont(): FontInfo = Fonts.fontInfo
 
   def secondary(): Set[AssetType] =
-    AnythingAssets.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Explosion.assets ++ Prolog.assets ++ HUD.assets
+    AnythingAsset.assets ++ Doors.assets ++ Rooms.assets ++ Objects.assets ++ Explosion.assets ++ Prolog.assets ++ HUD.assets
 
   object Buttons {
     val start: AssetName = AssetName("btn_start")

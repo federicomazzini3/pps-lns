@@ -3,7 +3,7 @@ package lns.scenes.game.enemy.mask
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Mask
-import lns.core.*
+import lns.core.anythingAssets.MaskAsset
 import lns.scenes.game.anything.{ DynamicState, FireState }
 
 /**

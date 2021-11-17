@@ -4,9 +4,8 @@ import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.AnythingAsset
-import lns.core.*
 import lns.core.Assets.Rooms
+import lns.core.anythingAssets.{ AltarAsset, AnythingAsset, ArrowAsset }
 import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView }
 
 trait ItemView[VM <: AnythingViewModel[ItemModel] | Unit] extends AnythingView[ItemModel, VM]

@@ -4,7 +4,7 @@ import indigo.*
 import indigo.shared.FrameContext
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.{ Assets, ParabiteAsset }
+import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ *, given }

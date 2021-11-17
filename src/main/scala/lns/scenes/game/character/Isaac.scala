@@ -3,7 +3,7 @@ package lns.scenes.game.character
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.*
-import lns.core.*
+import lns.core.anythingAssets.IsaacAsset
 import lns.scenes.game.anything.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
@@ -11,9 +11,9 @@ import lns.scenes.game.stats.PropertyName.*
 /**
  * Isaac Character view elements builder
  */
-trait Isaac extends CharacterAsset {
+trait Isaac extends IsaacAsset {
 
-  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("character_body")
+  val bodySprite: Sprite[Material.Bitmap] = spriteAnimation("isaac_body")
 
   /**
    * Builds the head view
@@ -41,12 +41,12 @@ trait Isaac extends CharacterAsset {
   def headAnimation(model: CharacterModel, viewModel: CharacterViewModel): Rectangle =
     viewModel.fireAnimationTimer match {
       case x if x > 0 && x > FireRate @@ model.stats / 2 =>
-        Character.headCrop(viewModel.fireState, false)
-      case x if x > 0 => Character.headCrop(viewModel.fireState, true)
+        Isaac.headCrop(viewModel.fireState, false)
+      case x if x > 0 => Isaac.headCrop(viewModel.fireState, true)
       case _ =>
         model.isFiring() match {
-          case true => Character.headCrop(model.getFireState(), false)
-          case _    => Character.headCrop(model.getDynamicState(), true)
+          case true => Isaac.headCrop(model.getFireState(), false)
+          case _    => Isaac.headCrop(model.getDynamicState(), true)
         }
     }
 
@@ -59,7 +59,7 @@ trait Isaac extends CharacterAsset {
    */
   def bodyView(model: CharacterModel): Sprite[Material.Bitmap] =
     bodyAnimation(model)
-      .withRef(Character.bodyWidth / 2, 0)
+      .withRef(Isaac.bodyWidth / 2, 0)
       .flipHorizontal(bodyFlip(model))
       .moveTo(width / 2, 20)
 

@@ -3,7 +3,7 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Parabite
-import lns.core.*
+import lns.core.anythingAssets.ParabiteAsset
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.enemy.EnemyState
 
@@ -50,7 +50,7 @@ trait Parabite extends ParabiteAsset {
    *   anim frame
    */
   def getFrame(timer: Double): Int =
-    Math.floor((Animations.Parabite.hideTime - timer) / Animations.Parabite.hideFrameTime).toInt
+    Math.floor((Parabite.hideTime - timer) / Parabite.hideFrameTime).toInt
 
   /**
    * Plays the animation cycle if the character is moving

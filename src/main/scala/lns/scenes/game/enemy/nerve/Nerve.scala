@@ -3,7 +3,7 @@ package lns.scenes.game.enemy.nerve
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Nerve
-import lns.core.*
+import lns.core.anythingAssets.NerveAsset
 
 /**
  * Nerve Enemy view elements builder

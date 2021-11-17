@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.{ Assets, CharacterAsset }
+import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
