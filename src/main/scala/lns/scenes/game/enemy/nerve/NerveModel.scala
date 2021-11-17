@@ -53,13 +53,12 @@ case class NerveModel(
  * Factory of [[NerveModel]]
  */
 object NerveModel {
-  import lns.core.AnythingAssets.*
 
   def initial: NerveModel = NerveModel(
     AnythingId.generate,
     view = () => NerveView,
-    boundingBox = nerve.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
-    shotAreaOffset = nerve.shotAreaOffset,
+    boundingBox = NerveView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = NerveView.shotAreaOffset,
     stats = Stats.Nerve,
     life = MaxLife @@ Stats.Nerve
   )

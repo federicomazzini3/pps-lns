@@ -4,12 +4,11 @@ import scala.language.implicitConversions
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.Assets
+import lns.core.{ Assets, BoneyAsset }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ *, given }
-import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.anything.*
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.enemy.{ EnemyModel, EnemyState, EnemyStatus, Follower }
 
@@ -60,13 +59,12 @@ case class BoneyModel(
  * Factory of [[BoneyModel]]
  */
 object BoneyModel {
-  import lns.core.AnythingAssets.*
 
   def initial: BoneyModel = BoneyModel(
     AnythingId.generate,
     view = () => BoneyView,
-    boundingBox = boney.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
-    shotAreaOffset = boney.shotAreaOffset,
+    boundingBox = BoneyView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = BoneyView.shotAreaOffset,
     stats = Stats.Boney,
     life = MaxLife @@ Stats.Boney
   )

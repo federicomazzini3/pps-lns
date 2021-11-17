@@ -19,5 +19,5 @@ object MaskView extends MaskView[Unit] with SimpleAnythingView with Mask {
   type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    drawComponents(List(shadowModel, headView(model)))
+    drawComponents(List(shadowView, headView(model)))
 }

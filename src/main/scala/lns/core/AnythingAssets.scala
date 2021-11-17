@@ -8,6 +8,9 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 given Conversion[Double, Int] with
   def apply(v: Double): Int = v.toInt
 
+/**
+ * AnythingAsset trait from which all the assets of the "anything" elements can be extends
+ */
 trait AnythingAsset {
   val name: String
   val width: Int
@@ -15,29 +18,51 @@ trait AnythingAsset {
   val offsetY: Int
   val scale: Double
 
+  /**
+   * Bounding Box
+   *
+   * @param position
+   *   the postiion Vertex of boundign box
+   * @return
+   *   BoundingBox
+   */
   def boundingBox(position: Vertex): BoundingBox =
     BoundingBox(
       position,
       Vertex(withScale(width), withScale(height - offsetY))
     )
-  def initialBoundingBox: BoundingBox = boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2))
 
+  /**
+   * Offset to define the portion of the asset that can be hit by the shots, different from the bounding box to manage
+   * collisions
+   *
+   * @return
+   *   offset scaled
+   */
   def shotAreaOffset: Int = withScale(-offsetY)
 
+  /**
+   * Method to scale the size of the assets in proportion to the room
+   *
+   * @param f
+   *   function from Double to Double
+   * @return
+   *   size of the scaled asset
+   */
   def withScale: Double => Double = (size: Double) => size * scale
 
   def asset: AssetName = AssetName(name)
 
-  def boudingModel: Shape =
+  def spriteAnimation(name: String): Sprite[Material.Bitmap] =
+    Sprite(BindingKey(name + "_sprite"), 0, 0, 1, AnimationKey(name), Material.Bitmap(asset))
+
+  def boudingView: Shape =
     Shape.Box(
       Rectangle(Point(0, 0), Size(width, height - offsetY)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
     )
 
-  def spriteAnimation(name: String): Sprite[Material.Bitmap] =
-    Sprite(BindingKey(name + "_sprite"), 0, 0, 1, AnimationKey(name), Material.Bitmap(asset))
-
-  def shadowModel: Shape = Shape
+  def shadowView: Shape = Shape
     .Circle(
       center = Point(width / 2, height + width / 4),
       radius = width / 3,
@@ -47,7 +72,7 @@ trait AnythingAsset {
 
   def drawComponents(components: List[SceneNode]): Group =
     Group()
-      //.addChild(boundingModel)
+      //.addChild(boudingView)
       .addChild(
         Group()
           .withRef(0, offsetY)
@@ -113,11 +138,4 @@ object AnythingAssets {
     AssetType.Image(AssetName("parabite"), AssetPath(Assets.baseUrl + "enemies/parabite.png")),
     AssetType.Image(AssetName("stone"), AssetPath(Assets.baseUrl + "elements/stone.png"))
   )
-
-  val character = new CharacterAsset()
-  val boney     = new BoneyAsset()
-  val mask      = new MaskAsset()
-  val nerve     = new NerveAsset()
-  val parabite  = new ParabiteAsset()
-  val stone     = new StoneAsset()
 }

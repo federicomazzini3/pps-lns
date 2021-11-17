@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.Assets
+import lns.core.{ Assets, CharacterAsset }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
@@ -93,13 +93,12 @@ case class CharacterModel(
  * Factory of [[CharacterModel]]
  */
 object CharacterModel {
-  import lns.core.AnythingAssets.*
 
   def initial: CharacterModel = CharacterModel(
     id = AnythingId.generate,
     view = () => CharacterView,
-    boundingBox = character.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
-    shotAreaOffset = character.shotAreaOffset,
+    boundingBox = CharacterView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = CharacterView.shotAreaOffset,
     stats = Stats.Isaac,
     life = MaxLife @@ Stats.Isaac
   )

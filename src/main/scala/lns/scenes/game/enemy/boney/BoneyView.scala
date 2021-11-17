@@ -19,5 +19,5 @@ object BoneyView extends BoneyView[Unit] with SimpleAnythingView with Boney {
   type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    drawComponents(List(shadowModel, bodyView(model), headView(model)))
+    drawComponents(List(shadowView, bodyView(model), headView(model)))
 }

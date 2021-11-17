@@ -23,10 +23,9 @@ case class StoneModel(
 }
 
 object ElementModel {
-  import lns.core.AnythingAssets.*
 
   def defaultArea(i: Int, j: Int): BoundingBox =
-    stone.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j))
+    StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j))
 
   def stones(): Map[AnythingId, AnythingModel] =
     val stones =
@@ -37,7 +36,7 @@ object ElementModel {
       } yield id -> StoneModel(
         id = id,
         view = () => StoneView,
-        boundingBox = stone.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j)),
+        boundingBox = StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j)),
         shotAreaOffset = 0
       )
 

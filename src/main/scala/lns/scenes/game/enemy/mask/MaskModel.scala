@@ -71,13 +71,12 @@ case class MaskModel(
  * Factory of [[MaskModel]]
  */
 object MaskModel {
-  import lns.core.AnythingAssets.*
 
   def initial: MaskModel = MaskModel(
     AnythingId.generate,
     view = () => MaskView,
-    boundingBox = mask.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
-    shotAreaOffset = mask.shotAreaOffset,
+    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    shotAreaOffset = MaskView.shotAreaOffset,
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask
   )
@@ -85,8 +84,8 @@ object MaskModel {
   def initial2: MaskModel = MaskModel(
     AnythingId.generate,
     view = () => MaskView,
-    boundingBox = mask.boundingBox(Vertex(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6)),
-    shotAreaOffset = mask.shotAreaOffset,
+    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6)),
+    shotAreaOffset = MaskView.shotAreaOffset,
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask
   )

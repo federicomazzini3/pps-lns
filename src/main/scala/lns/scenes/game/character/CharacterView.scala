@@ -24,7 +24,7 @@ object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
     model.life match {
       case 0 => Group()
-      case _ => drawComponents(List(shadowModel, bodyView(model), headView(model, viewModel)))
+      case _ => drawComponents(List(shadowView, bodyView(model), headView(model, viewModel)))
     }
 
 }
