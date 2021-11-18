@@ -11,6 +11,9 @@ trait StoneAsset extends AnythingAsset {
   override val scale: Double = 1.048
 }
 
+/**
+ * Elements assets for loading
+ */
 object Elements {
   val assets: Set[AssetType] = Set(
     AssetType.Image(AssetName("stone"), AssetPath(Assets.baseUrl + "elements/stone.png"))

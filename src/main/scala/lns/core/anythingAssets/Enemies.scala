@@ -35,6 +35,9 @@ trait ParabiteAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
+/**
+ * Enemies assets for loading
+ */
 object Enemies {
   val assets: Set[AssetType] = Set(
     AssetType.Image(AssetName("boney"), AssetPath(Assets.baseUrl + "enemies/boney.png")),

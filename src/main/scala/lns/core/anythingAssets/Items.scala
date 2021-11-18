@@ -5,6 +5,9 @@ import lns.core.Assets
 
 import scala.language.implicitConversions
 
+/**
+ * Basic trait for the Item asset
+ */
 trait ItemAsset extends AnythingAsset {
   override val name: String  = ""
   override val width: Int    = Assets.Rooms.cellSize
@@ -20,6 +23,11 @@ trait ItemAsset extends AnythingAsset {
   val itemHeight: Int   = 32
   val itemScale: Double = Assets.Rooms.cellSize.toDouble / 32
 
+  /**
+   * Draw item asset over altar
+   * @param name
+   *   item name
+   */
   def drawItemOnAltar(name: String): Group =
     drawComponents(List(altarView, itemView(name)))
 
@@ -39,6 +47,9 @@ trait ItemAsset extends AnythingAsset {
     ).withScale(Vector2(itemScale, itemScale))
 }
 
+/**
+ * Items assets for loading
+ */
 object Items {
   val all: Set[String] =
     Set("arrow", "drop", "eye", "fireball", "glasses", "heart", "juice", "mushroom", "syringe", "tail")

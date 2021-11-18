@@ -11,6 +11,9 @@ trait IsaacAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
+/**
+ * Characters assets for loading
+ */
 object Characters {
   val assets: Set[AssetType] = Set(
     AssetType.Image(AssetName("isaac"), AssetPath(Assets.baseUrl + "characters/isaac.png"))

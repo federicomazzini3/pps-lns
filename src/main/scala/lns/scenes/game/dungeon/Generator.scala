@@ -41,8 +41,6 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      case RoomType.Start => // TODO da rimuovere
-        RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
       case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
 
     }

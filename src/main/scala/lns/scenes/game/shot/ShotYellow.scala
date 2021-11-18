@@ -7,7 +7,7 @@ import lns.core.anythingAssets.AnythingAsset
 import lns.scenes.game.anything.*
 
 /**
- * Isaac Character view elements builder
+ * Yellow shot view elements builder
  */
 trait ShotYellow extends AnythingAsset {
   override val name: String  = ""

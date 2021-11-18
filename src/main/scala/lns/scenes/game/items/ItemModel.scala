@@ -58,7 +58,7 @@ object ItemModel {
       view = () => ItemView,
       boundingBox = ItemView.boundingBox(Vertex(Rooms.floorSize / 6, Rooms.floorSize / 6)),
       name = name,
-      stats = Stats.Isaac // TODO
+      stats = Stats.item(name)
     )
     Map(item.id -> item)
 
@@ -80,7 +80,7 @@ object ItemModel {
       view = () => ItemView,
       boundingBox = ItemView.boundingBox(Vertex(Rooms.cellSize * x, Rooms.cellSize * y)),
       name = name,
-      stats = Stats.Isaac // TODO
+      stats = Stats.item(name)
     )
 
     items.toMap
