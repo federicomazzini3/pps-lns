@@ -10,7 +10,7 @@ import lns.core.{ ContextFixture, ViewMock }
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, FireModel }
 import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import org.scalatest.freespec.AnyFreeSpec
@@ -35,6 +35,7 @@ case class MyFiringModel(
     with FiresContinuously {
   type Model = MyFiringModel
 
+  val shotView   = () => new SingleShotView() with ShotBlue
   val shotOffset = 5
 
   def withStats(stats: Stats): Model                                = copyMacro

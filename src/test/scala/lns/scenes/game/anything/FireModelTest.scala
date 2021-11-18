@@ -10,7 +10,7 @@ import lns.core.{ ContextFixture, ViewMock }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.AnythingId
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import org.scalatest.freespec.AnyFreeSpec
@@ -27,6 +27,7 @@ case class MyFireModel(
 ) extends FireModel {
   type Model = MyFireModel
 
+  val shotView   = () => new SingleShotView() with ShotBlue
   val shotOffset = 0
 
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): MyFireModel = copyMacro

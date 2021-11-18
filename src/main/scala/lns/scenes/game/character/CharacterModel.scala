@@ -7,9 +7,9 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.*
-import lns.scenes.game.shot.ShotEvent
-import lns.scenes.game.stats.*
+import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.shot.*
+import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
 /**
@@ -58,6 +58,7 @@ case class CharacterModel(
 
   type Model = CharacterModel
 
+  val shotView        = () => new SingleShotView() with ShotBlue
   val shotOffset: Int = -40
 
   // TODO: Builder pattern -> usare Require qui oppure sui Trait

@@ -41,7 +41,8 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
+      case RoomType.Start => RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
+      case _              => RoomModel.emptyRoom(position, generateDoors(grid, position))
 
     }
 

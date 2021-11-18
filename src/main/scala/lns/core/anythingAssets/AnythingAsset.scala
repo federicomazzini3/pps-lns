@@ -108,6 +108,22 @@ trait AnythingAsset {
       .withScale(Vector2(scale, scale))
 }
 
+/**
+ * ShotAsset trait from which all shots can be extends
+ */
+trait ShotAsset extends AnythingAsset {
+  override val name: Option[String] = None
+  override val width: Int           = 40
+  override val height: Int          = 40
+  override val offsetY: Int         = 0
+  override val scale: Double        = 1
+
+  def drawShot: Shape
+}
+
+/**
+ * All AnythingAsset assets for loading: Characters, Enemies, Elements and Items
+ */
 object AnythingAsset {
   val assets: Set[AssetType] = Characters.assets ++ Enemies.assets ++ Elements.assets ++ Items.assets
 }

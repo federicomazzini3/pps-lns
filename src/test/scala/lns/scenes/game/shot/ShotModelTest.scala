@@ -29,7 +29,9 @@ trait ShotModelFixture extends ContextFixture with BeforeAndAfterEach { this: Su
   val fireDirection = Vector2(1, 0);
 
   def createShot(direction: Vector2): ShotModel =
-    ShotModel(AnythingId.generate, Vector2(roomCenterX, roomCenterY), direction, Stats.createShot(stats))
+    ShotModel(AnythingId.generate, Vector2(roomCenterX, roomCenterY), direction, Stats.createShot(stats))(() =>
+      new SingleShotView() with ShotBlue
+    )
 
 }
 class ShotModelTest extends AnyFreeSpec with ShotModelFixture {

@@ -9,7 +9,7 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.enemy.{ EnemyModel, EnemyState, EnemyStatus, FiresContinuously, KeepsAway }
-import lns.scenes.game.shot.ShotEvent
+import lns.scenes.game.shot.*
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
@@ -64,6 +64,7 @@ case class MaskModel(
 
   type Model = MaskModel
 
+  val shotView   = () => new SingleShotView() with ShotRed
   val shotOffset = boundingBox.height / 2
 
   def withStats(stats: Stats): Model                                = copyMacro

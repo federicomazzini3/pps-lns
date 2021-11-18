@@ -8,7 +8,7 @@ import lns.StartupData
 import lns.scenes.game.GameContext
 import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.shot.{ ShotEvent, ShotModel }
+import lns.scenes.game.shot.{ ShotEvent, ShotModel, ShotView }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.subsystems.*
@@ -296,6 +296,7 @@ trait FireModel extends AnythingModel with StatsModel {
   val shot: Option[Vector2]
   val fireRateTimer: Double
   val shotOffset: Int
+  val shotView: () => ShotView[_]
 
   def withFire(fireRateTimer: Timer, shot: Option[Vector2]): Model
 
@@ -342,7 +343,7 @@ trait FireModel extends AnythingModel with StatsModel {
         Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset),
         direction,
         Stats.createShot(stats)
-      )
+      )(shotView)
     )
 
   /**

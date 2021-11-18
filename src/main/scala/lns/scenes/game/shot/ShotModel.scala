@@ -108,9 +108,11 @@ case class ShotEvent(shot: ShotModel) extends GlobalEvent
  * Factory of [[ShotModel]]
  */
 object ShotModel {
-  def apply(owner: AnythingId, position: Vector2, direction: Vector2, stats: Stats): ShotModel = ShotModel(
+  def apply(owner: AnythingId, position: Vector2, direction: Vector2, stats: Stats)(
+      view: () => ShotView[_]
+  ): ShotModel = ShotModel(
     AnythingId.generate,
-    view = () => ShotView,
+    view = view,
     BoundingBox(
       position,
       Vertex(40, 40)

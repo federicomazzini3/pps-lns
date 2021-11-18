@@ -59,11 +59,11 @@ object ItemModel {
    * @return
    *   Map[AnythingId, AnythingModel]
    */
-  def create(name: String): Map[AnythingId, AnythingModel] =
+  def apply(name: String): Map[AnythingId, AnythingModel] =
     val item = ItemModel(
       id = AnythingId.generate,
       view = () => ItemView,
-      boundingBox = ItemView.boundingBox(Vertex(Rooms.floorSize / 6, Rooms.floorSize / 6)),
+      boundingBox = ItemView.boundingBox(Vertex(Rooms.floorSize / 2, Rooms.floorSize / 2)),
       name = name,
       stats = Stats.item(name)
     )
