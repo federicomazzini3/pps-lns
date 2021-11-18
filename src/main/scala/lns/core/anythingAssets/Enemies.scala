@@ -3,7 +3,7 @@ package lns.core.anythingAssets
 import indigo.*
 import lns.core.Assets
 
-class BoneyAsset extends AnythingAsset {
+trait BoneyAsset extends AnythingAsset {
   override val name: String  = "boney"
   override val width: Int    = 28
   override val height: Int   = 33
@@ -11,7 +11,7 @@ class BoneyAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
-class MaskAsset extends AnythingAsset {
+trait MaskAsset extends AnythingAsset {
   override val name: String  = "mask"
   override val width: Int    = 28
   override val height: Int   = 33
@@ -19,7 +19,7 @@ class MaskAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
-class NerveAsset extends AnythingAsset {
+trait NerveAsset extends AnythingAsset {
   override val name: String  = "nerve"
   override val width: Int    = 26
   override val height: Int   = 50
@@ -27,7 +27,7 @@ class NerveAsset extends AnythingAsset {
   override val scale: Double = 5
 }
 
-class ParabiteAsset extends AnythingAsset {
+trait ParabiteAsset extends AnythingAsset {
   override val name: String  = "parabite"
   override val width: Int    = 26
   override val height: Int   = 33

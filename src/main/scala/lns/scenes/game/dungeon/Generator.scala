@@ -41,8 +41,10 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      //case RoomType.Start => RoomModel.startRoom(position, generateDoors(grid, position))
+      case RoomType.Start => // TODO da rimuovere
+        RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
       case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
+
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
@@ -51,7 +53,7 @@ object Generator {
 
   def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stones()
 
-  def generateItems(): Map[AnythingId, AnythingModel] = ItemModel.initial
+  def generateItems(): Map[AnythingId, AnythingModel] = ItemModel.all
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

@@ -3,7 +3,7 @@ package lns.core.anythingAssets
 import indigo.*
 import lns.core.Assets
 
-class IsaacAsset extends AnythingAsset {
+trait IsaacAsset extends AnythingAsset {
   override val name: String  = "isaac"
   override val width: Int    = 28
   override val height: Int   = 33

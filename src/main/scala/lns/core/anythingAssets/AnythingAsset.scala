@@ -103,7 +103,7 @@ trait AnythingAsset {
    */
   def drawComponents(components: List[SceneNode]): Group =
     Group()
-      //.addChild(boudingView)
+      // .addChild(boudingView)
       .addChild(
         Group()
           .withRef(0, offsetY)
