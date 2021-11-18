@@ -7,7 +7,7 @@ import lns.core.anythingAssets.BoneyAsset
 import lns.scenes.game.anything.DynamicState
 
 /**
- * Isaac Character view elements builder
+ * Boonie enemy view elements builder
  */
 trait Boney extends BoneyAsset {
 
@@ -15,7 +15,6 @@ trait Boney extends BoneyAsset {
 
   /**
    * Builds the head view
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return
@@ -29,7 +28,6 @@ trait Boney extends BoneyAsset {
 
   /**
    * Builds the body view
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return
@@ -44,7 +42,6 @@ trait Boney extends BoneyAsset {
   /**
    * An asset image may be represented only in right position instead of left + right. In this case we need to flip it
    * if the model is moving leftward
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return
@@ -57,7 +54,6 @@ trait Boney extends BoneyAsset {
 
   /**
    * Plays the animation cycle if the character is moving
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return

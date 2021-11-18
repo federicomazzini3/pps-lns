@@ -5,6 +5,9 @@ import lns.core.Animations.Explosion.size
 import lns.scenes.game.anything.{ DynamicState, FireState }
 import lns.scenes.game.enemy.EnemyState
 
+/**
+ * Factory for Animation
+ */
 object Animations {
 
   def apply(): List[Animation] =

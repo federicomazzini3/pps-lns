@@ -17,7 +17,6 @@ trait Isaac extends IsaacAsset {
 
   /**
    * Builds the head view
-   *
    * @param model
    *   the [[CharacterModel]]
    * @return
@@ -30,7 +29,6 @@ trait Isaac extends IsaacAsset {
 
   /**
    * Manual Animation for the head. The right frame is selected based on the FireState and DynamicState
-   *
    * @param model
    *   the [[CharacterModel]]
    * @param viewModel

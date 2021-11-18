@@ -6,7 +6,7 @@ import lns.core.Animations.Nerve
 import lns.core.anythingAssets.NerveAsset
 
 /**
- * Nerve Enemy view elements builder
+ * Nerve enemy view elements builder
  */
 trait Nerve extends NerveAsset {
 
@@ -14,7 +14,6 @@ trait Nerve extends NerveAsset {
 
   /**
    * Builds the body view
-   *
    * @param model
    *   the [[NerveModel]]
    * @return
@@ -26,7 +25,6 @@ trait Nerve extends NerveAsset {
 
   /**
    * Plays the animation cycle if the character is moving
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return

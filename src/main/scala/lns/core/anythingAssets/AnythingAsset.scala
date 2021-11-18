@@ -24,7 +24,6 @@ trait AnythingAsset {
 
   /**
    * Bounding Box
-   *
    * @param position
    *   the postiion Vertex of boundign box
    * @return
@@ -39,7 +38,6 @@ trait AnythingAsset {
   /**
    * Offset to define the portion of the asset that can be hit by the shots, different from the bounding box to manage
    * collisions
-   *
    * @return
    *   offset scaled
    */
@@ -47,7 +45,6 @@ trait AnythingAsset {
 
   /**
    * Method to scale the size of the assets in proportion to the room
-   *
    * @param f
    *   function from Double to Double
    * @return
@@ -57,7 +54,6 @@ trait AnythingAsset {
 
   /**
    * Method to screate default Sprite animation
-   *
    * @param name
    *   the name of animation
    * @return
@@ -68,7 +64,6 @@ trait AnythingAsset {
 
   /**
    * Standard Shape to view on screen boundingBox
-   *
    * @return
    *   Shape
    */
@@ -80,7 +75,6 @@ trait AnythingAsset {
 
   /**
    * Standard shape to view on screen shadow
-   *
    * @return
    *   Shape
    */
@@ -95,7 +89,6 @@ trait AnythingAsset {
   /**
    * Method to draw on the screen the sprite composed of all its parts with the correct scaling, some by default, the
    * others passed as parameters and customizable by the inheriting class
-   *
    * @param components
    *   A List of SceneNode
    * @return

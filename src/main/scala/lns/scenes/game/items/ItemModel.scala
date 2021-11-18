@@ -52,6 +52,13 @@ case class ItemModel(
  */
 object ItemModel {
 
+  /**
+   * Create [[ItemModel]] by item name
+   * @param name
+   *   String of item name
+   * @return
+   *   Map[AnythingId, AnythingModel]
+   */
   def create(name: String): Map[AnythingId, AnythingModel] =
     val item = ItemModel(
       id = AnythingId.generate,
@@ -62,6 +69,11 @@ object ItemModel {
     )
     Map(item.id -> item)
 
+  /**
+   * Create all [[ItemModel]] available
+   * @return
+   *   Map[AnythingId, AnythingModel]
+   */
   def all: Map[AnythingId, AnythingModel] =
     val itemsXrow = 5
     val items = for {

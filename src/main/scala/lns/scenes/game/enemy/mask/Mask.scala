@@ -7,13 +7,12 @@ import lns.core.anythingAssets.MaskAsset
 import lns.scenes.game.anything.{ DynamicState, FireState }
 
 /**
- * Isaac Character view elements builder
+ * Mask enemy view elements builder
  */
 trait Mask extends MaskAsset {
 
   /**
    * Builds the head view
-   *
    * @param model
    *   the [[MaskModel]]
    * @return
@@ -26,7 +25,6 @@ trait Mask extends MaskAsset {
 
   /**
    * Manual Animation for the head. The right frame is selected based on the FireState and DynamicState
-   *
    * @param model
    *   the [[MaskModel]]
    * @return

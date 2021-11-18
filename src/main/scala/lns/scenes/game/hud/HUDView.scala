@@ -11,6 +11,9 @@ import lns.scenes.game.character.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 
+/**
+ * HUD View
+ */
 object HUDView {
   val width  = 100
   val height = 200
@@ -19,6 +22,16 @@ object HUDView {
     case Full, Empty, Half
   import HeartStatus.*
 
+  /**
+   * Method to compute how many full, half and empty hearts show. Cased on the current life in relation to the maximum
+   * life
+   * @param maxlife
+   *   Maxlife
+   * @param life
+   *   Current life
+   * @return
+   *   List[HeartStatus] enum: Full, Empty Half
+   */
   def computeLife(maxlife: Int, life: Double): List[HeartStatus] =
     (1 to maxlife).toList
       .foldLeft((List.empty[HeartStatus], life))((acc, i) =>
@@ -30,6 +43,13 @@ object HUDView {
       )
       ._1
 
+  /**
+   * Draw the computed life with correct Heart asset and position on screen
+   * @param character
+   *   [[CharacterModel]] to get max life and current life
+   * @return
+   *   Group
+   */
   def drawLife(character: CharacterModel): Group =
     Group().addChildren(
       computeLife(MaxLife @@ character.stats, character.life).zipWithIndex.map {
@@ -39,9 +59,27 @@ object HUDView {
       }
     )
 
+  /**
+   * Draw the stats value as text
+   * @param msg
+   *   String of stats value
+   * @param x
+   *   X position int he HUD view
+   * @param y
+   *   Y position int he HUD view
+   * @return
+   *   Group
+   */
   def drawStatsText(msg: String, x: Int, y: Int): Text[Material.ImageEffects] =
     Text(msg, x, y, 1, Assets.Fonts.fontKey, Assets.Fonts.fontMaterial)
 
+  /**
+   * Draw stats value with icon in correcto position inside HUD
+   * @param character
+   *   [[CharacterModel]]
+   * @return
+   *   Group
+   */
   def drawStats(character: CharacterModel): Group =
     Group()
       .addChild(Assets.HUD.Graphics.MaxSpeed.moveTo(0, 40))
@@ -55,6 +93,15 @@ object HUDView {
       .addChild(Assets.HUD.Graphics.FireSpeed.moveTo(0, 160))
       .addChild(drawStatsText(FireSpeed @@ character.stats, 30, 166))
 
+  /**
+   * Draw all HUD: Life and Stats
+   * @param context
+   *   [[FrameContext]]
+   * @param character
+   *   [[CharacterModel]]
+   * @return
+   *   Group
+   */
   def draw(context: FrameContext[StartupData], character: CharacterModel): Group =
     Group()
       .addChild(drawLife(character))

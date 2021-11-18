@@ -27,6 +27,8 @@ trait ItemAsset extends AnythingAsset {
    * Draw item asset over altar
    * @param name
    *   item name
+   * @return
+   *   Group
    */
   def drawItemOnAltar(name: String): Group =
     drawComponents(List(altarView, itemView(name)))
