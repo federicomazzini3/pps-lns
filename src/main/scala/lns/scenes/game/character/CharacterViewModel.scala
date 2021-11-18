@@ -18,6 +18,9 @@ case class CharacterViewModel(
   def withFireTimer(fireAnimationTimer: Timer, fireState: FireState): ViewModel = copyMacro
 }
 
+/**
+ * Factory of [[CharacterViewModel]]
+ */
 object CharacterViewModel {
   def initial(id: AnythingId): CharacterViewModel = CharacterViewModel(id)
 }

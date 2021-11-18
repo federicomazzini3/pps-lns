@@ -2,8 +2,7 @@ package lns.scenes.game.element
 
 import indigo.*
 import indigo.shared.scenegraph.Graphic
-import lns.core.Animations.*
-import lns.core.*
+import lns.core.anythingAssets.StoneAsset
 
 /**
  * Stone view elements builder
@@ -11,12 +10,7 @@ import lns.core.*
 trait Stone extends StoneAsset {
   def stoneView: Graphic[Material.Bitmap] =
     Graphic(
-      Rectangle(
-        0,
-        0,
-        width,
-        height
-      ),
+      Rectangle(0, 0, width, height),
       1,
       Material.Bitmap(asset)
     ).withScale(Vector2(1, 1.40))

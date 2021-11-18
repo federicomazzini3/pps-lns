@@ -43,9 +43,15 @@ extension (stats: Stats) {
 /**
  * Companion object to create Stats, a Map of tuples StatProperty (PropertyName, PropertyValue)
  */
-object Stats {
+object Stats extends Characters with Enemies with Items {
+
   def apply(args: StatProperty*): Stats = Map(args*)
 
+  /**
+   * Create shot's stats by owner stats
+   * @param stats
+   *   Owner's Stats
+   */
   def createShot(stats: Stats): Stats =
     Stats(
       MaxLife       -> 1,
@@ -54,47 +60,4 @@ object Stats {
       Range         -> FireRange @@ stats,
       Damage        -> FireDamage @@ stats
     )
-
-  def Isaac: Stats = Stats(
-    MaxLife       -> 3,
-    Invincibility -> 1.5,
-    MaxSpeed      -> 400,
-    Damage        -> 0,
-    FireDamage    -> 1,
-    FireRange     -> 800,
-    FireRate      -> 0.4,
-    FireSpeed     -> 600
-  )
-
-  def Boney: Stats = Stats(
-    MaxLife       -> 5,
-    Invincibility -> 0,
-    MaxSpeed      -> 300,
-    Damage        -> 0.5
-  )
-
-  def Mask: Stats = Stats(
-    MaxLife       -> 4,
-    Invincibility -> 0,
-    MaxSpeed      -> 200,
-    Damage        -> 0.5,
-    FireDamage    -> 0.5,
-    FireRange     -> 300,
-    FireRate      -> 1,
-    FireSpeed     -> 600
-  )
-
-  def Nerve: Stats = Stats(
-    MaxLife       -> 6,
-    Invincibility -> 0,
-    MaxSpeed      -> 0,
-    Damage        -> 1
-  )
-
-  def Parabite: Stats = Stats(
-    MaxLife       -> 3,
-    Invincibility -> 0,
-    MaxSpeed      -> 600,
-    Damage        -> 1
-  )
 }

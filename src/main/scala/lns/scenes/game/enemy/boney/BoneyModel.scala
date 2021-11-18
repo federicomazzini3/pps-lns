@@ -4,7 +4,7 @@ import scala.language.implicitConversions
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
-import lns.core.{ Assets, BoneyAsset }
+import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.*
@@ -17,13 +17,20 @@ import scala.collection.immutable.Queue
 /**
  * Enemy model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
  * computing shot and have stats
- *
+ * @param id
+ *   [[AnythingId]] The unique identifier of the Anything instance.
+ * @param view
+ *   [[AnythingView]] The Anything's View factory function.
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
- * @param status
- *   Initial [[EnemyState]]
+ * @param shotAreaOffset
+ *   shotAreaOffset
  * @param stats
  *   Initial [[Stats]]
+ * @param status
+ *   Initial [[EnemyState]]
+ * @param crossable
+ *   crossable, default false
  * @param speed
  *   [[DynamicModel]] speed, default Vector2(0, 0)
  * @param life

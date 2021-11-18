@@ -12,7 +12,7 @@ import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.stats.*
 import lns.scenes.game.element.ElementModel
-
+import lns.scenes.game.items.ItemModel
 import lns.subsystems.prolog.{ Substitution, Term }
 import lns.subsystems.prolog.Term.*
 
@@ -30,7 +30,7 @@ object Generator {
   def generateRoom(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
     roomType match {
       case RoomType.Item =>
-        RoomModel.itemRoom(position, generateDoors(grid, position), generateBlockingElements())
+        RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
       case RoomType.Arena =>
         val enemyTest  = MaskModel.initial
         val enemyTest2 = MaskModel.initial2
@@ -41,8 +41,8 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      //case RoomType.Start => RoomModel.startRoom(position, generateDoors(grid, position))
       case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
+
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =
@@ -50,6 +50,8 @@ object Generator {
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
   def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stones()
+
+  def generateItems(): Map[AnythingId, AnythingModel] = ItemModel.all
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

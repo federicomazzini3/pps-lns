@@ -18,13 +18,20 @@ import scala.collection.immutable.Queue
 /**
  * Enemy model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
  * computing shot and have stats
- *
+ * @param id
+ *   [[AnythingId]] The unique identifier of the Anything instance.
+ * @param view
+ *   [[AnythingView]] The Anything's View factory function.
  * @param boundingBox
  *   [[AnythingModel]] boundingBox
+ * @param shotAreaOffset
+ *   shotAreaOffset
  * @param stats
  *   Initial [[Stats]]
  * @param status
  *   Initial [[EnemyState]]
+ * @param crossable
+ *   crossable, default false
  * @param speed
  *   [[DynamicModel]] speed, default Vector2(0, 0)
  * @param life

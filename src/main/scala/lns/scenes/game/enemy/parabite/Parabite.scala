@@ -3,12 +3,12 @@ package lns.scenes.game.enemy.parabite
 import indigo.*
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.core.Animations.Parabite
-import lns.core.*
+import lns.core.anythingAssets.ParabiteAsset
 import lns.scenes.game.anything.DynamicState
 import lns.scenes.game.enemy.EnemyState
 
 /**
- * Isaac Character view elements builder
+ * Parabite enemy view elements builder
  */
 trait Parabite extends ParabiteAsset {
 
@@ -16,7 +16,6 @@ trait Parabite extends ParabiteAsset {
 
   /**
    * Builds the body view
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return
@@ -31,7 +30,6 @@ trait Parabite extends ParabiteAsset {
   /**
    * An asset image may be represented only in right position instead of left + right. In this case we need to flip it
    * if the model is moving leftward
-   *
    * @param model
    *   the [[ParabiteModel]]
    * @return
@@ -50,11 +48,10 @@ trait Parabite extends ParabiteAsset {
    *   anim frame
    */
   def getFrame(timer: Double): Int =
-    Math.floor((Animations.Parabite.hideTime - timer) / Animations.Parabite.hideFrameTime).toInt
+    Math.floor((Parabite.hideTime - timer) / Parabite.hideFrameTime).toInt
 
   /**
    * Plays the animation cycle if the character is moving
-   *
    * @param model
    *   the [[BoneyModel]]
    * @return
