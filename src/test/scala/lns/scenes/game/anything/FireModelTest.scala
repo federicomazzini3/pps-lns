@@ -10,7 +10,7 @@ import lns.core.{ ContextFixture, ViewMock }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.AnythingId
-import lns.scenes.game.shot.*
+import lns.scenes.game.shots.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import org.scalatest.freespec.AnyFreeSpec

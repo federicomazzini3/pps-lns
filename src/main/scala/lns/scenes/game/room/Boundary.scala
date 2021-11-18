@@ -2,7 +2,7 @@ package lns.scenes.game.room
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.scenes.game.anything.DynamicState
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*
 import org.scalajs.dom.raw.Position

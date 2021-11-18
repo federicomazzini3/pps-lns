@@ -7,7 +7,7 @@ import indigo.shared.datatypes.Vector2
 import indigo.shared.scenegraph.{ Graphic, Shape }
 import lns.StartupData
 import lns.core.Assets
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 

@@ -6,9 +6,9 @@ import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.scenes.game.GameContext
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.room.{ Boundary, RoomModel }
-import lns.scenes.game.shot.{ ShotEvent, ShotModel, ShotView }
+import lns.scenes.game.shots.{ ShotEvent, ShotModel, ShotView }
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.subsystems.*

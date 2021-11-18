@@ -11,11 +11,11 @@ import lns.scenes.game.GameContext
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicState, SolidModel }
 import lns.scenes.game.room.door.*
-import lns.scenes.game.shot.ShotModel
+import lns.scenes.game.shots.ShotModel
 import lns.scenes.game.room.door.DoorImplicit.*
-import lns.scenes.game.character.CharacterModel
-import lns.scenes.game.enemy.EnemyModel
-import lns.scenes.game.enemy.nerve.NerveModel
+import lns.scenes.game.characters.CharacterModel
+import lns.scenes.game.enemies.EnemyModel
+import lns.scenes.game.enemies.nerve.NerveModel
 import lns.scenes.game.anything.given
 import java.util.UUID
 import scala.language.implicitConversions

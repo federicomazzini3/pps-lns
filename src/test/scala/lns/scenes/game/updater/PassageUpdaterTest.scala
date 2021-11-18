@@ -5,7 +5,7 @@ import lns.scenes.game.room.*
 import door.Location.*
 import indigo.shared.datatypes.Vector2
 import indigoextras.geometry.Vertex
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import org.scalatest.freespec.AnyFreeSpec
 
 class PassageUpdaterTest extends AnyFreeSpec {

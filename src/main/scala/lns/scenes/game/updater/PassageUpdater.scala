@@ -2,7 +2,7 @@ package lns.scenes.game.updater
 
 import indigoextras.geometry.Vertex
 import lns.scenes.game.anything.DynamicState.{ MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, MOVE_UP }
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.dungeon.DungeonModel
 import lns.scenes.game.room.*
 import lns.scenes.game.room.door.Location.{ Above, Below, Left, Right }
