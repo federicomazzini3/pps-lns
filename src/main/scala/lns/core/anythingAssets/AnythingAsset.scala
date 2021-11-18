@@ -14,13 +14,16 @@ given Conversion[Double, Int] with
  * AnythingAsset trait from which all the assets of the "anything" elements can be extends
  */
 trait AnythingAsset {
-  val name: String
+  val name: Option[String]
   val width: Int
   val height: Int
   val offsetY: Int
   val scale: Double
 
-  def asset: AssetName = AssetName(name)
+  def asset: AssetName = name match {
+    case Some(n) => AssetName(n)
+    case _       => throw new Exception("no asset name")
+  }
 
   /**
    * Bounding Box

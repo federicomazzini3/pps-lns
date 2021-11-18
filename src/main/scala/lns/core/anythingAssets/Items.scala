@@ -9,11 +9,11 @@ import scala.language.implicitConversions
  * Basic trait for the Item asset
  */
 trait ItemAsset extends AnythingAsset {
-  override val name: String  = ""
-  override val width: Int    = Assets.Rooms.cellSize
-  override val height: Int   = Assets.Rooms.cellSize * 1.6
-  override val offsetY: Int  = Assets.Rooms.cellSize * 0.6
-  override val scale: Double = 1
+  override val name: Option[String] = None
+  override val width: Int           = Assets.Rooms.cellSize
+  override val height: Int          = Assets.Rooms.cellSize * 1.6
+  override val offsetY: Int         = Assets.Rooms.cellSize * 0.6
+  override val scale: Double        = 1
 
   val altarWidth: Int    = 32
   val altarHeight: Int   = 32
