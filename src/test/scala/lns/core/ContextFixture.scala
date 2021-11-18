@@ -10,7 +10,7 @@ import indigo.shared.{ AnimationsRegister, BoundaryLocator, FontRegister, FrameC
 import lns.StartupData
 import lns.scenes.game.GameContext
 import lns.scenes.game.room.RoomModel
-import lns.scenes.game.character.CharacterModel
+import lns.scenes.game.characters.CharacterModel
 import org.scalatest.Suite
 
 /**

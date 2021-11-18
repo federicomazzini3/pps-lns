@@ -3,7 +3,7 @@ package lns.core
 import indigo.*
 import lns.core.Animations.Explosion.size
 import lns.scenes.game.anything.{ DynamicState, FireState }
-import lns.scenes.game.enemy.EnemyState
+import lns.scenes.game.enemies.EnemyState
 
 /**
  * Factory for Animation

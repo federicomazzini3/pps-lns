@@ -4,14 +4,14 @@ import indigo.*
 import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.scenes.game.anything.{ AnythingId, AnythingModel }
-import lns.scenes.game.enemy.boney.BoneyModel
-import lns.scenes.game.enemy.mask.MaskModel
-import lns.scenes.game.enemy.nerve.NerveModel
-import lns.scenes.game.enemy.parabite.ParabiteModel
+import lns.scenes.game.enemies.boney.BoneyModel
+import lns.scenes.game.enemies.mask.MaskModel
+import lns.scenes.game.enemies.nerve.NerveModel
+import lns.scenes.game.enemies.parabite.ParabiteModel
 import lns.scenes.game.room.RoomModel
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.stats.*
-import lns.scenes.game.element.ElementModel
+import lns.scenes.game.elements.ElementModel
 import lns.scenes.game.items.ItemModel
 import lns.subsystems.prolog.{ Substitution, Term }
 import lns.subsystems.prolog.Term.*
@@ -41,9 +41,7 @@ object Generator {
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(position, generateDoors(grid, position), generateBlockingElements())
-      case RoomType.Start => RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
-      case _              => RoomModel.emptyRoom(position, generateDoors(grid, position))
-
+      case _ => RoomModel.emptyRoom(position, generateDoors(grid, position))
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =

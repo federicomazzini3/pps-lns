@@ -10,14 +10,14 @@ import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
 import lns.scenes.game.hud.HUDView
 import lns.scenes.game.anything.FireModel
-import lns.scenes.game.character.*
+import lns.scenes.game.characters.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
 import lns.scenes.game.room.{ Boundary, RoomView }
 import lns.scenes.game.room.RoomView.*
-import lns.scenes.game.character.*
+import lns.scenes.game.characters.*
 import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
-import lns.scenes.game.shot.*
+import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.room.*
 import lns.scenes.game.subsystems.{ BattleEventSubSystems, Hit, Dead }

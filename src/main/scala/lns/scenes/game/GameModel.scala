@@ -7,11 +7,11 @@ import lns.StartupData
 import lns.core.PrologClient
 import lns.scenes.game.*
 import anything.*
-import character.*
+import characters.*
 import dungeon.*
 import dungeon.RoomType.*
 import room.*
-import shot.*
+import shots.*
 import updater.*
 import updater.CollisionUpdater.*
 import updater.PassageUpdater.*

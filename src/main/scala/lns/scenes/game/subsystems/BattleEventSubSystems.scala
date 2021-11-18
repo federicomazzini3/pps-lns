@@ -5,7 +5,7 @@ import indigo.shared.datatypes.Vector2
 import lns.core.Assets
 import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.*
-import lns.scenes.game.shot.ShotModel
+import lns.scenes.game.shots.ShotModel
 
 case class BattleEventSubSystems(screenDimensions: Rectangle) extends SubSystem:
   type EventType      = GlobalEvent
