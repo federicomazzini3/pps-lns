@@ -36,6 +36,8 @@ given Conversion[Vector2, Vertex] with
  *   to check the max distance shot and interrupt his movement
  * @param speed
  *   [[DynamicModel]] speed, defautl Vector2(0,0)
+ * @param collisionDetected
+ *   [[DynamicModel]] collisionDetected, true if the Anything is collided with some other Anything. Default false
  * @param life
  *   [[AliveModel]] life, default 1
  * @param invincibilityTimer
@@ -53,6 +55,7 @@ case class ShotModel(
     direction: Vector2,
     range: Double,
     speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false,
     life: Double = 1,
     invincibilityTimer: Double = 0,
     crossable: Boolean = false
@@ -63,11 +66,11 @@ case class ShotModel(
 
   type Model = ShotModel
 
-  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withStats(stats: Stats): Model                               = copyMacro
-  def withRange(range: Double): Model                              = copyMacro
-  def withSolid(crossable: Boolean): Model                         = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
+  def withStats(stats: Stats): Model                                                           = copyMacro
+  def withRange(range: Double): Model                                                          = copyMacro
+  def withSolid(crossable: Boolean): Model                                                     = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = {
     val maxSpeed = MaxSpeed @@ stats * context.gameTime.delta.toDouble

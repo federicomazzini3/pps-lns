@@ -28,17 +28,18 @@ case class MyFollowerModel(
     crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,
-    speed: Vector2 = Vector2(0, 0)
+    speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false
 ) extends EnemyModel
     with DynamicModel
     with Follower {
   type Model = MyFollowerModel
 
-  def withStats(stats: Stats): Model                               = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
-  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withSolid(crossable: Boolean): Model                         = copyMacro
+  def withStats(stats: Stats): Model                                                           = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                                            = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                                                     = copyMacro
 }
 
 trait FollowerModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
@@ -50,7 +51,7 @@ trait FollowerModelFixture extends ContextFixture with BeforeAndAfterEach { this
   val initialPos = 100
 
   override val character: CharacterModel =
-    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
+    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0), false)
 
   override val gameContext: GameContext = GameContext(room, character)
 

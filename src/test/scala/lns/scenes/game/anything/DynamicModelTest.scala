@@ -19,12 +19,13 @@ case class MyDynamicModel(
     boundingBox: BoundingBox,
     stats: Stats,
     nextSpeed: Vector2,
-    speed: Vector2 = Vector2(0, 0)
+    speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false
 ) extends DynamicModel {
   type Model = MyDynamicModel
 
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): MyDynamicModel = copyMacro
-  def withStats(stats: Stats): Model                                        = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): MyDynamicModel = copyMacro
+  def withStats(stats: Stats): Model                                                                    = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext) = nextSpeed
 }

@@ -61,15 +61,25 @@ object CollisionUpdater {
       case (anything: SolidModel with DynamicModel, against: SolidModel) =>
         anything match {
           case s: ShotModel =>
+            val newPosition = Boundary.elementBound(against.shotArea, anything.boundingBox)
             Outcome(
               anything
-                .withDynamic(Boundary.elementBound(against.shotArea, anything.boundingBox), anything.speed)
+                .withDynamic(
+                  newPosition,
+                  anything.speed,
+                  anything.collisionDetected | newPosition.position != anything.boundingBox.position
+                )
                 .asInstanceOf[anything.Model]
             )
           case _ =>
+            val newPosition = Boundary.elementBound(against.boundingBox, anything.boundingBox)
             Outcome(
               anything
-                .withDynamic(Boundary.elementBound(against.boundingBox, anything.boundingBox), anything.speed)
+                .withDynamic(
+                  newPosition,
+                  anything.speed,
+                  anything.collisionDetected | newPosition.position != anything.boundingBox.position
+                )
                 .asInstanceOf[anything.Model]
             )
         }

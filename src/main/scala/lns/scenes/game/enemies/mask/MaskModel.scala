@@ -34,6 +34,8 @@ import scala.collection.immutable.Queue
  *   crossable, default false
  * @param speed
  *   [[DynamicModel]] speed, default Vector2(0, 0)
+ * @param collisionDetected
+ *   [[DynamicModel]] collisionDetected, true if the Anything is collided with some other Anything. Default false
  * @param life
  *   [[AliveModel]] life, default 0
  * @param invincibilityTimer
@@ -52,6 +54,7 @@ case class MaskModel(
     status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Timer = 0,
     fireRateTimer: Timer = 0,
@@ -67,12 +70,12 @@ case class MaskModel(
   val shotView   = () => new SingleShotView() with ShotRed
   val shotOffset = boundingBox.height / 2
 
-  def withStats(stats: Stats): Model                                = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
-  def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model  = copyMacro
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
-  def withSolid(crossable: Boolean): Model                          = copyMacro
+  def withStats(stats: Stats): Model                                                           = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                                            = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
+  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
+  def withSolid(crossable: Boolean): Model                                                     = copyMacro
 }
 
 /**

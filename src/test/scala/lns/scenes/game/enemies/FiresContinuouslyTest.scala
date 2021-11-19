@@ -62,7 +62,7 @@ trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: 
   val tests: List[(CharacterModel, Vector2)] =
     List(Vector2(100, 0), Vector2(200, 100), Vector2(100, 200), Vector2(0, 100)).map(p =>
       (
-        character.withDynamic(BoundingBox(p.x, p.y, 10, 10), Vector2(0, 0)),
+        character.withDynamic(BoundingBox(p.x, p.y, 10, 10), Vector2(0, 0), false),
         (p - Vector2(initialPos, initialPos)).normalise
       )
     )

@@ -34,6 +34,8 @@ import scala.language.implicitConversions
  *   crossable, default false
  * @param speed
  *   [[DynamicModel]] speed, default Vector2(0, 0)
+ * @param collisionDetected
+ *   [[DynamicModel]] collisionDetected, true if the Anything is collided with some other Anything. Default false
  * @param life
  *   [[AliveModel]] life, default 0
  * @param invincibilityTimer
@@ -50,6 +52,7 @@ case class ParabiteModel(
     status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Timer = 0,
     path: Queue[Vector2] = Queue.empty
@@ -59,12 +62,12 @@ case class ParabiteModel(
 
   type Model = ParabiteModel
 
-  def withStats(stats: Stats): Model                               = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
-  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
-  def withSolid(crossable: Boolean): Model                         = copyMacro
+  def withStats(stats: Stats): Model                                                           = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                                            = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
+  def withTraveller(path: Queue[Vector2]): Model                                               = copyMacro
+  def withSolid(crossable: Boolean): Model                                                     = copyMacro
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
