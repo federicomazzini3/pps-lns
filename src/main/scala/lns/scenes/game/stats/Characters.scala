@@ -10,11 +10,11 @@ trait Characters {
   def Isaac: Stats = Stats(
     MaxLife       -> 3,
     Invincibility -> 1.5,
-    MaxSpeed      -> 400,
+    MaxSpeed      -> 600,
     Damage        -> 0,
     FireDamage    -> 1,
-    FireRange     -> 800,
-    FireRate      -> 0.4,
-    FireSpeed     -> 600
+    FireRange     -> 900,
+    FireRate      -> 0.3,
+    FireSpeed     -> 1000
   )
 }

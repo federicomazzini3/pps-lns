@@ -72,32 +72,23 @@ case class ShotModel(
   def withRange(range: Double): Model                                                          = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = {
-    val maxSpeed = MaxSpeed @@ stats * context.gameTime.delta.toDouble
-    val speed = range match {
-      case range if range - maxSpeed >= 0 => MaxSpeed @@ stats
-      case range if range > 1             => range / context.gameTime.delta.toDouble
-      case _                              => 0
-    }
-    direction.normalise * speed
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = range match {
+    case 0 => Vector2.zero
+    case _ => direction.normalise * MaxSpeed @@ stats
   }
 
-  def rangeAvailable(range: Double, speed: Vector2, context: FrameContext[StartupData]): Double =
-    range - (speed.abs.length * context.gameTime.delta.toDouble)
+  override def limitMove(move: Vector2): Vector2 = range < move.length match {
+    case true => move.normalise * range
+    case _    => move
+  }
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
       superObj <- super.update(context)(gameContext)
-      newObj = life match {
-        case life if life > 0 && range <= 0 => superObj.withAlive(0, 0)
-        case _                              => superObj
-      }
-      retObj = newObj.speed match {
-        case Vector2.zero if range > 0 => newObj.withRange(0).asInstanceOf[Model]
-        case Vector2.zero              => newObj
-        case _ if newObj.life > 0 =>
-          newObj.withRange(rangeAvailable(range, newObj.speed, context)).asInstanceOf[Model]
-        case _ => newObj
+      retObj = (superObj.movedBy(this), range == 0 || collisionDetected) match {
+        case (_, true)                      => superObj.withAlive(0, 0).asInstanceOf[Model]
+        case (x, _) if x == 0 || range <= x => superObj.withRange(0).asInstanceOf[Model]
+        case (x, _)                         => superObj.withRange(range - x).asInstanceOf[Model]
       }
     } yield retObj
 }
