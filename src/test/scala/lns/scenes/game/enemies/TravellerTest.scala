@@ -28,17 +28,18 @@ case class MyTravellerModel(
     life: Double = 0,
     invincibilityTimer: Double = 0,
     speed: Vector2 = Vector2(0, 0),
+    collisionDetected: Boolean = false,
     path: Queue[Vector2] = Queue.empty
 ) extends EnemyModel
     with Traveller {
   type Model = MyTravellerModel
 
-  def withStats(stats: Stats): Model                               = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model                = copyMacro
-  def withAlive(life: Double, invincibilityTimer: Double): Model   = copyMacro
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model = copyMacro
-  def withTraveller(path: Queue[Vector2]): Model                   = copyMacro
-  def withSolid(crossable: Boolean): Model                         = copyMacro
+  def withStats(stats: Stats): Model                                                           = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                                            = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
+  def withTraveller(path: Queue[Vector2]): Model                                               = copyMacro
+  def withSolid(crossable: Boolean): Model                                                     = copyMacro
 }
 
 trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
@@ -54,7 +55,7 @@ trait TravellerModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   val firstDirection = (path.head - Vector2(initialPos, initialPos)).normalise
 
   override val character: CharacterModel =
-    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0))
+    CharacterModel.initial.withDynamic(BoundingBox(0, 0, 10, 10), Vector2(0, 0), false)
 
   override val gameContext: GameContext = GameContext(room, character)
 

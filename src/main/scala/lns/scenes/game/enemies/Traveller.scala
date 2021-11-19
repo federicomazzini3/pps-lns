@@ -32,13 +32,11 @@ trait Traveller extends DynamicModel { this: EnemyModel =>
       case _ => Vector2.zero
     }
 
-  override def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
-    val speed: Vector2 = computeSpeed(context)(gameContext)
-    val frameSpeed     = speed * context.gameTime.delta.toDouble
-    frameSpeed.length match {
-      case 0                                            => (speed, boundingBox)
-      case x if path.head.distanceTo(getPosition()) < x => (speed, boundingBox.moveTo(path.head))
-      case _                                            => (speed, boundingBox.moveBy(frameSpeed))
+  override def limitMove(move: Vector2): Vector2 =
+    val distance = path.head.distanceTo(getPosition());
+    distance < move.length match {
+      case true => move.normalise * distance
+      case _    => move
     }
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
@@ -46,7 +44,8 @@ trait Traveller extends DynamicModel { this: EnemyModel =>
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
         case (EnemyState.Attacking | EnemyState.Defending, _)
-            if path.nonEmpty && (getPosition().distanceTo(path.head) < 10) =>
+            if path.nonEmpty &&
+              (getPosition().distanceTo(path.head) < 1.0 || collisionDetected || superObj.movedBy(this) == 0) =>
           superObj.withTraveller(path.dequeue._2).asInstanceOf[Model]
         case _ => superObj
       }

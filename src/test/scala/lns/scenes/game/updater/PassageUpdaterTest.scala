@@ -54,7 +54,7 @@ class PassageUpdaterTest extends AnyFreeSpec {
       }
       "a character adjacent to a left door" - {
         val movedCharacter = character
-          .withDynamic(character.boundingBox.moveTo(DoorPosition.left), Speed.toLeft)
+          .withDynamic(character.boundingBox.moveTo(DoorPosition.left), Speed.toLeft, false)
           .asInstanceOf[CharacterModel]
         "should pass to the room adjacent to the current room on left side" in {
           val newCharacter = PassageUpdater(dungeon, initialRoom, movedCharacter)._2
@@ -67,7 +67,7 @@ class PassageUpdaterTest extends AnyFreeSpec {
       }
       "a character adjacent to a right door" - {
         val movedCharacter = character
-          .withDynamic(character.boundingBox.moveTo(DoorPosition.right), Speed.toRight)
+          .withDynamic(character.boundingBox.moveTo(DoorPosition.right), Speed.toRight, false)
           .asInstanceOf[CharacterModel]
         "should pass to the room adjacent to the current room on right side" in {
           val newCharacter = PassageUpdater(dungeon, initialRoom, movedCharacter)._2
@@ -80,7 +80,7 @@ class PassageUpdaterTest extends AnyFreeSpec {
       }
       "a character adjacent to the door above" - {
         val movedCharacter = character
-          .withDynamic(character.boundingBox.moveTo(DoorPosition.above), Speed.toAbove)
+          .withDynamic(character.boundingBox.moveTo(DoorPosition.above), Speed.toAbove, false)
           .asInstanceOf[CharacterModel]
         "should pass to the room adjacent to the current room on above side" in {
           val newCharacter = PassageUpdater(dungeon, initialRoom, movedCharacter)._2
@@ -93,7 +93,7 @@ class PassageUpdaterTest extends AnyFreeSpec {
       }
       "a character adjacent to the door below" - {
         val movedCharacter = character
-          .withDynamic(character.boundingBox.moveTo(DoorPosition.below), Speed.toBelow)
+          .withDynamic(character.boundingBox.moveTo(DoorPosition.below), Speed.toBelow, false)
           .asInstanceOf[CharacterModel]
         "should pass to the room adjacent to the current room on below side" in {
           val newCharacter = PassageUpdater(dungeon, initialRoom, movedCharacter)._2

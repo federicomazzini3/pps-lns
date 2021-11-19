@@ -154,8 +154,9 @@ trait DynamicModel extends AnythingModel with StatsModel {
   type Model >: this.type <: DynamicModel
 
   val speed: Vector2
+  val collisionDetected: Boolean
 
-  def withDynamic(boundingBox: BoundingBox, speed: Vector2): Model
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model
 
   /**
    * @return
@@ -179,6 +180,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
   }
 
   /**
+   * Computes the Anything speed vector in px/s unit. Represents the current Anything intention of movement
    * @param context
    *   indigo frame context data
    * @param gameContext
@@ -187,6 +189,29 @@ trait DynamicModel extends AnythingModel with StatsModel {
    *   the speed vector
    */
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2
+
+  /**
+   * Calculates the speed vector for the current frame that represents how many pixels the Anything has to move in
+   * current frame update
+   * @param context
+   *   indigo frame context data
+   * @param speed
+   *   speed Vector2
+   * @return
+   *   the speed vector for the current frame
+   */
+  protected def frameSpeed(context: FrameContext[StartupData], speed: Vector2): Vector2 =
+    speed * context.gameTime.delta.toDouble
+
+  /**
+   * Limit the movement to do in the current frame update, default no limits. To be overriden when needed to specify a
+   * custom limit rule
+   * @param move
+   *   current movement Vector2
+   * @return
+   *   current movement Vector2 limited by a rule, default no limit rule
+   */
+  protected def limitMove(move: Vector2): Vector2 = move
 
   /**
    * @param context
@@ -200,7 +225,15 @@ trait DynamicModel extends AnythingModel with StatsModel {
    */
   def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
     val speed: Vector2 = computeSpeed(context)(gameContext)
-    (speed, boundingBox.moveBy(speed * context.gameTime.delta.toDouble))
+    speed match {
+      case Vector2.zero => (speed, boundingBox)
+      case x            => (x, boundingBox.moveBy(limitMove(frameSpeed(context, x))))
+    }
+
+  def movedBy(previous: DynamicModel): Double = getPosition() - previous.getPosition() match {
+    case v if v ~== Vector2.zero => 0.0
+    case v                       => v.length
+  }
 
   /**
    * Update request called during game loop on every frame. The Anything movement speed direction and module is first
@@ -217,7 +250,9 @@ trait DynamicModel extends AnythingModel with StatsModel {
       superObj <- super.update(context)(gameContext)
       (newSpeed, newPosition) = computeMove(context)(gameContext)
       boundLocation           = gameContext.room.boundPosition(newPosition)
-      newObj                  = superObj.withDynamic(boundLocation, newSpeed).asInstanceOf[Model]
+      newObj = superObj
+        .withDynamic(boundLocation, newSpeed, boundLocation.position != newPosition.position)
+        .asInstanceOf[Model]
     } yield newObj
 
 }
