@@ -25,25 +25,29 @@ object CollisionUpdater {
       f: (AnythingModel, AnythingModel) => Outcome[AnythingModel]
   ): Outcome[AnythingModel] =
     //prendo solo i solid che non sono crossable e diversi da me stesso
-    anythings.values
-      .collect {
-        case against: SolidModel if !against.crossable && against.id != anything.id => against
-      }
-      //uno shot non si scontra con un altro shot, uno shot non si scontra con il proprietario
-      .filter(against =>
-        (anything, against) match {
-          case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
-          case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
-          case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
-          case _                                                  => true
-        }
-      )
-      .foldLeft(Outcome(anything)) { (anything, against) =>
-        for {
-          an  <- anything
-          all <- f(an, against)
-        } yield all //f(an, against)
-      }
+    anything match {
+      case a: SolidModel if !a.crossable =>
+        anythings.values
+          .collect {
+            case against: SolidModel if !against.crossable && against.id != anything.id => against
+          }
+          //uno shot non si scontra con un altro shot, uno shot non si scontra con il proprietario
+          .filter(against =>
+            (anything, against) match {
+              case (shot: ShotModel, other: ShotModel)                => false // no collision between 2 shots
+              case (shot: ShotModel, other) if shot.owner == other.id => false // no collision shot and owner
+              case (other, shot: ShotModel) if shot.owner == other.id => false // no collision shot and owner
+              case _                                                  => true
+            }
+          )
+          .foldLeft(Outcome(anything)) { (anything, against) =>
+            for {
+              an  <- anything
+              all <- f(an, against)
+            } yield all //f(an, against)
+          }
+      case _ => Outcome(anything)
+    }
 
   /**
    * Update an anything position if there is a collision with another element
