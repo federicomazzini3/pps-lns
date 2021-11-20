@@ -33,6 +33,16 @@ trait ItemAsset extends AnythingAsset {
   def drawItemOnAltar(name: String): Group =
     drawComponents(List(altarView, itemView(name)))
 
+  /**
+   * Draw only altar when once item is picked
+   * @param name
+   *   item name
+   * @return
+   *   Group
+   */
+  def drawOnlyAltar: Group =
+    drawComponents(List(altarView))
+
   def altarView: Graphic[Material.Bitmap] =
     Graphic(
       Rectangle(0, 0, altarWidth, altarHeight),

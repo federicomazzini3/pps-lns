@@ -40,12 +40,15 @@ case class ItemModel(
     name: String,
     stats: Stats,
     shotAreaOffset: Int = 0,
-    crossable: Boolean = false
+    crossable: Boolean = false,
+    pickedup: Boolean = false
 ) extends SolidModel {
 
   type Model = ItemModel
 
   def withSolid(crossable: Boolean): Model = copyMacro
+
+  def withPick(pickedup: Boolean): Model = copyMacro
 }
 
 /**
