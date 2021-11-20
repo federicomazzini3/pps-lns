@@ -30,7 +30,7 @@ object Generator {
   def generateRoom(grid: BasicGrid, position: Position, roomType: RoomType): RoomModel =
     roomType match {
       case RoomType.Item =>
-        RoomModel.itemRoom(position, generateDoors(grid, position), generateItems())
+        RoomModel.itemRoom(position, generateDoors(grid, position), generateItem())
       case RoomType.Arena =>
         val enemyTest  = ParabiteModel.initial
         val enemyTest2 = MaskModel.initial2
@@ -50,7 +50,7 @@ object Generator {
 
   def generateBlockingElements(): Map[AnythingId, AnythingModel] = ElementModel.stones()
 
-  def generateItems(): Map[AnythingId, AnythingModel] = ItemModel.all
+  def generateItem(): Map[AnythingId, AnythingModel] = ItemModel.random
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

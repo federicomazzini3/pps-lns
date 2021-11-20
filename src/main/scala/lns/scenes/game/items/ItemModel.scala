@@ -12,6 +12,7 @@ import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel }
 import lns.scenes.game.stats.*
 
 import scala.language.implicitConversions
+import scala.util.Random
 
 /**
  * Item model that is solid and defines the stat variations to attribute to the character when he collects it
@@ -66,6 +67,22 @@ object ItemModel {
       boundingBox = ItemView.boundingBox(Vertex(Rooms.floorSize / 2, Rooms.floorSize / 2)),
       name = name,
       stats = Stats.item(name)
+    )
+    Map(item.id -> item)
+
+  /**
+   * Create [[ItemModel]] randomly
+   * @return
+   *   Map[AnythingId, AnythingModel]
+   */
+  def random: Map[AnythingId, AnythingModel] =
+    val randomItem = Items.all.toVector(Random.between(0, Items.all.size - 1))
+    val item = ItemModel(
+      id = AnythingId.generate,
+      view = () => ItemView,
+      boundingBox = ItemView.boundingBox(Vertex(150 * 4, 150 * 4)),
+      name = randomItem,
+      stats = Stats.item(randomItem)
     )
     Map(item.id -> item)
 
