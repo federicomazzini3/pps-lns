@@ -18,5 +18,6 @@ object ItemView extends ItemView[Unit] with SimpleAnythingView with ItemAsset {
   type View = Group
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    drawItemOnAltar(model.name)
+    if !model.pickedup then drawItemOnAltar(model.name)
+    else drawOnlyAltar
 }
