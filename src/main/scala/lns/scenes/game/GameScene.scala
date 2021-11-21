@@ -54,7 +54,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
     case FrameTick =>
       model match {
 
-        case model @ GameModel.Started(dungeon, roomIndex, character) =>
+        case model @ GameModel.Started(_, dungeon, roomIndex, character) if model.generated =>
           val gameContext = GameContext(model.currentRoom, character)
           for {
             updatedCharacter <- model.updateCharacter(c => character.update(context)(gameContext))
@@ -76,7 +76,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
 
     case ShotEvent(shot) =>
       model match {
-        case model @ GameModel.Started(_, room, _) =>
+        case model @ GameModel.Started(_, _, room, _) =>
           model.updateCurrentRoom(room => model.currentRoom.addShot(shot))
         case _ => Outcome(model)
       }
@@ -129,7 +129,8 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
   ): Outcome[SceneUpdateFragment] =
     (model, viewModel) match {
 
-      case (model @ GameModel.Started(dungeon, room, character), viewModel: GameViewModel.Started) =>
+      case (model @ GameModel.Started(_, dungeon, room, character), viewModel: GameViewModel.Started)
+          if model.generated =>
         SceneUpdateFragment.empty
           .addLayers(
             Layer(

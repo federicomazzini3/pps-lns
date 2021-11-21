@@ -73,6 +73,8 @@ case class BasicGrid(val content: Map[Position, RoomType]) extends Grid {
 case class DungeonModel(val content: Map[Position, RoomModel], val initialRoom: Position) extends Grid {
   override type Room = RoomModel
 
+  val generated = content.foldLeft(true)((generated, room) => room._2.generated && generated)
+
   def room(position: Position): Option[RoomModel] = Grid.in(this)(position)
 
   def nearRoom(position: Position)(location: Location): Option[RoomModel] = Grid.near(this)(position)(location)

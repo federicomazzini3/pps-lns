@@ -1,12 +1,12 @@
 package lns.scenes.game.elements
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel, given }
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel }
 import lns.core.Macros.copyMacro
+import lns.scenes.game.room.Cell
 
 case class StoneModel(
     id: AnythingId,
@@ -24,21 +24,17 @@ case class StoneModel(
 
 object ElementModel {
 
-  def defaultArea(i: Int, j: Int): BoundingBox =
-    StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j))
-
-  def stones(): Map[AnythingId, AnythingModel] =
-    val stones =
-      for {
-        i <- 0 until 9 if i != 4
-        j <- 0 until 2
-        id = AnythingId.generate
-      } yield id -> StoneModel(
-        id = id,
-        view = () => StoneView,
-        boundingBox = StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j)),
-        shotAreaOffset = 0
-      )
-
-    stones.toMap
+  def stones(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
+    def _stones(cells: Seq[Cell], stones: Map[AnythingId, AnythingModel]): Map[AnythingId, AnythingModel] =
+      if cells.size <= 0 then stones
+      else {
+        val stone = StoneModel(
+          id = AnythingId.generate,
+          view = () => StoneView,
+          boundingBox = StoneView.boundingBox(Vertex(Rooms.cellSize * cells.head.x, Rooms.cellSize * cells.head.y)),
+          shotAreaOffset = 0
+        )
+        _stones(cells.tail, stones + (stone.id -> stone))
+      }
+    _stones(cells, Map.empty)
 }

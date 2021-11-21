@@ -36,10 +36,13 @@ object GameModel {
    *   the character controlled by the player
    */
   case class Started(
+      val prologClient: PrologClient,
       val dungeon: DungeonModel,
       val currentRoomPosition: (Int, Int),
       val character: CharacterModel
   ) extends GameModel {
+
+    val generated = dungeon.generated
 
     /**
      * the extended anything collection with the current room's anything and the character
@@ -173,6 +176,7 @@ object GameModel {
       )
 
     Started(
+      PrologClient(),
       dungeonModel,
       dungeonModel.initialRoom,
       CharacterModel.initial

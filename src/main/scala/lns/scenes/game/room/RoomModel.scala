@@ -41,6 +41,11 @@ trait RoomModel {
   val doors: Doors
 
   /**
+   * flag to verify if the room is generated
+   */
+  val generated: Boolean
+
+  /**
    * the shots fired in a room
    */
   val anythings: Map[AnythingId, AnythingModel]
@@ -145,6 +150,7 @@ case class EmptyRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
   val doors = doorsLocations.open
@@ -165,6 +171,7 @@ case class ArenaRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -190,6 +197,7 @@ case class ItemRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -211,6 +219,7 @@ case class BossRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -229,13 +238,15 @@ object RoomModel {
   def initial(): EmptyRoom = EmptyRoom(
     (0, 0),
     defaultFloor,
-    Left :+ Right :+ Above :+ Below
+    Left :+ Right :+ Above :+ Below,
+    true
   )
 
   def emptyRoom(position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
     position,
     defaultFloor,
-    locations
+    locations,
+    true
   )
 
   def arenaRoom(position: Position, locations: DoorsLocations, anythings: Map[AnythingId, AnythingModel]): ArenaRoom =
@@ -243,6 +254,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      true,
       anythings
     )
 
@@ -251,6 +263,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      true,
       anythings
     )
 
@@ -259,6 +272,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      true,
       anythings
     )
 
