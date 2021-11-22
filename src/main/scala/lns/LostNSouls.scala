@@ -21,7 +21,11 @@ final case class BootData(screenDimensions: Rectangle)
 /**
  * Game startup data built from boot data
  */
-final case class StartupData(screenDimensions: Rectangle, dungeonGenerator: Option[String] = None) {
+final case class StartupData(
+    screenDimensions: Rectangle,
+    dungeonGenerator: Option[String] = None,
+    blockingElemGenerator: Option[String] = None
+) {
   def scale(edge: Int): Double =
     Math.min(
       1.0 / edge * screenDimensions.width,
@@ -66,7 +70,11 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
     Outcome(
       Startup
         .Success(
-          StartupData(bootData.screenDimensions, assetCollection.findTextDataByName(AssetName("dungeon_generator")))
+          StartupData(
+            bootData.screenDimensions,
+            assetCollection.findTextDataByName(AssetName("dungeon_generator")),
+            assetCollection.findTextDataByName(AssetName("blocking_elements_generator"))
+          )
         )
         .addAnimations(Animations())
     )

@@ -4,6 +4,7 @@ import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
 import lns.scenes.game.anything.{ SolidModel, * }
 import lns.scenes.game.characters.CharacterModel
+import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.items.ItemModel
 import lns.scenes.game.room.*
 import lns.scenes.game.shots.*
@@ -106,6 +107,8 @@ object CollisionUpdater {
             Collision.withElement(against.boundingBox, anything.shotArea)
           case (s: ShotModel, _) =>
             Collision.withElement(against.shotArea, anything.boundingBox)
+          case (e1: EnemyModel, e2: EnemyModel) =>
+            None
           case _ =>
             Collision.withElement(against.boundingBox, anything.boundingBox)
         } match {

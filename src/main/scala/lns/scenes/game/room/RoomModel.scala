@@ -70,6 +70,9 @@ trait RoomModel {
   def addShot(shot: ShotModel): Outcome[RoomModel] =
     updateAnythings(anythings => Outcome(anythings + (shot.id -> shot)))
 
+  def addAnythings(newAnythings: Map[AnythingId, AnythingModel]): Outcome[RoomModel] =
+    updateAnythings(anythings => Outcome(anythings ++ newAnythings))
+
   /**
    * Remove an anyhthing from the room
    * @param anything
@@ -106,7 +109,7 @@ trait RoomModel {
         case room: ItemRoom =>
           room.copy(anythings = ua)
         case room: ArenaRoom =>
-          room.copy(anythings = ua)
+          room.copy(anythings = ua, generated = true)
         case room: BossRoom =>
           room.copy(anythings = ua)
         case _ => this
@@ -254,7 +257,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
-      true,
+      false,
       anythings
     )
 

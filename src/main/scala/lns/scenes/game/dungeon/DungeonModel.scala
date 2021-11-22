@@ -5,7 +5,7 @@ import lns.scenes.game.GameModel
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*
 import lns.scenes.game.room.door.DoorState.*
-import lns.scenes.game.room.{ EmptyRoom, RoomModel }
+import lns.scenes.game.room.{ ArenaRoom, EmptyRoom, RoomModel }
 
 type Position = (Int, Int)
 
@@ -75,11 +75,16 @@ case class DungeonModel(val content: Map[Position, RoomModel], val initialRoom: 
 
   val generated = content.foldLeft(true)((generated, room) => room._2.generated && generated)
 
+  val firstRoomToGenerate: Option[RoomModel] =
+    content.collect {
+      case (pos, room: ArenaRoom) if !room.generated => room
+    }.headOption
+
   def room(position: Position): Option[RoomModel] = Grid.in(this)(position)
 
   def nearRoom(position: Position)(location: Location): Option[RoomModel] = Grid.near(this)(position)(location)
 
-  def nearPosition(position: Position)(location: Location): Option[(Int, Int)] =
+  def nearPosition(position: Position)(location: Location): Option[Position] =
     Grid.nearPosition(position)(location)
 
   def updateRoom(position: Position)(updatedRoom: RoomModel): DungeonModel =

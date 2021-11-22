@@ -11,6 +11,7 @@ import lns.scenes.game.anything.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 import lns.scenes.game.enemies.{ EnemyModel, EnemyState, EnemyStatus, Follower }
+import lns.scenes.game.room.Cell
 
 import scala.collection.immutable.Queue
 
@@ -70,10 +71,10 @@ case class BoneyModel(
  */
 object BoneyModel {
 
-  def initial: BoneyModel = BoneyModel(
+  def initial(cell: Cell): BoneyModel = BoneyModel(
     AnythingId.generate,
     view = () => BoneyView,
-    boundingBox = BoneyView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    boundingBox = BoneyView.boundingBox(Vertex(Assets.Rooms.cellSize * cell.x, Assets.Rooms.cellSize * cell.y)),
     shotAreaOffset = BoneyView.shotAreaOffset,
     stats = Stats.Boney,
     life = MaxLife @@ Stats.Boney

@@ -14,6 +14,7 @@ import lns.scenes.game.anything.FireModel
 import lns.scenes.game.characters.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
+import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
 import lns.scenes.game.room.{ Boundary, RoomView }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
@@ -21,7 +22,7 @@ import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.room.*
-import lns.scenes.game.subsystems.{ BattleEventSubSystems, Hit, Dead }
+import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit }
 import lns.scenes.game.updater.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
@@ -54,7 +55,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
     case FrameTick =>
       model match {
 
-        case model @ GameModel.Started(_, dungeon, roomIndex, character) if model.generated =>
+        case model @ GameModel.Started(_, dungeon, roomIndex, character) if dungeon.generated =>
           val gameContext = GameContext(model.currentRoom, character)
           for {
             updatedCharacter <- model.updateCharacter(c => character.update(context)(gameContext))
@@ -64,6 +65,19 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
             withMovements    <- withStats.updateMovementAfterCollision
           } yield withMovements
 
+        case model: GameModel.Started if !model.dungeon.generated && !model.prologClient.consultDone =>
+          model.dungeon.firstRoomToGenerate match {
+            case Some(room) =>
+              println(GeneratorHelper.rule(room.doors))
+              model.prologClient
+                .consult(
+                  context.startUpData.blockingElemGenerator.get,
+                  GeneratorHelper.rule(room.doors)
+                )
+                .map(pi => model.copy(prologClient = pi))
+            case _ => model
+          }
+
         case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
             .consult(
@@ -71,6 +85,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
               "generateDungeon(30,L)."
             )
             .map(pi => model.copy(prologClient = pi))
+
         case _ => model
       }
 
@@ -88,6 +103,14 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
             context.startUpData,
             Generator.getDungeon(substitution)
           )
+        case model: GameModel.Started if model.prologClient.hasQuery(queryId) =>
+          model.dungeon.firstRoomToGenerate match {
+            case Some(room) =>
+              model.updateRoom(room.positionInDungeon)(room =>
+                room.addAnythings(Generator.generateElementsFromProlog(substitution))
+              )
+            case _ => model
+          }
         case _ => model
       }
 
@@ -130,7 +153,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
     (model, viewModel) match {
 
       case (model @ GameModel.Started(_, dungeon, room, character), viewModel: GameViewModel.Started)
-          if model.generated =>
+          if dungeon.generated =>
         SceneUpdateFragment.empty
           .addLayers(
             Layer(

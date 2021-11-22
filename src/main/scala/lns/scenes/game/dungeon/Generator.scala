@@ -13,6 +13,7 @@ import lns.scenes.game.room.{ Cell, Floor, RoomModel }
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.stats.*
 import lns.scenes.game.elements.ElementModel
+import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.items.ItemModel
 import lns.subsystems.prolog.{ Substitution, Term }
 import lns.subsystems.prolog.Term.*
@@ -55,19 +56,18 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateAreas(doors: Set[Location]): (Seq[Cell], Seq[Cell]) =
-    (Seq.empty, Seq(Cell(0, 0), Cell(1, 0), Cell(2, 0), Cell(3, 0), Cell(5, 0), Cell(6, 0), Cell(7, 0), Cell(8, 0)))
+  def generateElementsFromProlog(substitution: Substitution): Map[AnythingId, AnythingModel] =
+    generateEnemies(GeneratorHelper.fromPrologList(substitution.links("A").toString)) ++
+      generateBlockingElements(GeneratorHelper.fromPrologList(substitution.links("S").toString))
 
   def generateBlockingElements(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
-    ElementModel.stones(cells)
+    ElementModel.random(cells)
 
   def generateEnemies(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
-    /** Farsi passare i posti disponibili e generare un numero di nemici casuale da 0 a n */
-    val enemyTest  = ParabiteModel.initial
-    val enemyTest2 = MaskModel.initial2
-    Map((enemyTest.id -> enemyTest), (enemyTest2.id -> enemyTest2))
+    EnemyModel.random(cells)
 
-  def generateItem(position: Cell): Map[AnythingId, AnythingModel] = ItemModel.random(position)
+  def generateItem(position: Cell): Map[AnythingId, AnythingModel] =
+    ItemModel.random(position)
 
   /**
    * Generates the dungeon from Prolog Substitution which contains a Term "L" that represents a list of room(x,y,type)

@@ -52,7 +52,7 @@ game_area(N,[D|Ds], A):-
 game_grid(N, G):-
 	findall((G1, G2), (range(0, N, G1),range(0, N, G2)), G).
 
-%game_grid(+Size, +Doors, -GridArea, -GameArea, -StoneArea)
+%place_stones(+Size, +Doors, -GridArea, -GameArea, -StoneArea)
 %place_stones(8,[(8,4)],G,A,S).
 place_stones(N, D, G, A, S):-
 	game_grid(N,G),
