@@ -1,12 +1,14 @@
 package lns.scenes.game.elements
 
 import scala.language.implicitConversions
-
 import indigo.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.core.Assets.Rooms
-import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel, given }
+import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel }
 import lns.core.Macros.copyMacro
+import lns.scenes.game.room.{ Cell, Floor }
+
+import scala.util.Random
 
 case class StoneModel(
     id: AnythingId,
@@ -24,21 +26,32 @@ case class StoneModel(
 
 object ElementModel {
 
-  def defaultArea(i: Int, j: Int): BoundingBox =
-    StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j))
+  def stone(cell: Cell) = StoneModel(
+    id = AnythingId.generate,
+    view = () => StoneView,
+    boundingBox = StoneView.boundingBox(Vertex(Rooms.cellSize * cell.x, Rooms.cellSize * cell.y)),
+    shotAreaOffset = 0
+  )
 
-  def stones(): Map[AnythingId, AnythingModel] =
-    val stones =
-      for {
-        i <- 0 until 9 if i != 4
-        j <- 0 until 2
-        id = AnythingId.generate
-      } yield id -> StoneModel(
-        id = id,
-        view = () => StoneView,
-        boundingBox = StoneView.boundingBox(Vertex(Rooms.cellSize * i, Rooms.cellSize * j)),
-        shotAreaOffset = 0
-      )
+  val elementModels = Seq(stone)
 
-    stones.toMap
+  def random(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
+    def _random(cells: Seq[Cell], stones: Map[AnythingId, AnythingModel]): Map[AnythingId, AnythingModel] =
+      if cells.size <= 0 then stones
+      else {
+        val element = Random.shuffle(elementModels).head(cells.head)
+        _random(cells.tail, stones + (element.id -> element))
+      }
+
+    val randomStonesNumber =
+      val max = 15
+      val min = 5
+      cells.size match {
+        case n if n > max + 1 => Random.between(min, max)
+        case n if n > min + 1 => n
+        case 0                => 0
+        case n                => Random.between(0, n)
+      }
+
+    _random(cells.take(randomStonesNumber), Map.empty)
 }

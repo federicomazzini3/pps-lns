@@ -8,6 +8,7 @@ import lns.scenes.game.room.*
 import lns.scenes.game.room.door.Location.{ Above, Below, Left, Right }
 import lns.scenes.game.room.door.{ Door, Location }
 import lns.scenes.game.room.door.LocationImplicit.*
+import lns.scenes.game.dungeon.Position
 
 object PassageUpdater {
 
@@ -19,7 +20,7 @@ object PassageUpdater {
    * @return
    *   The destination room and the character moved in the right position (near the destination door)
    */
-  def apply(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): ((Int, Int), CharacterModel) = {
+  def apply(dungeon: DungeonModel, room: RoomModel, character: CharacterModel): (Position, CharacterModel) = {
 
     /**
      * Change the current room based on location
@@ -27,7 +28,7 @@ object PassageUpdater {
      * @return
      *   The new dungeon position of the current room of the game
      */
-    def changeRoom(locations: Location): (Int, Int) =
+    def changeRoom(locations: Location): Position =
       dungeon.nearPosition(room.positionInDungeon)(locations).getOrElse(room.positionInDungeon)
 
     /**

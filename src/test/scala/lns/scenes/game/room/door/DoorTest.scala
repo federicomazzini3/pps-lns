@@ -2,8 +2,10 @@ package lns.scenes.game.room.door
 
 import org.scalatest.freespec.AnyFreeSpec
 import DoorImplicit.*
+import DoorImplicit.given
 import DoorState.*
 import Location.*
+import scala.language.implicitConversions
 
 class DoorTest extends AnyFreeSpec {
   "A collection of doors" - {

@@ -6,11 +6,11 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
-import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.anything.*
 import lns.scenes.game.enemies.{ EnemyModel, EnemyState, EnemyStatus, FiresContinuously, KeepsAway }
-import lns.scenes.game.room.RoomModel
+import lns.scenes.game.room.{ Cell, RoomModel }
 import lns.scenes.game.shots.ShotEvent
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.MaxLife
 
 import scala.collection.immutable.Queue
@@ -61,10 +61,10 @@ case class NerveModel(
  */
 object NerveModel {
 
-  def initial: NerveModel = NerveModel(
+  def initial(cell: Cell): NerveModel = NerveModel(
     AnythingId.generate,
     view = () => NerveView,
-    boundingBox = NerveView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    boundingBox = NerveView.boundingBox(Vertex(Assets.Rooms.cellSize * cell.x, Assets.Rooms.cellSize * cell.y)),
     shotAreaOffset = NerveView.shotAreaOffset,
     stats = Stats.Nerve,
     life = MaxLife @@ Stats.Nerve

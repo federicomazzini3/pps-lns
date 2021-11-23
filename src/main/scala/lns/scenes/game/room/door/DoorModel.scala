@@ -34,6 +34,16 @@ object Door {
   def apply(door: Door) = Map(door)
 
   /**
+   * @param locations
+   *   location of the doors
+   * @param f
+   *   function to map a location in location -> state
+   * @return
+   *   a collection of doors
+   */
+  def apply(locations: DoorsLocations)(f: Location => (Location, DoorState)) = locations.map(loc => f(loc)).toMap
+
+  /**
    * @param doors
    *   the map of doors to update
    * @param toAddDoor
@@ -77,8 +87,10 @@ object Door {
  * extension to map and tuple that enable Door method calling
  */
 object DoorImplicit {
-  import lns.scenes.game.room.door.Location.*
-  import lns.scenes.game.room.door.DoorState.*
+  import Location.*
+  import DoorState.*
+
+  given Conversion[Door, Doors] = Map(_)
 
   extension (doors: Doors) {
     def :+(toAddDoor: Door) = updateWith(doors, toAddDoor)
@@ -86,24 +98,19 @@ object DoorImplicit {
     def close: Doors        = Door.updateState(doors)(Close)
     def lock: Doors         = Door.updateState(doors)(Lock)
   }
-  extension (door: Door) {
-    def :+(toAddDoor: Door) = updateWith(Map(door), toAddDoor)
-  }
-
-  extension (doorsLocations: Set[Location]) {
-    def :+(toAddDoor: Location): Set[Location] = doorsLocations + toAddDoor
-    def open: Doors                            = doorsLocations.map(loc => loc -> DoorState.Open).toMap
-    def close: Doors                           = doorsLocations.map(loc => loc -> DoorState.Close).toMap
-    def lock: Doors                            = doorsLocations.map(loc => loc -> DoorState.Lock).toMap
-  }
-
-  extension (doorLocation: Location) {
-    def :+(toAddLocation: Location): Set[Location] = Set(doorLocation, toAddLocation)
-  }
 }
 
 object LocationImplicit {
   import Location.*
+  import DoorState.*
+
+  given Conversion[Location, Set[Location]] = Set(_)
+  extension (doorsLocations: Set[Location]) {
+    def :+(toAddDoor: Location): Set[Location] = doorsLocations + toAddDoor
+    def open: Doors                            = Door(doorsLocations)(loc => (loc -> Open))
+    def lock: Doors                            = Door(doorsLocations)(loc => (loc -> Lock))
+    def close: Doors                           = Door(doorsLocations)(loc => (loc -> Close))
+  }
   extension (location: Location) {
     def opposite: Location = location match {
       case Above => Below
@@ -112,4 +119,5 @@ object LocationImplicit {
       case Left  => Right
     }
   }
+
 }

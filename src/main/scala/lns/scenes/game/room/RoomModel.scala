@@ -12,7 +12,8 @@ import lns.scenes.game.dungeon.*
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, DynamicState, SolidModel }
 import lns.scenes.game.room.door.*
 import lns.scenes.game.shots.ShotModel
-import lns.scenes.game.room.door.DoorImplicit.*
+import lns.scenes.game.room.door.LocationImplicit.*
+import lns.scenes.game.room.door.LocationImplicit.given_Conversion_Location_Set
 import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.enemies.nerve.NerveModel
@@ -41,6 +42,11 @@ trait RoomModel {
   val doors: Doors
 
   /**
+   * flag to verify if the room is generated
+   */
+  val generated: Boolean
+
+  /**
    * the shots fired in a room
    */
   val anythings: Map[AnythingId, AnythingModel]
@@ -64,6 +70,9 @@ trait RoomModel {
    */
   def addShot(shot: ShotModel): Outcome[RoomModel] =
     updateAnythings(anythings => Outcome(anythings + (shot.id -> shot)))
+
+  def addAnythings(newAnythings: Map[AnythingId, AnythingModel]): Outcome[RoomModel] =
+    updateAnythings(anythings => Outcome(anythings ++ newAnythings))
 
   /**
    * Remove an anyhthing from the room
@@ -101,7 +110,7 @@ trait RoomModel {
         case room: ItemRoom =>
           room.copy(anythings = ua)
         case room: ArenaRoom =>
-          room.copy(anythings = ua)
+          room.copy(anythings = ua, generated = true)
         case room: BossRoom =>
           room.copy(anythings = ua)
         case _ => this
@@ -145,6 +154,7 @@ case class EmptyRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
   val doors = doorsLocations.open
@@ -165,6 +175,7 @@ case class ArenaRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -190,6 +201,7 @@ case class ItemRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -211,6 +223,7 @@ case class BossRoom(
     positionInDungeon: Position,
     floor: BoundingBox,
     doorsLocations: DoorsLocations,
+    generated: Boolean,
     anythings: Map[AnythingId, AnythingModel] = Map.empty
 ) extends RoomModel {
 
@@ -222,20 +235,23 @@ case class BossRoom(
  */
 object RoomModel {
   import lns.scenes.game.room.door.*
-  import lns.scenes.game.room.door.DoorImplicit.*
   import lns.scenes.game.room.door.DoorState.*
   import lns.scenes.game.room.door.Location.*
+  import lns.scenes.game.room.door.LocationImplicit.given_Conversion_Location_Set
+  import scala.language.implicitConversions
 
   def initial(): EmptyRoom = EmptyRoom(
     (0, 0),
     defaultFloor,
-    Left :+ Right :+ Above :+ Below
+    Left :+ Right :+ Above :+ Below,
+    true
   )
 
   def emptyRoom(position: Position, locations: DoorsLocations): EmptyRoom = EmptyRoom(
     position,
     defaultFloor,
-    locations
+    locations,
+    true
   )
 
   def arenaRoom(position: Position, locations: DoorsLocations, anythings: Map[AnythingId, AnythingModel]): ArenaRoom =
@@ -243,6 +259,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      false,
       anythings
     )
 
@@ -251,6 +268,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      true,
       anythings
     )
 
@@ -259,6 +277,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
+      true,
       anythings
     )
 

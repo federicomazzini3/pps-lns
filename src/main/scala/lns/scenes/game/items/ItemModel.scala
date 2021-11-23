@@ -4,12 +4,15 @@ import indigo.*
 import indigo.shared.*
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.core.Assets
 import lns.core.Assets.Rooms
 import lns.core.Macros.copyMacro
 import lns.core.anythingAssets.Items
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel }
 import lns.scenes.game.stats.*
+import lns.scenes.game.dungeon.*
+import lns.scenes.game.room.Cell
 
 import scala.language.implicitConversions
 import scala.util.Random
@@ -78,12 +81,13 @@ object ItemModel {
    * @return
    *   Map[AnythingId, AnythingModel]
    */
-  def random: Map[AnythingId, AnythingModel] =
+  def random(position: Cell): Map[AnythingId, AnythingModel] =
     val randomItem = Items.all.toVector(Random.between(0, Items.all.size - 1))
     val item = ItemModel(
       id = AnythingId.generate,
       view = () => ItemView,
-      boundingBox = ItemView.boundingBox(Vertex(150 * 4, 150 * 4)),
+      boundingBox =
+        ItemView.boundingBox(Vertex(Assets.Rooms.cellSize * position.x, Assets.Rooms.cellSize * position.y)),
       name = randomItem,
       stats = Stats.item(randomItem)
     )

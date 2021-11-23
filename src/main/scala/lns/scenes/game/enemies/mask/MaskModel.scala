@@ -7,10 +7,13 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ *, given }
+import lns.scenes.game.anything.*
+import lns.scenes.game.anything.given
 import lns.scenes.game.enemies.{ EnemyModel, EnemyState, EnemyStatus, FiresContinuously, KeepsAway }
+import lns.scenes.game.room.Cell
 import lns.scenes.game.shots.*
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.stats.*
+import lns.scenes.game.stats.given
 import lns.scenes.game.stats.PropertyName.*
 
 import scala.collection.immutable.Queue
@@ -83,19 +86,10 @@ case class MaskModel(
  */
 object MaskModel {
 
-  def initial: MaskModel = MaskModel(
+  def initial(cell: Cell): MaskModel = MaskModel(
     AnythingId.generate,
     view = () => MaskView,
-    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
-    shotAreaOffset = MaskView.shotAreaOffset,
-    stats = Stats.Mask,
-    life = MaxLife @@ Stats.Mask
-  )
-
-  def initial2: MaskModel = MaskModel(
-    AnythingId.generate,
-    view = () => MaskView,
-    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.floorSize / 6, Assets.Rooms.floorSize / 6)),
+    boundingBox = MaskView.boundingBox(Vertex(Assets.Rooms.cellSize * cell.x, Assets.Rooms.cellSize * cell.y)),
     shotAreaOffset = MaskView.shotAreaOffset,
     stats = Stats.Mask,
     life = MaxLife @@ Stats.Mask

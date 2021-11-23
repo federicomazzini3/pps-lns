@@ -7,9 +7,11 @@ import lns.StartupData
 import lns.core.Assets
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
-import lns.scenes.game.anything.{ *, given }
-import lns.scenes.game.enemies.{ *, given }
-import lns.scenes.game.stats.{ *, given }
+import lns.scenes.game.anything.*
+import lns.scenes.game.enemies.*
+import lns.scenes.game.enemies.given
+import lns.scenes.game.room.Cell
+import lns.scenes.game.stats.*
 import lns.scenes.game.stats.PropertyName.*
 
 import scala.collection.immutable.Queue
@@ -95,10 +97,10 @@ case class ParabiteModel(
  */
 object ParabiteModel {
 
-  def initial: ParabiteModel = ParabiteModel(
+  def initial(cell: Cell): ParabiteModel = ParabiteModel(
     AnythingId.generate,
     view = () => ParabiteView,
-    boundingBox = ParabiteView.boundingBox(Vertex(Assets.Rooms.floorSize / 2, Assets.Rooms.floorSize / 2)),
+    boundingBox = ParabiteView.boundingBox(Vertex(Assets.Rooms.cellSize * cell.x, Assets.Rooms.cellSize * cell.y)),
     shotAreaOffset = ParabiteView.shotAreaOffset,
     stats = Stats.Parabite,
     life = MaxLife @@ Stats.Parabite

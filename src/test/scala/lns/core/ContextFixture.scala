@@ -21,7 +21,7 @@ trait ContextFixture {
 
   val width           = 1920
   val height          = 1080
-  val startupData     = StartupData(screenDimensions = Rectangle(0, 0, width, height))
+  val startupData     = StartupData(screenDimensions = Rectangle(0, 0, width, height), None, None)
   val dice            = Dice.fromSeed(1000)
   val boundaryLocator = new BoundaryLocator(new AnimationsRegister, new FontRegister, new DynamicText)
   val room            = RoomModel.initial()

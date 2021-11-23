@@ -36,8 +36,9 @@ object GameModel {
    *   the character controlled by the player
    */
   case class Started(
+      val prologClient: PrologClient,
       val dungeon: DungeonModel,
-      val currentRoomPosition: (Int, Int),
+      val currentRoomPosition: Position,
       val character: CharacterModel
   ) extends GameModel {
 
@@ -54,7 +55,7 @@ object GameModel {
      * @return
      *   a new Game Model with current room updated
      */
-    def changeCurrentRoom(newCurrentRoom: (Int, Int)): Started =
+    def changeCurrentRoom(newCurrentRoom: Position): Started =
       this.copy(currentRoomPosition = newCurrentRoom)
 
     /**
@@ -71,8 +72,24 @@ object GameModel {
      *   a new GameModel with an updated current Room
      */
     def updateCurrentRoom(f: RoomModel => Outcome[RoomModel]): Outcome[Started] =
-      for (updatedRoom <- f(currentRoom))
-        yield this.copy(dungeon = dungeon.updateRoom(currentRoomPosition)(updatedRoom))
+      updateRoom(currentRoomPosition)(f)
+
+    /**
+     * Update the GameModel with an updated current RoomModel
+     * @param position
+     *   dungeon position of the room
+     * @param f
+     *   function that set the strategy to update the room
+     * @return
+     *   a new GameModel with an updated Room
+     */
+    def updateRoom(position: Position)(f: RoomModel => Outcome[RoomModel]): Outcome[Started] =
+      dungeon.room(position) match {
+        case Some(room) =>
+          for (updatedRoom <- f(room))
+            yield this.copy(dungeon = dungeon.updateRoom(position)(updatedRoom), prologClient = PrologClient())
+        case _ => Outcome(this)
+      }
 
     /**
      * Update the GameModel with an updated Character
@@ -173,6 +190,7 @@ object GameModel {
       )
 
     Started(
+      PrologClient(),
       dungeonModel,
       dungeonModel.initialRoom,
       CharacterModel.initial
