@@ -20,26 +20,29 @@ Da qui l'idea di crearne uno nuovo per lui.
 \begin{enumerate}
     \item L'utente potrà 
     \begin{enumerate}
-    \item avviare una nuova partita da un menu contestuale
-    \item controllare il proprio personaggio all'interno della stanza per
-    \begin{enumerate}
-        \item spostarsi e cambiare direzione
-        \item sparare ai nemici
-        \item raccogliere elementi utili all'aumento delle sue caratteristiche
-        \item spostarsi da una stanza all'altra attraverso delle porte
+        \item avviare una nuova partita da un menu contestuale
+        \item controllare con la tastiera il proprio personaggio all'interno della stanza per
+        \begin{enumerate}
+            \item spostarsi e cambiare direzione
+            \item sparare ai nemici che possono essere di diversa tipologia
+            \item evitare elementi bloccanti o di disturbo se presenti
+            \item raccogliere oggetti utili all'aumento delle sue caratteristiche
+            \item spostarsi da una stanza all'altra attraverso delle porte
+        \end{enumerate}
         \item visualizzare in modo continuo le sue statistiche e i suoi punti vita
-    \end{enumerate}
+        \item visualizzare in modo continuo una mappa del dungeon che indichi la sua posizione corrente
+       
     \end{enumerate}
     \item L'utente dovrà riuscire a 
     \begin{enumerate}
-    \item distinguere nemici, oggetti e elementi di disturbo
-    \item capire in che direzione si sta muovendo
-    \item capire dove sta sparando
-    \item capire di aver colpito un nemico
-    \item capire di aver raccolto un oggetto
-    \item capire qual'è la stanza del boss
-    \item capire che sta fronteggiando un boss
-    \item capire di aver vinto o perso una partita
+        \item distinguere visivamente nemici, oggetti e elementi di disturbo
+        \item capire in che direzione si sta muovendo
+        \item capire dove sta sparando
+        \item capire di aver colpito un nemico
+        \item capire di aver raccolto un oggetto
+        \item capire qual'è la stanza del boss
+        \item capire che sta fronteggiando un boss
+        \item capire di aver vinto o perso una partita
     \end{enumerate}
 \end{enumerate}
 
@@ -51,39 +54,74 @@ Da qui l'idea di crearne uno nuovo per lui.
     \begin{enumerate}
         \item presenza di un tasto per avviare una nuova partita
     \end{enumerate}
-    \item Generazione di una mappa di gioco 2D in maniera casuale
+    \item Caricamento del gioco
     \begin{enumerate}
-        \item Una mappa è formata da più stanze quadrate
+        \item presenza di una schermata durante il caricamento degli elementi di gioco
+    \end{enumerate}
+    \item Generazione del dungeon/mappa di gioco 2D in maniera casuale
+    \begin{enumerate}
+        \item Durante la generazione deve essere visualizzata una schermata di attesa
+        \item Un dungeon è formato da più stanze quadrate
         \item Ogni stanza è fisicamente adiacente ad almeno un'altra stanza
         \item Tra stanze adiacenti è presente una porta che le collega
-        \item Una stanza è di diverse tipologie
+        \item La disposione delle stanze avviene favorendo forme di mappa complesse simil labirinto 
+        \item Una stanza è di una tipologia fra
             \begin{enumerate}
-                \item Iniziale
+                \item Vuota
                     \begin{enumerate}
-                        \item Vuota
-                        \item Una sola nella mappa
+                        \item Stanza completamente vuota
+                        \item La partita comincia con il personaggio in una stanza vuota
+                        \item In un dungeon ci sono circa un 10\% di stanze vuote
                     \end{enumerate}
                 \item Oggetto
                     \begin{enumerate}
-                        \item Contiene un singolo oggetto scelto randomicamente
+                        \item Contiene al centro un singolo oggetto scelto randomicamente
+                        \item In un dungeon ci sono circa un 15\% di stanze oggetto
                     \end{enumerate}
                 \item Combattimento
                     \begin{enumerate}
                         \item Il contenuto è generato randomicamente
-                        \item Contiene alcuni nemici di una singola tipologia
-                        \item Contiene alcuni elementi bloccanti
+                        \item Contiene alcuni nemici
+                        \item Contiene alcuni elementi bloccanti disposti in modo da non ostruire l'accesso alle porte da parte del personaggio
                         \item Le porte si chiudono quando il giocatore entra nella stanza
                         \item Le porte si aprono quando il giocatore ha eliminato tutti i nemici
+                        \item In un dungeon ci sono circa un 75\% di stanze combattimento
                     \end{enumerate}
                 \item Boss
                     \begin{enumerate}
-                        \item Contiene solamente il boss
-                        \item Una sola nella mappa
+                        \item Contiene solamente il nemico boss
+                        \item Una sola nel dungeon
                         \item Adiacente ad una ed una sola altra stanza
-                        \item Riconoscibile grazie ad una porta particolare 
                     \end{enumerate}
             \end{enumerate}
-        \item A video è visibile solo la stanza dove è presente il personaggio
+        
+        
+    \end{enumerate}
+
+    \item Scena di gioco
+    \begin{enumerate}
+        \item A video, dopo la generazione del dungeon, è visibile
+        \begin{enumerate}
+            \item al centro dello schermo e rappresentata con vista dall'alto solo la stanza dove è correntemente presente il personaggio
+            \item a sinistra della stanza l'elenco delle statistiche del personaggio
+            \item a sinistra della stanza una mini mappa del dungeon
+            \begin{enumerate}
+                \item Le stanze vuote e combattimento sono di colore neutro (bianco)
+                \item La stanza corrente, quelle oggetto e la stanza boss sono evidenziate con colori propri 
+            \end{enumerate}
+        \end{enumerate}
+        \item All'interno di una stanza nemici, oggetti, elementi bloccanti e personaggio, in linea generale
+            \begin{enumerate}
+                \item sono vincolati a stare nei limiti del perimetro rappresentato dal pavimento
+                \item non possono fisicamente attraversarsi tra loro sovrapponendosi graficamente, tuttavia la parte in alto di un'entità può sovrapporsi alla parte bassa di un'altra senza generare collisione ad emulare altezze diverse
+            \end{enumerate}
+        \item All'interno di una stanza un colpo sparato
+        \begin{enumerate}
+            \item è rappresentato con un cerchio colorato
+            \item è vincolato a stare nei limiti del perimetro rappresentato dal pavimento
+            \item colpisce un'entità qualsiasi non appena il primo entra in contatto con il rettangolo che graficamente racchiude interamente la seconda 
+            \item quando colpisce qualcosa il cerchio viene sostituito da un esplosione animata
+        \end{enumerate}
         
     \end{enumerate}
     
@@ -99,46 +137,87 @@ Da qui l'idea di crearne uno nuovo per lui.
         \item Il personaggio è controllato dall'utente con la tastiera
         \begin{enumerate}
             \item L'utente può muovere il personaggio nelle quattro direzioni principali (sopra, sotto, destra, sinistra)
-            \item L'utente può eseguire uno o più "shot" verso una delle quattro direzioni principali (sopra, sotto, destra, sinistra)
-            \item Il personaggio è vincolato a stare nei limiti della stanza e può uscire solo dalle porte
+            \item L'utente può sparare uno o più colpi verso una delle quattro direzioni principali (sopra, sotto, destra, sinistra)
+            \item Il personaggio può uscire dalla stanza attraverso le porte
         \end{enumerate}
-        \item Il personaggio infligge danno ai nemici quando uno "shot" colpisce un nemico
+        \item Il personaggio è visivamente costituito da
+        \begin{enumerate}
+            \item Una testa orientata in modo da rappresentare la direzione di fuoco, se il personaggio non sta sparando allora è orientata nella direzione di movimento
+            \item Un corpo orientato ed animato in modo da rappresentare la direzione di movimento
+        \end{enumerate}
+        \item Il personaggio infligge danno ai nemici quando un suo colpo colpisce un nemico
         \item Il personaggio può raccogliere oggetti che modificano le sue caratteristiche
+        \item Il personaggio muore e la partita termina mostrando un messaggio "game over" quando la sua vita arriva a zero
     \end{enumerate}
     
-    \item Nemici con diverse caratteristiche
+    \item Nemici con diverse caratteristiche e comportamenti
     \begin{enumerate}
-        \item Un nemico può essere di diverse tipologie
-             \begin{enumerate}
-                \item A (nome del nemico)
-                \item B
-                \item C
-            \end{enumerate}
-        \item Ogni tipologia è caratterizzata da
+        \item Un nemico può essere nello stato
+        \begin{enumerate}
+            \item Inattivo: non esegue azioni
+            \item Attacco: esegue azioni di attacco nei confronti del personaggio
+            \item Difesa: esegue azioni per difendersi dal personaggio
+            \item Nascosto: esegue azioni per nascondersi dal personaggio
+        \end{enumerate}
+        \item Ogni nemico è caratterizzato da
             \begin{enumerate}
                 \item Punti vita
                 \item Velocità di movimento
-                \item Danno
-                \item Modalità di movimento
-                 \begin{enumerate}
-                    \item Casuale all'interno di una stanza
-                    \item In direzione del giocatore
+                \item Danno da contatto
+                \item Se il nemico spara
+                \begin{enumerate}
+                    \item Danno da fuoco
+                    \item Rate di fuoco
                 \end{enumerate}
             \end{enumerate}
-        \item Un nemico infligge danno al personaggio quando lo tocca
-        \item Un nemico si muove solo all'interno di una stanza
+        \item Un nemico infligge danno al personaggio quando vi entra in collisione
+        \item Un nemico che spara infligge danno al personaggio quando un suo colpo vi entra in collisione
+        \item Un nemico se si muove lo fa solo all'interno di una sola stanza
+        \item Un nemico muore quando la sua vita arriva a zero, al suo posto viene visualizzata un esplosione animata
+        \item Quattro tipologie di nemico
+            \begin{enumerate}
+                \item Nerve
+                    \begin{enumerate}
+                        \item Sta sempre nello stato di attacco
+                        \item Sta immobile
+                        \item Costituito da un corpo
+                    \end{enumerate}
+                \item Boney
+                    \begin{enumerate}
+                        \item Sta sempre nello stato di attacco
+                        \item Si sposta continuamente in direzione del personaggio
+                        \item Costituito da testa e corpo orientati nella direzione di movimento
+                    \end{enumerate}
+                \item Mask
+                    \begin{enumerate}
+                        \item Sta sempre nello stato di attacco
+                        \item Si sposta mantenendo una distanza predefinita dal personaggio
+                        \item Spara colpi in direzione del personaggio
+                        \item Costituito da una testa orientata nella direzione di fuoco
+                    \end{enumerate}
+                \item Parabite
+                    \begin{enumerate}
+                        \item Sta 1 secondo nello stato "inattivo", poi passa allo stato di "attacco", poi allo stato "nascosto" per 2 secondi poi ricomincia da capo
+                        \item Quando passa da inattivo ad attacco calcola una linea retta in direzione del personaggio e la percorre velocemente
+                        \item Quando passa allo stato "nascosto" può essere attraversato da personaggio o altri nemici e non può essere colpito
+                        \item Costituito da un corpo orientato nella direzione di movimento
+                    \end{enumerate}
+            \end{enumerate}
+        \item Boss
+        \begin{enumerate}
+            \item E' un nemico speciale che se viene sconfitto la partita termina visualizzando al giocatore il messaggio "hai vinto"
+            \item Il suo comportamento è determinato da ...
+            \item Costituito da un corpo ...
+        \end{enumerate}
     \end{enumerate}
     
-    \item Oggetti con diversi comportamenti
+    \item Oggetti che il personaggio può raccogliere con diversi comportamenti
     \begin{enumerate}
-        \item Un oggetto può essere di diverse tipologie
-             \begin{enumerate}
-                \item A (nome dell'oggetto)
-                \item B
-                \item C
-            \end{enumerate}
-        \item Un oggetto in base alla sua tipologia varia alcune caratteristiche del giocatore 
+        \item A (nome dell'oggetto - cosa fa)
+        \item B
+        \item C
     \end{enumerate}
+         
 \end{enumerate}
 
 
@@ -173,9 +252,9 @@ Da qui l'idea di crearne uno nuovo per lui.
 %modi di sviluppo, documentazione fornita.
 
 \begin{enumerate}
-\item Implementazione mediante Prolog del movimento dei nemici
+\item Implementazione mediante Prolog della generazione del dungeon, delle stanze combattimento e del comportamento del Boss
 \item Testing mediante ScalaTest
-\item Sviluppo del software in modo da poter aggiungere nuovi componenti o estensioni a quelli gia esistenti in modo semplice
+\item Sviluppo del software in modo da considerare possibili future estensioni di gioco come:
 \begin{enumerate}
     \item Aggiunta di diversi personaggi con cui giocatore
     \item Aggiunta di nuovi nemici e boss
