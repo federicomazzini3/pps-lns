@@ -78,7 +78,5 @@ object EnemyModel {
 
     val cellsWithoutDoor = cells.filter(cell => cell.x != Floor.nCenter / 2 && cell.y != Floor.nCenter / 2)
 
-    println("gamearea: " + cells.size)
-    println("enemies number: " + enemiesNumber)
     _random(Random.shuffle(cellsWithoutDoor).take(enemiesNumber), Map.empty)
 }

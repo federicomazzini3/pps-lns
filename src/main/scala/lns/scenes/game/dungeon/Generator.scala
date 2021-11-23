@@ -36,12 +36,13 @@ object Generator {
         RoomModel.itemRoom(positionInGrid, generateDoors(grid, positionInGrid), generateItem(Floor.center))
       case RoomType.Arena =>
         val doorsLocations = generateDoors(grid, positionInGrid)
-        //val (gameCells, blockCells) = generateAreas(doorsLocations)
+        //val enemy          = ParabiteModel.initial(Cell(3, 4))
+        //val enemy2         = ParabiteModel.initial(Cell(5, 4))
         RoomModel.arenaRoom(
           positionInGrid,
           doorsLocations,
           Map.empty
-          //generateEnemies(gameCells) ++ generateBlockingElements(blockCells)
+          //Map(enemy.id -> enemy, enemy2.id -> enemy2)
         )
       case RoomType.Boss =>
         RoomModel.bossRoom(
@@ -64,6 +65,8 @@ object Generator {
     ElementModel.random(cells)
 
   def generateEnemies(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
+    //val enemy = ParabiteModel.initial(Cell(5, 4))
+    //Map(enemy.id -> enemy)
     EnemyModel.random(cells)
 
   def generateItem(position: Cell): Map[AnythingId, AnythingModel] =

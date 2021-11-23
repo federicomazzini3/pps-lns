@@ -53,7 +53,5 @@ object ElementModel {
         case n                => Random.between(0, n)
       }
 
-    println("stone area: " + cells.size)
-    println("stone number: " + randomStonesNumber)
     _random(cells.take(randomStonesNumber), Map.empty)
 }
