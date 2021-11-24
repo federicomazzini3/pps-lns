@@ -136,8 +136,8 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
             updatedRoom <- newRoom.update(context, model.currentRoom)
           } yield viewModel.copy(character = updatedCharacter, room = updatedRoom)
 
-        case (model: GameModel.Started, _) => Outcome(GameViewModel.start(model))
-        case _                             => Outcome(viewModel)
+        case (model: GameModel.Started, _) if model.dungeon.generated => Outcome(GameViewModel.start(model))
+        case _                                                        => Outcome(viewModel)
 
       }
 

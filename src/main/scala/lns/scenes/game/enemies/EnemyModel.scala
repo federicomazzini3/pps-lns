@@ -57,7 +57,7 @@ object EnemyModel {
   val enemyModels = Seq(
     NerveModel.initial,
     MaskModel.initial,
-    //ParabiteModel.initial,
+    ParabiteModel.initial,
     BoneyModel.initial
   )
 
