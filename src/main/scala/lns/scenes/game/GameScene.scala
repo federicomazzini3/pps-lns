@@ -6,6 +6,7 @@ import indigo.shared.datatypes.Vector2
 import indigo.shared.scenegraph.Group
 import lns.StartupData
 import lns.core.{ Assets, EmptyScene, Model, ViewModel }
+import lns.scenes.end.Restart
 import lns.scenes.game.GameModel
 import lns.scenes.game.GameViewModel
 import lns.scenes.game.hud.HUDView
@@ -15,14 +16,12 @@ import lns.scenes.game.characters.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
 import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
-import lns.scenes.game.room.{ Boundary, RoomView }
+import lns.scenes.game.room.{ ArenaRoom, BossRoom, Boundary, RoomModel, RoomView, * }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
-import lns.scenes.game.room.{ ArenaRoom, RoomModel, RoomView }
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
-import lns.scenes.game.room.*
-import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit }
+import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit, ResetSubsystem }
 import lns.scenes.game.updater.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
@@ -114,6 +113,8 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
         case _ => model
       }
 
+    case Restart => Outcome(GameModel.initial).addGlobalEvents(ResetSubsystem)
+
     case _ =>
       model
   }
@@ -141,6 +142,8 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
 
       }
 
+    case Restart => Outcome(GameViewModel.initial(context.startUpData, GameModel.initial))
+
     case _ =>
       Outcome(viewModel)
   }
@@ -162,7 +165,10 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
                 CharacterView.draw(context, character, viewModel.character))
                 .fitToScreen(context)(Assets.Rooms.roomSize)
             ),
-            Layer(BindingKey("HUD"), List(HUDView.draw(context, character), MapView.draw(context, dungeon, room)))
+            Layer(
+              BindingKey("HUD"),
+              List(HUDView.draw(context, character), MapView.draw(context, dungeon, room))
+            )
           )
 
       case _ => DungeonLoadingView(context.startUpData)
@@ -181,3 +187,23 @@ extension (group: Group) {
       .withRef(edge / 2, edge / 2)
       .moveTo(context.startUpData.screenDimensions.center)
 }
+
+/*object EndView {
+
+  def draw(context: FrameContext[StartupData], model: GameModel.Started): Group =
+    def message = model match {
+      case m if model.character.life == 0 => "GAME OVER"
+    }
+    Group()
+      .addChild(
+        Text(
+          message,
+          context.startUpData.screenDimensions.horizontalCenter,
+          context.startUpData.screenDimensions.verticalCenter,
+          1,
+          Assets.Fonts.fontKey,
+          Assets.Fonts.fontMaterial
+        ).alignCenter
+      )
+
+}*/
