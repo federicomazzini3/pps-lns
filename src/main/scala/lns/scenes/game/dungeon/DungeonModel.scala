@@ -77,7 +77,7 @@ case class DungeonModel(val content: Map[Position, RoomModel], val initialRoom: 
 
   val firstRoomToGenerate: Option[RoomModel] =
     content.collect {
-      case (pos, room: ArenaRoom) if !room.generated => room
+      case (pos, room: RoomModel) if !room.generated => room
     }.headOption
 
   def room(position: Position): Option[RoomModel] = Grid.in(this)(position)

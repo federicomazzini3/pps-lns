@@ -46,10 +46,11 @@ object Generator {
           //Map(enemy.id -> enemy, enemy2.id -> enemy2)
         )
       case RoomType.Boss =>
+        val boss = BossModel.initial
         RoomModel.bossRoom(
           positionInGrid,
           generateDoors(grid, positionInGrid),
-          Map.empty
+          Map(boss.id -> boss)
         )
       case _ =>
         // RoomModel.emptyRoom(positionInGrid, generateDoors(grid, positionInGrid))

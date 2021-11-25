@@ -112,7 +112,7 @@ trait RoomModel {
         case room: ArenaRoom =>
           room.copy(anythings = ua, generated = true)
         case room: BossRoom =>
-          room.copy(anythings = ua)
+          room.copy(anythings = ua, generated = true)
         case _ => this
       }
 
@@ -277,7 +277,7 @@ object RoomModel {
       position,
       defaultFloor,
       locations,
-      true,
+      false,
       anythings
     )
 
