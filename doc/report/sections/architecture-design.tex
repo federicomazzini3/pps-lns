@@ -97,18 +97,20 @@ All'interno della scena di gioco, abbiamo identificato i principali componenti:
 \end{figure}
 
 \subsection{Anything OOP anziché pattern ECS}
-Per concludere la descrizione dell'architettura occorre specificare come organizzare gli oggetti presenti nel gioco, quelli che abbiamo chiamato Anything.
+Per concludere la descrizione dell'architettura occorre specificare come organizzare gli oggetti presenti nel gioco, quelli che abbiamo chiamato \textbf{Anything}.
 Un oggetto è caratterizzato da proprietà e comportamenti comuni ad altri, ad esempio tutti gli oggetti sono posizionabili nella stanza di gioco e visualizzabili mentre alcuni di questi possono spostarsi, collidere, causare danno e così via.
 
 Tradizionalmente molto usato nel game development è il pattern Entities-Components-Systems che prevede la sostituzione di una gerarchia di oggetti con il concetto di entità e componenti: le entità sono definite dai diversi componenti a loro associati. 
 Alcune implementazioni di ECS definiscono i componenti come solo strutture dati mentre il comportamento è specificato nel sistema che li gestisce, quindi in stile funzionale. 
 Questo pattern è nato per diversi motivi ma quello più banale è che, quando i linguaggi non supportano l'ereditarietà multipla, è impossibile specificare una precisa gerarchia di oggetti che soddisfi i requisiti di un gioco di una certa complessità, o comunque questa gerarchia sarebbe molto profonda e poco flessibile a future estensioni.
 
-Quello vogliamo fare in questo progetto è sfruttare appieno le potenzialità in ambito OOP che ci offre Scala, il quale ci permette tramite i mix-ins di appiattire la gerarchia ed ottenere la flessibilità richiesta dal problema.
+Quello vogliamo fare in questo progetto è sfruttare appieno le potenzialità in ambito \textbf{OOP} che ci offre Scala, il quale ci permette tramite i \textbf{mix-ins} di appiattire la gerarchia ed ottenere la flessibilità richiesta dal problema.
 Quindi abbiamo appositamente scelto il nome Anything in sostituzione al classico Entity per specificare che non stiamo applicando il pattern ECS, un sottotipo di Anything rappresenta una nostra entità che può essere mixata con altri tratti per ottenere nuove proprietà e comportamenti. 
-Visto l'impiego del pattern MVVM, occorre inoltre tenere ben presente che un Anything/"oggetto in gioco" deve essere in realtà codificato in tre parti ben distinte Model-ViewModel-View ciascuna sottotipo rispettivamente di AnythingModel, AnythingViewModel e AnythingView e ciascuna eventualmente mixata come descritto precedentemente. 
+
+Visto l'impiego del pattern MVVM, occorre inoltre tenere ben presente che un Anything deve essere in realtà codificato in tre parti ben distinte Model-ViewModel-View ciascuna sottotipo rispettivamente di \textbf{AnythingModel}, \textbf{AnythingViewModel} e \textbf{AnythingView} e ciascuna eventualmente mixata come descritto precedentemente. 
 Inoltre è da specificare che ogni oggetto in gioco è costitutito sempre da un Model e una View ma quest'ultima potrebbe non necessitare di un ViewModel.
-Il Model di un oggetto come comportamento base deve reagire alle richieste di aggiornamento che avvengono ad ogni iterazione del game loop: questa richiesta deve essere propagata a tutta la catena di ereditarietà e ai vari oggetti mixati.
-Sebbene gran parte del comportamento e della logica di gioco è così incapusalata nei Model degli oggetti, dovremmo comunque elaborare dei sistemi che avranno una visione globale gestendo l'interazione tra diversi Model, come un sistema per controllare le collisioni tra oggetti.
+
+Il Model di un oggetto come comportamento base deve reagire alle richieste di aggiornamento che avvengono ad ogni iterazione del game loop: questa richiesta deve essere propagata a tutta la catena di ereditarietà e ai vari oggetti mixati ed infine restituire un nuovo Model aggiornato.
+Sebbene gran parte del comportamento e della logica di gioco è così incapsulata nei Model degli oggetti, dovremmo comunque elaborare dei sistemi che avranno una visione globale gestendo l'interazione tra diversi Model, come un sistema per controllare le collisioni tra oggetti.
 
 Per concludere, la nostra soluzione OO non è la migliore soluzione possibile per lo sviluppo di un gioco. Il pattern ECS ha vantaggi prestazionali riconosciuti sia in termini di utilizzo CPU (meno calls per l'aggiornamento degli oggetti) che di ottimizzazione dell'utilizzo della memoria (data-oriented design), tuttavia a fini didattici vogliamo sperimentare elementi di Scala OOP avanzati.
