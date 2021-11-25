@@ -105,10 +105,12 @@ object Assets {
     val specificUrl: String         = "prolog/"
     val dungeon: AssetName          = AssetName("dungeon_generator")
     val blockingElements: AssetName = AssetName("blocking_elements_generator")
+    val loki: AssetName             = AssetName("loki")
 
     val assets: Set[AssetType] = Set(
       AssetType.Text(dungeon, AssetPath(baseUrl + specificUrl + "dungeon_generator.pl")),
-      AssetType.Text(blockingElements, AssetPath(baseUrl + specificUrl + "blocking_elements_generator.pl"))
+      AssetType.Text(blockingElements, AssetPath(baseUrl + specificUrl + "blocking_elements_generator.pl")),
+      AssetType.Text(loki, AssetPath(baseUrl + specificUrl + "loki.pl"))
     )
   }
 

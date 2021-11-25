@@ -11,7 +11,7 @@ import lns.scenes.game.enemies.EnemyState
 object Animations {
 
   def apply(): List[Animation] =
-    List(Isaac.body, Boney.body, Nerve.body, Parabite.body, Explosion.body)
+    List(Isaac.body, Boney.body, Nerve.body, Parabite.body, Explosion.body, Loki.body)
   def generateFrame(r: Range)(f: Int => Frame): List[Frame]   = r.toList.map(f(_))
   def generateFramesList(l: List[Frame]): NonEmptyList[Frame] = NonEmptyList.fromList(l).get
 
@@ -151,6 +151,25 @@ object Animations {
       .addCycle(Cycle.create("hiding", generateHidingFrame))
       .addCycle(Cycle.create("wakeup", generateWakeupFrame))
       .addCycle(Cycle.create("idle", generateIdleFrame(0, 0)))
+  }
+
+  object Loki {
+    /*Loki body*/
+    val bodyWidth: Int            = 41
+    val bodyHeight: Int           = 47
+    val hideFrameTime: Double     = 0.180
+    val hideTime: Double          = hideFrameTime * 6
+    val hideFrameTimeMillis: Long = (hideFrameTime * 1000).toLong
+
+    def generateBodyFrame(x: Int, y: Int): NonEmptyList[Frame] =
+      generateFramesList(
+        generateFrame(0 until 6)(i => Frame(Rectangle(x + (i * 48), y, bodyWidth, bodyHeight), Millis(120)))
+      )
+
+    val body: Animation = Animation
+      .create(AnimationKey("loki_body"), Cycle.create("move", generateBodyFrame(3, 0)))
+      .addCycle(Cycle.create("attack", generateBodyFrame(3, 58)))
+      .addCycle(Cycle.create("defence", generateBodyFrame(3, 96)))
   }
 
   object Explosion {

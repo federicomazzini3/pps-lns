@@ -125,5 +125,5 @@ trait ShotAsset extends AnythingAsset {
  * All AnythingAsset assets for loading: Characters, Enemies, Elements and Items
  */
 object AnythingAsset {
-  val assets: Set[AssetType] = Characters.assets ++ Enemies.assets ++ Elements.assets ++ Items.assets
+  val assets: Set[AssetType] = Characters.assets ++ Bosses.assets ++ Enemies.assets ++ Elements.assets ++ Items.assets
 }

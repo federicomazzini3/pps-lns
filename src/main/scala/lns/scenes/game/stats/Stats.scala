@@ -43,7 +43,7 @@ extension (stats: Stats) {
 /**
  * Companion object to create Stats, a Map of tuples StatProperty (PropertyName, PropertyValue)
  */
-object Stats extends Characters with Enemies with Items {
+object Stats extends Characters with Bosses with Enemies with Items {
 
   def apply(args: StatProperty*): Stats = Map(args*)
 

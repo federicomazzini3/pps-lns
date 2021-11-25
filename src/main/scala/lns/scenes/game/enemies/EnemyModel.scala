@@ -19,7 +19,7 @@ import scala.language.implicitConversions
 import scala.util.Random
 
 enum EnemyState:
-  case Idle, Attacking, Defending, Hiding
+  case Idle, Attacking, Defending, Hiding, Consulting
 
 type EnemyStatus = (EnemyState, Timer)
 extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
