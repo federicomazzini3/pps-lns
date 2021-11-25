@@ -1,0 +1,13 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Fix animazioni Parabite,,1,Alan,1h,1,1,1,0,,,
+Fix animazioni FireModel,,1,Alan,1h,1,1,1,1,0,,
+Come utente voglio che personaggio e nemici possano colpirsi,,12,,,12,10,7,5,3,1,0
+,Creare ShotModel con le Stats del personaggio,,Matteo,3h,,,,,,,
+,Refactor life personaggio: da Int a Double,,Matteo,2h,,,,,,,
+,Gestione delle collisioni e aggiornamento degli Anything,,Federico,5h,,,,,,,
+,Diminuzione Life per Anything in collisione tra loro ,,Federico,2h,,,,,,,
+,Rimozione Anything quando life arriva a zero,,Federico,0.5h,,,,,,,
+Refactor BoundingBox e profondità elementi,,3,Alan,3h,3,1,0,,,,
+Refactor GameScene per current room,,1,Federico,1h,1,1,1,0,,,
+Organizzare le stats di tutti gli enemy e character,,1,Matteo,1h,1,1,1,1,0,,
+Refactor collegamento Model + ViewModel + View per gli Anything,,4,Alan,4h,4,4,3,3,1,0,

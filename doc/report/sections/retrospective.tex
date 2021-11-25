@@ -12,7 +12,7 @@ Era previsto anche il setup della CI/CD, abbiamo deciso però di spostarla nella
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.4]{sprint-1-burn-down.png}
+    \includegraphics[scale=0.35]{sprint-1-burn-down.png}
     \caption{\textit{Grafico Burn-down primo sprint}} 
 \end{figure}
 
@@ -26,9 +26,10 @@ Non siamo riusciti a completare la visualizzazione del personaggio in quanto ci 
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.4]{sprint-2-burn-down.png}
+    \includegraphics[scale=0.35]{sprint-2-burn-down.png}
     \caption{\textit{Grafico Burn-down secondo sprint}} 
 \end{figure}
+
 
 \subsection{Sprint 3 11/10 - 17/10}
 
@@ -40,10 +41,9 @@ Infine, con lo studio di un workflow di test per Indigo, ci siamo predisposti pe
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.4]{sprint-3-burn-down.png}
+    \includegraphics[scale=0.35]{sprint-3-burn-down.png}
     \caption{\textit{Grafico Burn-down terzo sprint}} 
 \end{figure}
-
 
 \subsection{Sprint 4 18/10 - 24/10}
 Il quarto sprint è stato incentrato principalmente sul dungeon e sulla feature dello sparo per il personaggio controllato dall'utente. 
@@ -57,6 +57,7 @@ Nella prossima sprint, sarà necessario un refactor e una forte integrazione tra
     \includegraphics[scale=0.4]{sprint-4-burn-down.png}
     \caption{\textit{Grafico Burn-down quarto sprint}} 
 \end{figure}
+
 
 \subsection{Sprint 5 25/10 - 31/10}
 Il quinto sprint è stato dedicato al refactor di diversi sezioni dell'applicativo, per permettere, nelle prossime sprint, di implementare in maniera più semplice le feature rimanenti.  
@@ -76,6 +77,33 @@ Il sesto sprint è stato incentrato nel creare le dinamiche di gioco, tra cui la
 Durante lo sprint planning abbiamo sottostimato l'effort richiesto per l'inserimento degli elementi bloccanti, anche considerando l'utilizzo del Prolog per la loro disposizione, questo richiede una nuova sprint per essere portato a termine. Un altro imprevisto è stato il dover gestire il view model per i nemici, il tutto dovuto anche a dei limiti dei Indigo, il quale non è ancora maturo a livello di engine. Anche quest'ultima parte va rifattorizzata nel prossimo sprint.
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.38]{sprint-6-burn-down.png}
-    \caption{\textit{Grafico Burn-down quinto sprint}} 
+    \includegraphics[scale=0.35]{sprint-6-burn-down.png}
+    \caption{\textit{Grafico Burn-down sesto sprint}} 
 \end{figure}
+
+\subsection{Sprint 7 08/11 - 14/11}
+Il settimo sprint è stato dedicato al refinement di alcuni punti degli sprint precedenti e all'introduzione di nuove feature, tra cui lo sviluppo ulteriore delle dinamiche di gioco e d'interazione tra il personaggio e i nemici. 
+Si è quindi sviluppato un modello per le statistiche di qualsiasi elemento "Alive" e un modello di individuazione e gestione delle collisioni. 
+Per quanto riguarda i refinement invece, si è ripensato all'interazione tra Model, View e ViewModel, rifattorizzando l'architettura. 
+Durante questa sprint non si è ancora riusciti a concludere il posizionamento degli elementi bloccanti in Prolog per via dello sviluppo di altre feature più prioritarie.
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.35]{sprint-7-burn-down.png}
+    \caption{\textit{Grafico Burn-down settimo sprint}} 
+\end{figure}
+
+
+\subsection{Sprint 8 15/11 - 21/11}
+A livello di feature, sono stati aggiunti alcuni elementi di valore per il gioco. 
+In particolare, si è dotata la schermata di gioco di una minimappa, in modo tale che l'utente possa visualizzare a video la sua posizione nel dungeon al momento. 
+Si è sviluppato un algoritmo Prolog per generare un area di gioco e un area di elementi, 
+in modo tale da poter disporre all'interno della stanza nemici ed elementi bloccanti in maniera consona con quanto riportato nei requisiti.
+Si è poi incrementato il modello delle stats in maniera tale da poter essere modificate in base ad avvenimenti accaduti durante il gioco. 
+La disposizione degli elementi bloccanti necessiterà di sviluppo anche durante la prossima sprint, in particolare per quanto riguarda l'integrazione tra Prolog e Scala. 
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.35]{sprint-8-burn-down.png}
+    \caption{\textit{Grafico Burn-down ottavo sprint}} 
+\end{figure}
+
+\subsection{Sprint 9 22/11 - 28/11}
