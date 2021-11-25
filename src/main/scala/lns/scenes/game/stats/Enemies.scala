@@ -19,6 +19,8 @@ trait Enemies {
     Invincibility -> 0,
     MaxSpeed      -> 200,
     Damage        -> 0.5,
+    KeepAwayMin   -> 500,
+    KeepAwayMax   -> 600,
     FireDamage    -> 0.5,
     FireRange     -> 300,
     FireRate      -> 1,

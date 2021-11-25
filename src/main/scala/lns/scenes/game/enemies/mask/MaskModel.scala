@@ -65,7 +65,7 @@ case class MaskModel(
 ) extends EnemyModel
     with DynamicModel
     with FireModel
-    with KeepsAway((600, 900))
+    with KeepsAway
     with FiresContinuously {
 
   type Model = MaskModel

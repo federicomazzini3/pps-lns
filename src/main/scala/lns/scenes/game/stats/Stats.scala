@@ -1,7 +1,8 @@
 package lns.scenes.game.stats
 
 enum PropertyName:
-  case MaxLife, Invincibility, MaxSpeed, Range, Damage, FireDamage, FireRange, FireRate, FireSpeed
+  case MaxLife, Invincibility, MaxSpeed, Range, KeepAwayMin, KeepAwayMax, Damage, FireDamage, FireRange, FireRate,
+  FireSpeed
 
 import PropertyName.*
 
