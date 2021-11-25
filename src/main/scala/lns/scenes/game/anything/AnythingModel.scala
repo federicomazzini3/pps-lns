@@ -358,7 +358,9 @@ trait FireModel extends AnythingModel with StatsModel {
 
   /**
    * @param context
-   *   indigo frame context data
+   *   indigo frame context data * @param gameContext
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   Optional direction vector
    */

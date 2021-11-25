@@ -1,7 +1,7 @@
 package lns.scenes.game.bosses
 
 import indigo.*
-import indigo.shared.FrameContext
+import indigo.shared.{ FrameContext, Outcome }
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
 import lns.core.{ Assets, PrologClient }
@@ -12,13 +12,14 @@ import lns.scenes.game.enemies.*
 import lns.scenes.game.shots.{ ShotRed, SingleShotView }
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
+import lns.subsystems.prolog.Substitution
 
 import scala.collection.immutable.Queue
 import scala.language.implicitConversions
 
 /**
  * Boss model that is alive, it's dynamic by computing its speed and new position by a defined strategy, can fire
- * computing shot and have stats
+ * computing shot and have stats. The Behaviour of Boss is defined by Prolog
  * @param id
  *   [[AnythingId]] The unique identifier of the Anything instance.
  * @param view
@@ -41,8 +42,14 @@ import scala.language.implicitConversions
  *   [[AliveModel]] life, default 0
  * @param invincibilityTimer
  *   [[AliveModel]] invincibilityTimer, default 0
+ * @param fireRateTimer
+ *   [[FireModel]] fireRateTimer, default 0
+ * @param shot
+ *   [[FireModel]] shot, default None
  * @param path
  *   [[Traveller]] path, default Queue.empty
+ * @param prologClient
+ *   [[PrologModel]] default prologClient
  */
 case class BossModel(
     id: AnythingId,
@@ -59,8 +66,7 @@ case class BossModel(
     fireRateTimer: Timer = 0,
     shot: Option[Vector2] = None,
     path: Queue[Vector2] = Queue.empty,
-    prologClient: PrologClient = PrologClient(),
-    actionRateTimer: Double = 0
+    prologClient: PrologClient = PrologClient()
 ) extends EnemyModel
     with DynamicModel
     with FireModel
@@ -80,12 +86,16 @@ case class BossModel(
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withProlog(prologClient: PrologClient): Model                                            = copyMacro
-  def withActiontRateTimer(actionRateTimer: Timer): Model                                      = copyMacro
 
   def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] = None
 
   override def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
     "behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)],A)."
+
+  override def behaviour(response: Substitution): Outcome[Model] =
+    println("RESPONSE")
+    println(response)
+    Outcome(this.withStatus((EnemyState.Attacking, 5) +: status.drop(1)))
 
   /*
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =

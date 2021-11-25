@@ -12,7 +12,7 @@ import lns.scenes.game.anything.{ AnythingId, AnythingView, AnythingViewModel }
 trait BossView[VM <: AnythingViewModel[BossModel] | Unit] extends AnythingView[BossModel, VM] {}
 
 /**
- * Parabite view. Designed for a [[BossModel]] using a [[BossModelModel]] for the view data. Built grouping its elements
+ * Boos view. Designed for a [[BossModel]] using a [[BossModelModel]] for the view data. Built grouping its elements
  * body and shadow
  */
 object BossView extends BossView[BossViewModel] with Loki {
@@ -22,5 +22,5 @@ object BossView extends BossView[BossViewModel] with Loki {
   def viewModel: (id: AnythingId) => ViewModel = BossViewModel.initial
 
   def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
-    drawComponents(List(bodyView(model, viewModel)))
+    drawComponents(List(shadowView, bodyView(model, viewModel)))
 }
