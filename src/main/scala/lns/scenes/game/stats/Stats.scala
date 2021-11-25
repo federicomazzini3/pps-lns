@@ -21,7 +21,7 @@ given Conversion[PropertyValue, String] with
 extension (p: PropertyValue) {
   def |+|(v: PropertyValue): PropertyValue = p match {
     case p if (v + p) < 0 => 0
-    case _                => v + p
+    case _                => BigDecimal(v + p).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 }
 
