@@ -30,22 +30,22 @@ randomActionType([_,_,_], move).
 % @Boss
 % @Character
 % -attack1(direction)|attack2|attack3
-attackAction(Boss, Character, attack1(right)) :-
+attackAction(Boss, Character, attack1(down)) :-
 	Boss =.. [_,BossX,BossY,_,_],
     Character =.. [_,CharacterX,CharacterY,_,_],
     BossX is CharacterX,
     BossY < CharacterY, !.
-attackAction(Boss, Character, attack1(left)) :-
+attackAction(Boss, Character, attack1(top)) :-
 	Boss =.. [_,BossX,BossY,_,_],
     Character =.. [_,CharacterX,CharacterY,_,_],
     BossX is CharacterX,
     BossY > CharacterY, !.
-attackAction(Boss, Character, attack1(down)) :-
+attackAction(Boss, Character, attack1(right)) :-
 	Boss =.. [_,BossX,BossY,_,_],
     Character =.. [_,CharacterX,CharacterY,_,_],
     BossY is CharacterY,
     BossX < CharacterX, !.
-attackAction(Boss, Character, attack1(top)) :-
+attackAction(Boss, Character, attack1(left)) :-
 	Boss =.. [_,BossX,BossY,_,_],
     Character =.. [_,CharacterX,CharacterY,_,_],
     BossY is CharacterY,

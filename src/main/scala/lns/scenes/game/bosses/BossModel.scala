@@ -9,6 +9,7 @@ import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ *, given }
 import lns.scenes.game.enemies.*
+import lns.scenes.game.elements.*
 import lns.scenes.game.shots.{ ShotRed, SingleShotView }
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
@@ -89,8 +90,55 @@ case class BossModel(
 
   def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] = None
 
+  /**
+   * Builds boss info for goal
+   */
+  def bossInfo: String =
+    val x: Int = getPosition().x / Assets.Rooms.cellSize
+    val y: Int = getPosition().y / Assets.Rooms.cellSize
+    "boss(" + x + "," + y + "," + life + "," + MaxLife @@ stats + ")"
+
+  /**
+   * Builds character info for goal based on current gameContext
+   * @param [[GameContext]]
+   */
+  def characterInfo(gameContext: GameContext): String =
+    val x: Int = gameContext.character.getPosition().x / Assets.Rooms.cellSize
+    val y: Int = gameContext.character.getPosition().y / Assets.Rooms.cellSize
+    "character(" + x + "," + y + "," + gameContext.character.life + "," + MaxLife @@ gameContext.character.stats + ")"
+
+  /**
+   * Builds room size info for goal
+   */
+  def roomInfo: String =
+    val size: Int = Assets.Rooms.floorSize / Assets.Rooms.cellSize
+    "room(" + size + "," + size + ")"
+
+  /**
+   * Builds blocks info for goal based on current gameContext: a list of all stone insede room
+   * @param [[GameContext]]
+   */
+  def blocksInfo(gameContext: GameContext): String =
+    gameContext.room.anythings
+      .foldLeft(List[String]()) {
+        case (list, (id, stone: StoneModel)) =>
+          val x = stone.getPosition().x / Assets.Rooms.cellSize
+          val y = stone.getPosition().y / Assets.Rooms.cellSize
+          list :+ "block(" + x + "," + y + ")"
+        case (list, _) => list
+      }
+      .mkString("[", ",", "]")
+
+  /**
+   * Builds the goal string for the prolog example:
+   * behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)],A).
+   */
   override def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
-    "behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)],A)."
+    "behaviour(" +
+      bossInfo + "," +
+      characterInfo(gameContext) + "," +
+      roomInfo + "," +
+      blocksInfo(gameContext) + ", A)."
 
   override def behaviour(response: Substitution): Outcome[Model] =
     println("RESPONSE")
