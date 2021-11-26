@@ -59,8 +59,8 @@ trait Parabite extends ParabiteAsset {
    */
   def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
     model.status.head match {
-      case (EnemyState.Attacking, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
-      case (EnemyState.Hiding, _) =>
+      case (EnemyState.Attacking, _, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
+      case (EnemyState.Hiding, _, _) =>
         viewModel.animationTimer match {
           case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
           case t =>
@@ -68,7 +68,7 @@ trait Parabite extends ParabiteAsset {
               .changeCycle(CycleLabel("hiding"))
               .jumpToFrame(getFrame(t))
         }
-      case (EnemyState.Idle, _) =>
+      case (EnemyState.Idle, _, _) =>
         viewModel.animationTimer match {
           case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
           case t =>

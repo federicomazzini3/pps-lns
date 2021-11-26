@@ -413,6 +413,66 @@ trait FireModel extends AnythingModel with StatsModel {
 }
 
 /**
+ * Base model for every object that can fire multiple shots at the same time. Extends FireModel and share with it the
+ * firRateTimer. It is designed to be extended or mixed with other [[AnythingModel]] traits.
+ */
+trait MultiFireModel extends FireModel {
+  type Model >: this.type <: MultiFireModel
+
+  val shots: Option[List[Vector2]]
+
+  def withMultiFire(fireRateTimer: Timer, shots: Option[List[Vector2]]): Model
+
+  /**
+   * @return
+   *   Boolean: true if the model is firing otherwise false
+   */
+  def isMultiFiring(): Boolean = shots match {
+    case Some(_) => true
+    case _       => false
+  }
+
+  /**
+   * @param context
+   *   indigo frame context data * @param gameContext
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
+   * @return
+   *   Optional List of direction vector
+   */
+  def computeMultiFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]]
+
+  /**
+   * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer
+   * that limits the firing rate, a multiple global event is created and intercepted by the [[GameView]] Otherwise, if
+   * only the timer is present, it is decreased to 0
+   * @param context
+   *   indigo frame context data
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
+   * @return
+   *   the Outcome of the updated model
+   */
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    val newFireRateTimer = fireRateTimer.elapsed(context.gameTime.delta.toDouble)
+    val newShots         = computeMultiFire(context)(gameContext)
+
+    val retObj = for {
+      superObj <- super.update(context)(gameContext)
+      newObj = (newFireRateTimer, newShots) match {
+        case (0, Some(_)) => superObj.withMultiFire(FireRate @@ stats, newShots).asInstanceOf[Model]
+        case _            => superObj.withMultiFire(newFireRateTimer, newShots).asInstanceOf[Model]
+      }
+    } yield newObj
+
+    (newFireRateTimer, newShots) match {
+      case (0, Some(list)) =>
+        list.foldLeft(retObj)((obj, direction) => obj.addGlobalEvents(createEvent(direction)))
+      case _ => retObj
+    }
+}
+
+/**
  * Base model for every solid object. It is designed to be extended or mixed with other [[AnythingModel]] traits.
  */
 trait SolidModel extends AnythingModel {

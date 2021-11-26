@@ -63,7 +63,7 @@ attackAction(_, _, attack3).
 % @Room
 % @Blocks
 % -defence(x,y)
-defenceAction(boss(X, Y, _, _), _, room(RX, RY), Blocks, defence(NX, NY)) :-
+defenceAction(boss(X, Y, _, _), _, room(RX, RY), Blocks, defence(NX,NY)) :-
 	SX is RX - X, SY is RY - Y, getFreePlace(room(RX, RY), Blocks, block(SX, SY), block(NX, NY)).
 
 % Check if position is available excluding blocking elements

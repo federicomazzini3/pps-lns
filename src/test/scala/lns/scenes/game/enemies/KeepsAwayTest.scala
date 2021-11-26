@@ -24,7 +24,7 @@ case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0, None)),
     crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,

@@ -19,9 +19,9 @@ import scala.language.implicitConversions
 import scala.util.Random
 
 enum EnemyState:
-  case Idle, Attacking, Defending, Hiding, Consulting
+  case Idle, Attacking, Defending, Hiding, Falling, Consulting
 
-type EnemyStatus = (EnemyState, Timer)
+type EnemyStatus = (EnemyState, Timer, Option[Any])
 extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
 
 given Conversion[EnemyStatus, Queue[EnemyStatus]] with
@@ -43,12 +43,12 @@ trait EnemyModel extends AliveModel with DamageModel with SolidModel {
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (state, timer) if timer > 0 =>
+        case (state, timer, opt) if timer > 0 =>
           superObj
-            .withStatus((state, timer.elapsed(context.gameTime.delta.toDouble)) +: status.drop(1))
+            .withStatus((state, timer.elapsed(context.gameTime.delta.toDouble), opt) +: status.drop(1))
             .asInstanceOf[Model]
-        case (_, 0) if status.length > 1 => superObj.withStatus(status.drop(1)).asInstanceOf[Model]
-        case _                           => superObj
+        case (_, 0, _) if status.length > 1 => superObj.withStatus(status.drop(1)).asInstanceOf[Model]
+        case _                              => superObj
       }
     } yield newObj
 }

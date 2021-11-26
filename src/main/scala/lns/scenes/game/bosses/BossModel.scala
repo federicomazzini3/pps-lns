@@ -58,7 +58,7 @@ case class BossModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0, None)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     collisionDetected: Boolean = false,
@@ -66,11 +66,13 @@ case class BossModel(
     invincibilityTimer: Timer = 0,
     fireRateTimer: Timer = 0,
     shot: Option[Vector2] = None,
+    shots: Option[List[Vector2]] = None,
     path: Queue[Vector2] = Queue.empty,
     prologClient: PrologClient = PrologClient()
 ) extends EnemyModel
     with DynamicModel
     with FireModel
+    with MultiFireModel
     with Traveller
     with PrologModel("loki") {
 
@@ -85,10 +87,9 @@ case class BossModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                                               = copyMacro
   def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
+  def withMultiFire(fireRateTimer: Timer, shots: Option[List[Vector2]]): Model                 = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withProlog(prologClient: PrologClient): Model                                            = copyMacro
-
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] = None
 
   /**
    * Builds boss info for goal
@@ -131,40 +132,114 @@ case class BossModel(
 
   /**
    * Builds the goal string for the prolog example:
-   * behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)],A).
+   * behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)], Action).
    */
   override def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
     "behaviour(" +
       bossInfo + "," +
       characterInfo(gameContext) + "," +
       roomInfo + "," +
-      blocksInfo(gameContext) + ", A)."
+      blocksInfo(gameContext) + ", Action)."
 
+  /**
+   * Set the [[EnemyState]] based on prolog result:
+   * @param state
+   *   [[EnemyState]]
+   * @param timer
+   *   state time
+   * @param option
+   *   Option[Any] optional parameter for state
+   * @return
+   *   the Outcome of the updated model
+   */
+  def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[Any]): Outcome[Model] =
+    Outcome(this.withStatus((state, timer, option) +: status.drop(1)))
+
+  /**
+   * Implements model behaviour
+   * @param response
+   *   [[Substitution]] PrologClient consult result
+   * @return
+   *   the Outcome of the updated model
+   */
   override def behaviour(response: Substitution): Outcome[Model] =
-    println("RESPONSE")
-    println(response)
-    Outcome(this.withStatus((EnemyState.Attacking, 5) +: status.drop(1)))
+    val attackRegEx  = raw"attack1\(([a-z]+)\)".r
+    val moveRegEx    = raw"move\((\d{1}),\s*(\d{1})\)".r
+    val defenceRegEx = raw"defence\((\d{1}),\s*(\d{1})\)".r
 
-  /*
+    response.links("Action").toString() match {
+      case attackRegEx(direction) =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(("attack1", direction)))
+      case "attack2" =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some("attack2"))
+      case "attack3" =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some("attack3"))
+      case moveRegEx(x, y) =>
+        behaviourOutcome(EnemyState.Attacking, 0, Some("move", (x.toDouble, y.toDouble)))
+      case defenceRegEx(x, y) =>
+        Outcome(
+          this
+            .withSolid(true)
+            .withStatus(
+              (EnemyState.Hiding, 1.0, Some("defence", (x.toDouble, y.toDouble))) :+
+                (EnemyState.Falling, 1.0, None) :+
+                (EnemyState.Idle, 0, None)
+            )
+        )
+      case _ => Outcome(this)
+    }
+
+  override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] =
+    status.head match {
+      case (EnemyState.Attacking, _, Some(("attack1", direction))) =>
+        direction match {
+          case "top"   => Some(Vector2(0, -1))
+          case "right" => Some(Vector2(1, 0))
+          case "down"  => Some(Vector2(0, 1))
+          case "left"  => Some(Vector2(-1, 0))
+          case _       => None
+        }
+      case _ => None
+    }
+
+  override def computeMultiFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+    status.head match {
+      case (EnemyState.Attacking, _, Some("attack2")) =>
+        Some(List(Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)))
+      case (EnemyState.Attacking, _, Some("attack3")) =>
+        Some(List(Vector2(-1, -1), Vector2(1, 1), Vector2(1, -1), Vector2(-1, 1)))
+      case _ => None
+    }
+
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    println(status.head)
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Idle, 0) if getPosition().distanceTo(gameContext.character.getPosition()) >= 10 =>
+        case (EnemyState.Attacking, time, Some(("attack1", direction))) =>
+          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
+        case (EnemyState.Attacking, time, Some("attack2")) =>
+          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
+        case (EnemyState.Attacking, time, Some("attack3")) =>
+          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
+        case (EnemyState.Attacking, _, Some(("move", (x: Double, y: Double)))) =>
           superObj
-            .withTraveller(
-              Queue(gameContext.character.getPosition().clamp(0, Assets.Rooms.floorSize - boundingBox.height))
-            )
-            .withStatus((EnemyState.Attacking, 0.0))
+            .withStatus((EnemyState.Attacking, 0, None) +: status.drop(1))
+            .withTraveller(Queue(Vector2(x * Assets.Rooms.cellSize, y * Assets.Rooms.cellSize)))
             .asInstanceOf[Model]
-        case (EnemyState.Idle, _) if crossable == true => superObj.withSolid(false)
-        case (EnemyState.Attacking, _) if superObj.path.isEmpty == true =>
-          superObj.withSolid(true).withStatus((EnemyState.Hiding, 2.0) :+ (EnemyState.Idle, 1.0)).asInstanceOf[Model]
+        case (EnemyState.Hiding, 0, Some(("defence", (x: Double, y: Double)))) =>
+          superObj
+            .withDynamic(boundingBox.moveTo(x * Assets.Rooms.cellSize, y * Assets.Rooms.cellSize), Vector2.zero, false)
+            .asInstanceOf[Model]
+        case (EnemyState.Falling, 0, _) =>
+          superObj
+            .withSolid(false)
+            .withDynamic(boundingBox, Vector2.zero, true)
+            .asInstanceOf[Model]
         case _ => superObj
-
       }
     } yield newObj
-   */
+
 }
 
 /**

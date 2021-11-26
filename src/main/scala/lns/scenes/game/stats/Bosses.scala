@@ -10,10 +10,10 @@ trait Bosses {
   def Loki: Stats = Stats(
     MaxLife       -> 40,
     Invincibility -> 0,
-    MaxSpeed      -> 300,
+    MaxSpeed      -> 500,
     Damage        -> 1,
     FireDamage    -> 1,
-    FireRange     -> 300,
+    FireRange     -> 800,
     FireRate      -> 1,
     FireSpeed     -> 600
   )

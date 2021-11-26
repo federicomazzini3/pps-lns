@@ -16,7 +16,7 @@ import lns.scenes.game.stats.PropertyName.*
 trait KeepsAway { this: EnemyModel with DynamicModel =>
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     status.head match {
-      case (EnemyState.Idle, _) => Vector2.zero
+      case (EnemyState.Idle, _, _) => Vector2.zero
       case _ =>
         getPosition().distanceTo(gameContext.character.getPosition()) match {
           case x if x < KeepAwayMin @@ stats =>

@@ -71,9 +71,9 @@ trait PrologModel(name: String) extends EnemyModel {
     for {
       superObj <- super.update(context)(gameContext)
       newObj <- status.head match {
-        case (EnemyState.Idle, _) =>
+        case (EnemyState.Idle, 0, _) =>
           superObj
-            .withStatus((EnemyState.Consulting, -1) +: status)
+            .withStatus((EnemyState.Consulting, -1, None) +: status)
             .consult(context)(gameContext)
             .asInstanceOf[Outcome[Model]]
         case _ => Outcome(superObj)
