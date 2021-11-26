@@ -32,7 +32,7 @@ La seconda volta invece, è stato definito per il vero Dungeon, già generato e 
 \subsubsection{Room}
 Come già descritto, le stanze sono di diverso tipo, Empty, Arena, Item e Boss. Per modellare questi concetti ho definito un trait base il quale contiene la maggior parte dei comportamenti ma lascia il resto alle classi specializzate. 
 Una room, qualsiasi, è caratterizzata da un insieme di porte (link ad altre room), una collezione di Anything e un area di gioco in cui gli elementi si muovono. 
-Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi possibili per la modifica di una Room, intesa come creazione di un nuovo modello con la modifica specificata. Per evitare ripetizioni di codice, la funzione generale sfrutta le \textbf{Higher Order Function}. 
+Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi possibili per la modifica di una Room, intesa come creazione di un nuovo modello con la modifica specificata. Per evitare ripetizioni di codice, la funzione generale sfrutta le \textbf{Higher Order Function} e mette in campo il pattern \textbf{strategy}. 
 \begin{lstlisting}
     def updateAnythings
     (updateFunc: Map[AnythingId, AnythingModel] => 
