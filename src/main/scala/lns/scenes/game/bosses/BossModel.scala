@@ -45,8 +45,8 @@ import scala.language.implicitConversions
  *   [[AliveModel]] invincibilityTimer, default 0
  * @param fireRateTimer
  *   [[FireModel]] fireRateTimer, default 0
- * @param shot
- *   [[FireModel]] shot, default None
+ * @param shots
+ *   [[FireModel]] shots, default None
  * @param path
  *   [[Traveller]] path, default Queue.empty
  * @param prologClient
@@ -65,14 +65,12 @@ case class BossModel(
     life: Double = 0,
     invincibilityTimer: Timer = 0,
     fireRateTimer: Timer = 0,
-    shot: Option[Vector2] = None,
     shots: Option[List[Vector2]] = None,
     path: Queue[Vector2] = Queue.empty,
     prologClient: PrologClient = PrologClient()
 ) extends EnemyModel
     with DynamicModel
     with FireModel
-    with MultiFireModel
     with Traveller
     with PrologModel("loki") {
 
@@ -86,8 +84,7 @@ case class BossModel(
   def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
   def withTraveller(path: Queue[Vector2]): Model                                               = copyMacro
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
-  def withMultiFire(fireRateTimer: Timer, shots: Option[List[Vector2]]): Model                 = copyMacro
+  def withFire(fireRateTimer: Double, shots: Option[List[Vector2]]): Model                     = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withProlog(prologClient: PrologClient): Model                                            = copyMacro
 
@@ -189,21 +186,16 @@ case class BossModel(
       case _ => Outcome(this)
     }
 
-  override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] =
+  override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
     status.head match {
       case (EnemyState.Attacking, _, Some(("attack1", direction))) =>
         direction match {
-          case "top"   => Some(Vector2(0, -1))
-          case "right" => Some(Vector2(1, 0))
-          case "down"  => Some(Vector2(0, 1))
-          case "left"  => Some(Vector2(-1, 0))
+          case "top"   => Some(List(Vector2(0, -1)))
+          case "right" => Some(List(Vector2(1, 0)))
+          case "down"  => Some(List(Vector2(0, 1)))
+          case "left"  => Some(List(Vector2(-1, 0)))
           case _       => None
         }
-      case _ => None
-    }
-
-  override def computeMultiFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
-    status.head match {
       case (EnemyState.Attacking, _, Some("attack2")) =>
         Some(List(Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)))
       case (EnemyState.Attacking, _, Some("attack3")) =>
