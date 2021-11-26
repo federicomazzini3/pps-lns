@@ -6,22 +6,17 @@ import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.core.Assets.Rooms
 import lns.scenes.game.anything.{ AnythingId, AnythingModel, SolidModel }
 import lns.core.Macros.copyMacro
+import lns.scenes.game.elements.stone.{ StoneModel, StoneView }
 import lns.scenes.game.room.{ Cell, Floor }
 
 import scala.util.Random
 
-case class StoneModel(
-    id: AnythingId,
-    view: () => StoneView[_],
-    boundingBox: BoundingBox,
-    shotAreaOffset: Int,
-    crossable: Boolean = false
-) extends SolidModel {
+trait ElementModel extends SolidModel {
+  type Model >: this.type <: ElementModel
 
-  type Model = StoneModel
+  val crossable: Boolean
 
-  def withSolid(crossable: Boolean): Model = copyMacro
-
+  def withSolid(crossable: Boolean): Model
 }
 
 object ElementModel {

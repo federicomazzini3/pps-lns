@@ -1,6 +1,7 @@
-package lns.scenes.game.elements
+package lns.scenes.game.elements.stone
 
 import indigo.*
+import indigo.shared.materials.Material
 import indigo.shared.scenegraph.Graphic
 import lns.core.anythingAssets.StoneAsset
 

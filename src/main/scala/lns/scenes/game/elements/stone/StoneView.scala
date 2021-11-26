@@ -1,4 +1,4 @@
-package lns.scenes.game.elements
+package lns.scenes.game.elements.stone
 
 import indigo.*
 import indigo.shared.FrameContext
@@ -8,6 +8,7 @@ import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.anything.{ AnythingView, AnythingViewModel, SimpleAnythingView, SolidModel }
 import lns.scenes.game.characters.{ CharacterModel, CharacterViewModel }
+import lns.scenes.game.elements.stone.{ Stone, StoneModel }
 
 /**
  * Base view for a [[StoneModel]]
