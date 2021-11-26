@@ -1,1 +1,95 @@
 \subsection{Alan Mancini}
+Durante il corso del progetto mi sono occupato di studiare ed implementare:
+\begin{itemize}
+    \item AnythingModel con alcuni suoi sottotipi come DynamicModel e AliveModel e sperimentazione del workflow per consentire mixin/estensione e l'update del Model immutabile 
+    \item Macro per ridurre il boilerplate code quando si estende un AnythingModel
+    \item Utilities per semplificare l'update di un insieme di AnythingModel
+    \item AnythingView e AnythingViewModel di base e sperimentazione del workflow derivante
+    \item Nemici per quanto concerne Model ed i loro comportamenti riutilizzabili
+    \item Servizio Prolog come sottosistema di Indigo, integrazione di TauProlog e intefacciamento grazie a Scala.js, ed infine client per consultazioni da parte del gioco
+    \item Generazione del dungeon randomica con Prolog
+    \item Visualizzazione mini-mappa del dungeon
+\end{itemize}
+\subsubsection{AnythingModel e immutabilità}
+Per quanto riguarda il trait AnythingModel e suoi trait sottotipi/mixins il problema è quello di consentire l'update dello stesso nel contesto dell'immutabilità ritornando quindi una \textbf{copia aggiornata di se stesso e del tipo corrente}. 
+Scala infatti attualmente non dispone di un sistema per copiare un oggetto aggiornando solo alcune sue proprietà, se non riapplicando il costruttore creando un nuovo oggetto o utilizzando il metodo copy di una case class, ma a partire da un trait base non si conosce ancora quale classe/case class lo estenderà.
+Una tecnica che potrebbe sembrare idonea è l'utilizzo di un self-type richiedendo un tipo anonimo che implementi un metodo copy, ma occorrebbe specificare tutti i suoi argomenti e questi non si conoscono in quanto dipendono dalla classe finale e come questa viene mixata.
+
+Sebbene una soluzione consigliata è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile.
+
+La soluzione trovata è quindi quella di applicare il pattern \textbf{F-Bounded Polimorphism} con type-member.
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait AnythingModel {
+    type Model >: this.type <: AnythingModel
+    
+    val id: AnythingId
+    val view: () => AnythingView[Model, _]
+
+    ...
+
+    def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+        Outcome(this)
+    }
+}  
+\end{lstlisting}
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait DynamicModel extends AnythingModel with StatsModel {
+  type Model >: this.type <: DynamicModel
+
+  val speed: Vector2
+  val collisionDetected: Boolean
+
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    for {
+      superObj <- super.update(context)(gameContext)
+      (newSpeed, newPosition) = computeMove(context)(gameContext)
+      boundLocation           = gameContext.room.boundPosition(newPosition)
+      newObj = superObj
+        .withDynamic(boundLocation, newSpeed, boundLocation.position != newPosition.position)
+        .asInstanceOf[Model]
+    } yield newObj
+
+} 
+\end{lstlisting}
+
+Da notare la necessità di un cast a Model in quanto il compilatore Scala non riconosce che il type member di ritorno è lo stesso definito poco sopra: questo cast comunque è legittimo e sicuro. 
+
+Per concludere la descrizione di Anything: ogni Model viene creato specificando la sua View (factories as functions in linea con il \textbf{pattern strategy}) in modo tale che, quando una collezione di oggetti viene renderizzata, non è necessario fare type-match e indicare la corretta View da utilizzare in base al Model.
+
+
+\subsubsection{Macro per ridurre boilerplate code}
+Quando si definisce il Model di un oggetto di gioco che mixa diversi comportamenti è necessario implementare altrettanti metodi del tipo with-Comportamento in modo da permettere la sua copia aggiornata. 
+
+\begin{lstlisting}[basicstyle=\tiny]
+def withDynamic(x,y,z) = copy(x=x,y=y,z=z); 
+\end{lstlisting}
+
+Per questo ho cercato un modo per generare in automatico questi metodi per una case class qualsiasi e l'unico sistema era scrivere una macro attivata da una annotation, ma Scala 3 al momento non supporta questa soluzione possibile su Scala 2.
+
+Quindi ho implementato la \textbf{copyMacro} che consente di eseguire il metodo copy con come argomenti quelli dello scope dove viene attivata la macro, sfruttando le potenzialita della ancora non documentata Scala Reflection API. 
+
+\begin{lstlisting}[basicstyle=\tiny]
+def withDynamic(x,y,z) = copyMacro
+\end{lstlisting}
+
+\subsubsection{Utilities per update di collection di Anything}
+
+Quando si esegue l'update di una collezione di oggetti AnythingModel o AnythingViewModel ad esempio Map[AnythingId, AnythingModel] si ottiene una Map[AnythingId, Outcome[AnythingModel]] ma quello che occorre è ottenere la Map originale unendo le Outcome e gli eventi contenuti da ciascuna.
+
+\begin{lstlisting}[basicstyle=\tiny]
+anythings.map((id, any) => id -> any.update(context)(GameContext(this, character)))
+\end{lstlisting}
+
+Per comodità ho applicato il \textbf{pattern adapter} fornendo un apposito convertitore implicito, di seguito quello per AnythingViewModel.
+
+\begin{lstlisting}[basicstyle=\tiny]
+given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[AnythingId, AnythingViewModel[_]]]] with
+  def apply(set: Map[AnythingId, Outcome[AnythingViewModel[_]]]): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
+    set.foldLeft(Outcome(Map[AnythingId, AnythingViewModel[_]]().empty))((acc, el) =>
+      acc.merge[AnythingViewModel[_], Map[AnythingId, AnythingViewModel[_]]](el._2)((set, el2) => set + (el._1 -> el2))
+    )
+\end{lstlisting}
