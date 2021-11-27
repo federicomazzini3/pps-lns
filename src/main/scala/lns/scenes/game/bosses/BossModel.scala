@@ -14,6 +14,7 @@ import lns.scenes.game.shots.{ ShotRed, SingleShotView }
 import lns.scenes.game.stats.{ *, given }
 import lns.scenes.game.stats.PropertyName.*
 import lns.subsystems.prolog.Substitution
+import lns.subsystems.prolog.Term.*
 
 import scala.collection.immutable.Queue
 import scala.language.implicitConversions
@@ -163,27 +164,22 @@ case class BossModel(
    *   the Outcome of the updated model
    */
   override def behaviour(response: Substitution): Outcome[Model] =
-    println(response.links("Action"))
-    val attackRegEx  = raw"attack1\(([a-z]+)\)".r
-    val moveRegEx    = raw"move\((\d{1}),\s*(\d{1})\)".r
-    val defenceRegEx = raw"defence\((\d{1}),\s*(\d{1})\)".r
-
-    response.links("Action").toString() match {
-      case attackRegEx(direction) =>
+    response.links("Action") match {
+      case Struct(Atom("attack1"), Atom(direction)) =>
         behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack1", Some(direction))))
-      case "attack2" =>
+      case Atom("attack2") =>
         behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack2", None)))
-      case "attack3" =>
+      case Atom("attack3") =>
         behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack3", None)))
-      case moveRegEx(x, y) =>
+      case Struct(Atom("move"), Num(x, _), Num(y, _)) =>
         behaviourOutcome(EnemyState.Attacking, 0.0, Some(MoveAction(x.toDouble, y.toDouble)))
-      case defenceRegEx(x, y) =>
+      case Struct(Atom("defence"), Num(x, _), Num(y, _)) =>
         Outcome(
           this
             .withSolid(true)
             .withStatus(
-              (EnemyState.Hiding, 1.0, Some(DefenceAction(x.toDouble, y.toDouble))) +:
-                (EnemyState.Falling, 1.0, None) +:
+              (EnemyState.Hiding, 0.640, Some(DefenceAction(x.toDouble, y.toDouble))) +:
+                (EnemyState.Falling, 0.640, None) +:
                 (EnemyState.Idle, 0.0, None) +:
                 status.drop(1)
             )

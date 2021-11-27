@@ -65,7 +65,7 @@ trait AnythingViewModel[M <: AnythingModel: Typeable] {
 }
 
 /**
- * Base model for every thing that can fire. It is designed to be extended or mixed with other [[AnythingViewModel]]
+ * Base viewModel for every thing that can fire. It is designed to be extended or mixed with other [[AnythingViewModel]]
  * traits.
  */
 trait FireViewModel[M <: FireModel] extends AnythingViewModel[M] {
@@ -82,8 +82,8 @@ trait FireViewModel[M <: FireModel] extends AnythingViewModel[M] {
    * fireAnimationTimer is present, it is decreased to mark the end of the animation
    * @param context
    *   indigo frame context data
-   * @param room
-   *   current room in which the Anything is placed
+   * @param model
+   *   the model of the Anything to which the viewModel is bound
    * @return
    *   the Outcome of the updated model
    */

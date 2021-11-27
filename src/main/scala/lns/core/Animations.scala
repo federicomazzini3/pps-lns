@@ -155,21 +155,66 @@ object Animations {
 
   object Loki {
     /*Loki body*/
-    val bodyWidth: Int            = 41
-    val bodyHeight: Int           = 47
-    val hideFrameTime: Double     = 0.180
-    val hideTime: Double          = hideFrameTime * 6
+    val bodyWidth: Int  = 44
+    val bodyHeight: Int = 47
+
+    val hideFrameTime: Double     = 0.80
+    val hideTime: Double          = hideFrameTime * 8
     val hideFrameTimeMillis: Long = (hideFrameTime * 1000).toLong
 
-    def generateBodyFrame(x: Int, y: Int): NonEmptyList[Frame] =
+    val fallingFrameTime: Double     = 0.80
+    val fallingTime: Double          = fallingFrameTime * 8
+    val fallingFrameTimeMillis: Long = (fallingFrameTime * 1000).toLong
+
+    def generateAttackFrame: NonEmptyList[Frame] =
       generateFramesList(
-        generateFrame(0 until 6)(i => Frame(Rectangle(x + (i * 48), y, bodyWidth, bodyHeight), Millis(120)))
+        List(
+          Frame(Rectangle(2, 0, bodyWidth, bodyHeight), Millis(80)),
+          Frame(Rectangle(50, 0, bodyWidth, bodyHeight), Millis(80)),
+          Frame(Rectangle(98, 0, bodyWidth, bodyHeight), Millis(80))
+        )
+      )
+
+    def generateIdleFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(193, 0, bodyWidth, bodyHeight), Millis(80))
+        )
+      )
+
+    def generateHidingFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(193, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis))
+        )
+      )
+
+    def generateFallingFrame: NonEmptyList[Frame] =
+      generateFramesList(
+        List(
+          Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
+          Frame(Rectangle(240, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis))
+        )
       )
 
     val body: Animation = Animation
-      .create(AnimationKey("loki_body"), Cycle.create("move", generateBodyFrame(3, 0)))
-      .addCycle(Cycle.create("attack", generateBodyFrame(3, 58)))
-      .addCycle(Cycle.create("defence", generateBodyFrame(3, 96)))
+      .create(AnimationKey("loki_body"), Cycle.create("attack", generateAttackFrame))
+      .addCycle(Cycle.create("idle", generateIdleFrame))
+      .addCycle(Cycle.create("hiding", generateHidingFrame))
+      .addCycle(Cycle.create("falling", generateFallingFrame))
   }
 
   object Explosion {

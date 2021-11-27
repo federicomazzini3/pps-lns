@@ -50,7 +50,6 @@ trait PrologModel(name: String) extends EnemyModel {
    *   the Outcome of the updated model
    */
   def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
-    println("CONSULT")
     prologClient
       .consult(
         context.startUpData.getPrologFile(name).get,

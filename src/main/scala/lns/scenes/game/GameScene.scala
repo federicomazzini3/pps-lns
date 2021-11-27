@@ -82,7 +82,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
           prologClient
             .consult(
               context.startUpData.getPrologFile("dungeon_generator").get,
-              "generateDungeon(30,L)."
+              "generateDungeon(2,L)." //TODO 30
             )
             .map(pi => model.copy(prologClient = pi))
 

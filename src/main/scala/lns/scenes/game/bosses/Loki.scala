@@ -32,8 +32,11 @@ trait Loki extends LokiAsset {
    * @return
    *   anim frame
    */
-  def getFrame(timer: Double): Int =
+  def getHideFrame(timer: Double): Int =
     Math.floor((Loki.hideTime - timer) / Loki.hideFrameTime).toInt
+
+  def getFallingFrame(timer: Double): Int =
+    Math.floor((Loki.fallingTime - timer) / Loki.fallingFrameTime).toInt
 
   /**
    * Plays the animation cycle related to [[EnemyState]]
@@ -43,19 +46,25 @@ trait Loki extends LokiAsset {
    *   the updated body Sprite
    */
   def bodyAnimation(model: BossModel, viewModel: BossViewModel): Sprite[Material.Bitmap] =
-    bodySprite.changeCycle(CycleLabel("move")).play()
-  /*
     model.status.head match {
-      case (EnemyState.Attacking, _) => bodySprite.changeCycle(CycleLabel("attack")).play()
-      case (EnemyState.Hiding, _) =>
+      case (EnemyState.Attacking, 0, _) => bodySprite.changeCycle(CycleLabel("attack")).jumpToFirstFrame()
+      case (EnemyState.Attacking, _, _) => bodySprite.changeCycle(CycleLabel("attack")).play()
+      case (EnemyState.Hiding, _, _) =>
         viewModel.animationTimer match {
-          case 0 => bodySprite.changeCycle(CycleLabel("defence")).jumpToLastFrame()
+          case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
           case t =>
             bodySprite
-              .changeCycle(CycleLabel("defence"))
-              .jumpToFrame(getFrame(t))
+              .changeCycle(CycleLabel("hiding"))
+              .jumpToFrame(getHideFrame(t))
         }
-      case _ => bodySprite.changeCycle(CycleLabel("move")).play()
+      case (EnemyState.Falling, _, _) =>
+        viewModel.animationTimer match {
+          case 0 => bodySprite.changeCycle(CycleLabel("falling")).jumpToLastFrame()
+          case t =>
+            bodySprite
+              .changeCycle(CycleLabel("falling"))
+              .jumpToFrame(getFallingFrame(t))
+        }
+      case _ => bodySprite.changeCycle(CycleLabel("idle")).play()
     }
-   */
 }
