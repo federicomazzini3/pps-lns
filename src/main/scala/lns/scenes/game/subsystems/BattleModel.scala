@@ -21,7 +21,8 @@ case class BattleModel(bc: Set[BattleConsequence], state: GameState) {
   def gameOver: Outcome[BattleModel] =
     this.update(battleModel => Outcome(this.copy(state = GameOver))).addGlobalEvents(Redirect(500))
 
-  def win: Outcome[BattleModel] = Outcome(this.copy(state = Win))
+  def win: Outcome[BattleModel] =
+    this.update(battleModel => Outcome(this.copy(state = Win))).addGlobalEvents(Redirect(500))
 }
 
 object BattleModel {
