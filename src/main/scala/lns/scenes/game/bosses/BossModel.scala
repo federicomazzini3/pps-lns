@@ -88,12 +88,15 @@ case class BossModel(
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withProlog(prologClient: PrologClient): Model                                            = copyMacro
 
+  def posToCell(value: Int): Int       = value / Assets.Rooms.cellSize
+  def cellToPos(value: Double): Double = value * Assets.Rooms.cellSize
+
   /**
    * Builds boss info for goal
    */
   def bossInfo: String =
-    val x: Int = getPosition().x / Assets.Rooms.cellSize
-    val y: Int = getPosition().y / Assets.Rooms.cellSize
+    val x: Int = posToCell(getPosition().x)
+    val y: Int = posToCell(getPosition().y)
     "boss(" + x + "," + y + "," + life + "," + MaxLife @@ stats + ")"
 
   /**
@@ -101,8 +104,8 @@ case class BossModel(
    * @param [[GameContext]]
    */
   def characterInfo(gameContext: GameContext): String =
-    val x: Int = gameContext.character.getPosition().x / Assets.Rooms.cellSize
-    val y: Int = gameContext.character.getPosition().y / Assets.Rooms.cellSize
+    val x: Int = posToCell(gameContext.character.getPosition().x)
+    val y: Int = posToCell(gameContext.character.getPosition().y)
     "character(" + x + "," + y + "," + gameContext.character.life + "," + MaxLife @@ gameContext.character.stats + ")"
 
   /**
@@ -120,8 +123,8 @@ case class BossModel(
     gameContext.room.anythings
       .foldLeft(List[String]()) {
         case (list, (id, stone: StoneModel)) =>
-          val x = stone.getPosition().x / Assets.Rooms.cellSize
-          val y = stone.getPosition().y / Assets.Rooms.cellSize
+          val x = posToCell(stone.getPosition().x)
+          val y = posToCell(stone.getPosition().y)
           list :+ "block(" + x + "," + y + ")"
         case (list, _) => list
       }
@@ -149,7 +152,7 @@ case class BossModel(
    * @return
    *   the Outcome of the updated model
    */
-  def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[Any]): Outcome[Model] =
+  def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[EnemyAction]): Outcome[Model] =
     Outcome(this.withStatus((state, timer, option) +: status.drop(1)))
 
   /**
@@ -160,27 +163,29 @@ case class BossModel(
    *   the Outcome of the updated model
    */
   override def behaviour(response: Substitution): Outcome[Model] =
+    println(response.links("Action"))
     val attackRegEx  = raw"attack1\(([a-z]+)\)".r
     val moveRegEx    = raw"move\((\d{1}),\s*(\d{1})\)".r
     val defenceRegEx = raw"defence\((\d{1}),\s*(\d{1})\)".r
 
     response.links("Action").toString() match {
       case attackRegEx(direction) =>
-        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(("attack1", direction)))
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack1", Some(direction))))
       case "attack2" =>
-        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some("attack2"))
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack2", None)))
       case "attack3" =>
-        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some("attack3"))
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack3", None)))
       case moveRegEx(x, y) =>
-        behaviourOutcome(EnemyState.Attacking, 0, Some("move", (x.toDouble, y.toDouble)))
+        behaviourOutcome(EnemyState.Attacking, 0.0, Some(MoveAction(x.toDouble, y.toDouble)))
       case defenceRegEx(x, y) =>
         Outcome(
           this
             .withSolid(true)
             .withStatus(
-              (EnemyState.Hiding, 1.0, Some("defence", (x.toDouble, y.toDouble))) :+
-                (EnemyState.Falling, 1.0, None) :+
-                (EnemyState.Idle, 0, None)
+              (EnemyState.Hiding, 1.0, Some(DefenceAction(x.toDouble, y.toDouble))) +:
+                (EnemyState.Falling, 1.0, None) +:
+                (EnemyState.Idle, 0.0, None) +:
+                status.drop(1)
             )
         )
       case _ => Outcome(this)
@@ -188,7 +193,7 @@ case class BossModel(
 
   override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
     status.head match {
-      case (EnemyState.Attacking, _, Some(("attack1", direction))) =>
+      case (EnemyState.Attacking, _, Some(AttackAction("attack1", Some(direction)))) =>
         direction match {
           case "top"   => Some(List(Vector2(0, -1)))
           case "right" => Some(List(Vector2(1, 0)))
@@ -196,32 +201,24 @@ case class BossModel(
           case "left"  => Some(List(Vector2(-1, 0)))
           case _       => None
         }
-      case (EnemyState.Attacking, _, Some("attack2")) =>
+      case (EnemyState.Attacking, _, Some(AttackAction("attack2", None))) =>
         Some(List(Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)))
-      case (EnemyState.Attacking, _, Some("attack3")) =>
+      case (EnemyState.Attacking, _, Some(AttackAction("attack3", None))) =>
         Some(List(Vector2(-1, -1), Vector2(1, 1), Vector2(1, -1), Vector2(-1, 1)))
       case _ => None
     }
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
-    println(status.head)
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Attacking, time, Some(("attack1", direction))) =>
-          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
-        case (EnemyState.Attacking, time, Some("attack2")) =>
-          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
-        case (EnemyState.Attacking, time, Some("attack3")) =>
-          superObj.withStatus((EnemyState.Attacking, time, None) +: status.drop(1))
-        case (EnemyState.Attacking, _, Some(("move", (x: Double, y: Double)))) =>
+        case (EnemyState.Attacking, _, Some(MoveAction(x, y))) =>
           superObj
-            .withStatus((EnemyState.Attacking, 0, None) +: status.drop(1))
-            .withTraveller(Queue(Vector2(x * Assets.Rooms.cellSize, y * Assets.Rooms.cellSize)))
+            .withTraveller(Queue(Vector2(cellToPos(x), cellToPos(y))))
             .asInstanceOf[Model]
-        case (EnemyState.Hiding, 0, Some(("defence", (x: Double, y: Double)))) =>
+        case (EnemyState.Hiding, 0, Some(DefenceAction(x, y))) =>
           superObj
-            .withDynamic(boundingBox.moveTo(x * Assets.Rooms.cellSize, y * Assets.Rooms.cellSize), Vector2.zero, false)
+            .withDynamic(boundingBox.moveTo(cellToPos(x), cellToPos(y)), Vector2.zero, false)
             .asInstanceOf[Model]
         case (EnemyState.Falling, 0, _) =>
           superObj
@@ -233,6 +230,13 @@ case class BossModel(
     } yield newObj
 
 }
+
+/**
+ * [[EnemyAction]] implements for [[BossModel]]
+ */
+case class AttackAction(val name: String, direction: Option[String]) extends EnemyAction
+case class MoveAction(x: Double, y: Double)                          extends EnemyAction
+case class DefenceAction(x: Double, y: Double)                       extends EnemyAction
 
 /**
  * Factory of [[BossModel]]

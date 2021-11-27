@@ -50,6 +50,7 @@ trait PrologModel(name: String) extends EnemyModel {
    *   the Outcome of the updated model
    */
   def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    println("CONSULT")
     prologClient
       .consult(
         context.startUpData.getPrologFile(name).get,
@@ -59,7 +60,7 @@ trait PrologModel(name: String) extends EnemyModel {
 
   /**
    * Update request called during game loop on every frame. If the EnemyModel has [[EnemyState.Idle]] is called Prolog
-   * consult
+   * consult if it already has't [[ConsultingAction]]
    * @param context
    *   indigo frame context data
    * @param gameContext
@@ -71,12 +72,18 @@ trait PrologModel(name: String) extends EnemyModel {
     for {
       superObj <- super.update(context)(gameContext)
       newObj <- status.head match {
-        case (EnemyState.Idle, 0, _) =>
+        case (EnemyState.Idle, 0, None) =>
           superObj
-            .withStatus((EnemyState.Consulting, -1, None) +: status)
+            .withStatus((EnemyState.Idle, -1.0, Some(ConsultingAction())) +: status)
             .consult(context)(gameContext)
             .asInstanceOf[Outcome[Model]]
         case _ => Outcome(superObj)
       }
     } yield newObj
 }
+
+/**
+ * ConsultingAction that implement [[EnemyAction]] for Idle [[EnemyState]]. When the model is in idle state but does not
+ * have this action, the prolog is consulted
+ */
+case class ConsultingAction() extends EnemyAction

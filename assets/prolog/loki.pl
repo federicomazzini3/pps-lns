@@ -76,7 +76,7 @@ checkPosition([H|T], P) :- H\==P, checkPosition(T, P).
 % @Room
 % @X
 % @Y
-checkRoom(room(RX, RY), X, Y) :- X=<RX, Y=<RY, X>=0, Y>=0.
+checkRoom(room(RX, RY), X, Y) :- X<RX, Y<RY, X>=0, Y>=0.
 
 % Get new free place X, Y free around block
 % @Room
