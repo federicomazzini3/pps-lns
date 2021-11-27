@@ -120,7 +120,7 @@ case class BossModel(
    */
   def blocksInfo(gameContext: GameContext): String =
     gameContext.room.anythings
-      .collect { case (_, stone: StoneModel) =>
+      .collect { case (_, stone: ElementModel) =>
         stone
       }
       .foldLeft(List[String]()) { (list, stone) =>
