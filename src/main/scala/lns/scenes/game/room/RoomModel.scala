@@ -126,17 +126,7 @@ trait RoomModel {
    *   a new room with the anything state updated
    */
   def update(context: FrameContext[StartupData])(character: CharacterModel): Outcome[RoomModel] =
-    /*val updatedAnythings: Outcome[Map[AnythingId, AnythingModel]] =
-      anythings
-        .map((id, any) => id -> any.update(context)(GameContext(this, character)))
-
-    for (updated <- updatedAnythings)
-      yield this.updateAnythings(anythings => updated)*/
-
-    this.updateAnythings(anythings =>
-      anythings
-        .map((id, any) => id -> any.update(context)(GameContext(this, character)))
-    )
+    this.updateEachAnything(anything => anything.update(context)(GameContext(this, character)))
 }
 
 /**

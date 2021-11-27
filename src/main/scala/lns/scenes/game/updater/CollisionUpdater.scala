@@ -97,7 +97,7 @@ object CollisionUpdater {
    * @return
    *   anything updated with new stats, based on the element's stats it collides with
    */
-  def updateLife(
+  def updateStats(
       context: FrameContext[StartupData]
   )(anything: AnythingModel, against: AnythingModel): Outcome[AnythingModel] =
     (anything, against) match {

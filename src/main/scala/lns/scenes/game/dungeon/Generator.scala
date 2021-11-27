@@ -10,7 +10,7 @@ import lns.scenes.game.enemies.boney.BoneyModel
 import lns.scenes.game.enemies.mask.MaskModel
 import lns.scenes.game.enemies.nerve.NerveModel
 import lns.scenes.game.enemies.parabite.ParabiteModel
-import lns.scenes.game.room.{ Cell, Floor, RoomModel }
+import lns.scenes.game.room.{ ArenaRoom, BossRoom, Cell, Floor, RoomModel }
 import lns.scenes.game.room.door.{ DoorState, Location }
 import lns.scenes.game.stats.*
 import lns.scenes.game.elements.ElementModel
@@ -60,16 +60,20 @@ object Generator {
     Set(Location.Left, Location.Right, Location.Above, Location.Below)
       .filter(location => Grid.near(grid)(position)(location).isDefined)
 
-  def generateElementsFromProlog(substitution: Substitution): Map[AnythingId, AnythingModel] =
-    generateEnemies(GeneratorHelper.fromPrologList(substitution.links("A").toString)) ++
-      generateBlockingElements(GeneratorHelper.fromPrologList(substitution.links("S").toString))
+  def generateElementsFromProlog(substitution: Substitution, room: RoomModel): Map[AnythingId, AnythingModel] =
+    room match {
+      case a: ArenaRoom =>
+        generateEnemies(GeneratorHelper.fromPrologList(substitution.links("A").toString)) ++
+          generateBlockingElements(GeneratorHelper.fromPrologList(substitution.links("S").toString))
+      case b: BossRoom =>
+        generateBlockingElements(GeneratorHelper.fromPrologList(substitution.links("S").toString))
+      case _ => Map.empty
+    }
 
   def generateBlockingElements(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
     ElementModel.random(cells)
 
   def generateEnemies(cells: Seq[Cell]): Map[AnythingId, AnythingModel] =
-    //val enemy = ParabiteModel.initial(Cell(5, 4))
-    //Map(enemy.id -> enemy)
     EnemyModel.random(cells)
 
   def generateItem(position: Cell): Map[AnythingId, AnythingModel] =

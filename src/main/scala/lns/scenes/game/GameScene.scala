@@ -107,12 +107,12 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
           model.dungeon.firstRoomToGenerate match {
             case Some(room) =>
               model.updateRoom(room.positionInDungeon)(room =>
-                room.addAnythings(Generator.generateElementsFromProlog(substitution))
+                room.addAnythings(Generator.generateElementsFromProlog(substitution, room))
               )
             case _ => model
           }
         case model @ GameModel.Started(_, dungeon, roomIndex, character) =>
-          model.updateEachAnythingsCurrentRoom { anything =>
+          model.updateEachAnythings { anything =>
             anything match {
               case anything: PrologModel if anything.prologClient.hasQuery(queryId) => anything.behaviour(substitution)
               case _                                                                => Outcome(anything)

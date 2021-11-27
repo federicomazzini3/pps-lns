@@ -8,6 +8,7 @@ import lns.scenes.end.*
 import lns.scenes.end.Restart
 import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.*
+import lns.scenes.game.bosses.BossModel
 import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.shots.ShotModel
@@ -41,9 +42,11 @@ case class BattleEventSubSystems(screenDimensions: Rectangle) extends SubSystem:
             gameOver <- model.gameOver
             bc       <- gameOver.addBattleConsequence(Rip(a, context.gameTime))
           } yield bc
-        //model.gameOver.addBattleConsequence(Rip(a, context.gameTime))
-        //case b: BossModel =>
-        // model.win.addBattleConsequence(Rip(a, context.gameTime))
+        case b: BossModel =>
+          for {
+            win <- model.win
+            bc  <- win.addBattleConsequence(Rip(a, context.gameTime))
+          } yield bc
         case _ =>
           model.addBattleConsequence(Rip(a, context.gameTime))
       }

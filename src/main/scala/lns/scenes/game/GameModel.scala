@@ -109,7 +109,7 @@ object GameModel {
      * @return
      *   a new GameModel with an updated collection of anythings
      */
-    def updateEachAnythingsCurrentRoom(f: AnythingModel => Outcome[AnythingModel]): Outcome[GameModel.Started] =
+    def updateEachAnythings(f: AnythingModel => Outcome[AnythingModel]): Outcome[GameModel.Started] =
       updateCurrentRoom(room => room.updateEachAnything(f))
 
     /**
@@ -119,7 +119,7 @@ object GameModel {
      * @return
      *   a new GameModel with an updated collection of anythings
      */
-    def updateAnythingsCurrentRoom(
+    def updateAnythings(
         f: Map[AnythingId, AnythingModel] => Outcome[Map[AnythingId, AnythingModel]]
     ): Outcome[GameModel.Started] =
       updateCurrentRoom(room => room.updateAnythings(f))
@@ -145,14 +145,14 @@ object GameModel {
       for {
         modelWithUpdatedCharacter <- this
           .updateCharacter(character =>
-            CollisionUpdater(character)(this.currentRoom.anythings)(updateLife(context))
+            CollisionUpdater(character)(this.currentRoom.anythings)(updateStats(context))
               .map(c => c.asInstanceOf[CharacterModel])
           )
-        modelWithUpdatedAnything <- modelWithUpdatedCharacter.updateEachAnythingsCurrentRoom(anything =>
-          for (a <- CollisionUpdater(anything)(this.allAnythings)(updateLife(context)))
+        modelWithUpdatedAnything <- modelWithUpdatedCharacter.updateEachAnythings(anything =>
+          for (a <- CollisionUpdater(anything)(this.allAnythings)(updateStats(context)))
             yield a
         )
-        modelWithoutDeadAnythings <- modelWithUpdatedAnything.updateAnythingsCurrentRoom(anythings =>
+        modelWithoutDeadAnythings <- modelWithUpdatedAnything.updateAnythings(anythings =>
           Outcome(anythings.filter {
             case (id, elem: AliveModel) if elem.life <= 0 => false
             case _                                        => true
@@ -172,7 +172,7 @@ object GameModel {
             CollisionUpdater(character)(this.currentRoom.anythings)(updateMove)
               .map(c => c.asInstanceOf[CharacterModel])
           )
-        modelWithUpdatedAnythings <- modelWithUpdatedCharacter.updateEachAnythingsCurrentRoom(anything =>
+        modelWithUpdatedAnythings <- modelWithUpdatedCharacter.updateEachAnythings(anything =>
           CollisionUpdater(anything)(this.allAnythings)(updateMove)
         )
       } yield modelWithUpdatedAnythings
