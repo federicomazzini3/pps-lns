@@ -23,20 +23,7 @@ trait Loki extends LokiAsset {
   def bodyView(model: BossModel, viewModel: BossViewModel): Sprite[Material.Bitmap] =
     bodyAnimation(model, viewModel)
       .withRef(0, 0)
-      .moveTo(0, 0)
-
-  /**
-   * Calculates current animation frame for the defence animation
-   * @param timer
-   *   current animation timer from X to 0
-   * @return
-   *   anim frame
-   */
-  def getHideFrame(timer: Double): Int =
-    Math.floor((Loki.hideTime - timer) / Loki.hideFrameTime).toInt
-
-  def getFallingFrame(timer: Double): Int =
-    Math.floor((Loki.fallingTime - timer) / Loki.fallingFrameTime).toInt
+      .moveTo(-6, 0)
 
   /**
    * Plays the animation cycle related to [[EnemyState]]
@@ -47,15 +34,15 @@ trait Loki extends LokiAsset {
    */
   def bodyAnimation(model: BossModel, viewModel: BossViewModel): Sprite[Material.Bitmap] =
     model.status.head match {
-      case (EnemyState.Attacking, 0, _) => bodySprite.changeCycle(CycleLabel("attack")).jumpToFirstFrame()
-      case (EnemyState.Attacking, _, _) => bodySprite.changeCycle(CycleLabel("attack")).play()
+      case (EnemyState.Attacking, 0.0, _) => bodySprite.changeCycle(CycleLabel("attack")).jumpToLastFrame()
+      case (EnemyState.Attacking, _, _)   => bodySprite.changeCycle(CycleLabel("attack")).jumpToFirstFrame()
       case (EnemyState.Hiding, _, _) =>
         viewModel.animationTimer match {
           case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
           case t =>
             bodySprite
               .changeCycle(CycleLabel("hiding"))
-              .jumpToFrame(getHideFrame(t))
+              .jumpToFrame(Loki.getHidingFrame(t))
         }
       case (EnemyState.Falling, _, _) =>
         viewModel.animationTimer match {
@@ -63,7 +50,7 @@ trait Loki extends LokiAsset {
           case t =>
             bodySprite
               .changeCycle(CycleLabel("falling"))
-              .jumpToFrame(getFallingFrame(t))
+              .jumpToFrame(Loki.getFallingFrame(t))
         }
       case _ => bodySprite.changeCycle(CycleLabel("idle")).play()
     }

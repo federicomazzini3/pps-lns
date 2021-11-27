@@ -24,11 +24,11 @@ case class BossViewModel(
     for {
       superObj <- super.update(context)(model)
       newObj = model.status.head match {
-        case state @ (EnemyState.Hiding, time, _) if lastState != state._1 =>
-          superObj.withLastState(state._1, time).asInstanceOf[ViewModel]
-        case state @ (EnemyState.Falling, time, _) if lastState != state._1 =>
-          superObj.withLastState(state._1, time).asInstanceOf[ViewModel]
-        case state @ ((EnemyState.Hiding, _, _) | (EnemyState.Falling, _, _)) if animationTimer > 0 =>
+        case state @ ((EnemyState.Attacking, _, _) | (EnemyState.Hiding, _, _) | (EnemyState.Falling, _, _))
+            if lastState != state._1 =>
+          superObj.withLastState(state._1, state._2).asInstanceOf[ViewModel]
+        case state @ ((EnemyState.Attacking, _, _) | (EnemyState.Hiding, _, _) | (EnemyState.Falling, _, _))
+            if animationTimer > 0 =>
           superObj
             .withLastState(state._1, animationTimer.elapsed(context.gameTime.delta.toDouble))
             .asInstanceOf[ViewModel]

@@ -1,4 +1,4 @@
-package lns.scenes.game.bosses
+package lns.scenes.game.enemies
 
 import indigo.*
 import indigo.shared.*

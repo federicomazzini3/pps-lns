@@ -53,10 +53,7 @@ object Generator {
           Map(boss.id -> boss)
         )
       case _ =>
-        // RoomModel.emptyRoom(positionInGrid, generateDoors(grid, positionInGrid))
-        val boss = BossModel.initial
-        RoomModel.bossRoom(positionInGrid, generateDoors(grid, positionInGrid), Map(boss.id -> boss))
-
+        RoomModel.emptyRoom(positionInGrid, generateDoors(grid, positionInGrid))
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =

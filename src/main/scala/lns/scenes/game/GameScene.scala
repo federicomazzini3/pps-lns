@@ -13,13 +13,13 @@ import lns.scenes.game.hud.HUDView
 import lns.scenes.game.map.MapView
 import lns.scenes.game.anything.FireModel
 import lns.scenes.game.characters.*
-import lns.scenes.game.bosses.PrologModel
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
 import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
 import lns.scenes.game.room.{ ArenaRoom, BossRoom, Boundary, RoomModel, RoomView, * }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
+import lns.scenes.game.enemies.PrologModel
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit, ResetSubsystem }
@@ -82,7 +82,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
           prologClient
             .consult(
               context.startUpData.getPrologFile("dungeon_generator").get,
-              "generateDungeon(2,L)." //TODO 30
+              "generateDungeon(30,L)."
             )
             .map(pi => model.copy(prologClient = pi))
 

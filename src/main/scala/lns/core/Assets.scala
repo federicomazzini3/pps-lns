@@ -176,6 +176,9 @@ object Assets {
     val wallSize: Int  = (roomSize - floorSize) / 2
     val cellSize: Int  = 152
 
+    def positionToCell(value: Int): Int       = value / Assets.Rooms.cellSize
+    def cellToPosition(value: Double): Double = value * Assets.Rooms.cellSize
+
     object EmptyRoom {
       val name: AssetName = AssetName("empty-room")
     }

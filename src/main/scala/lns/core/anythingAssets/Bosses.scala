@@ -5,7 +5,7 @@ import lns.core.Assets
 
 trait LokiAsset extends AnythingAsset {
   override val name: Option[String] = Some("loki")
-  override val width: Int           = 41
+  override val width: Int           = 32
   override val height: Int          = 47
   override val offsetY: Int         = 18
   override val scale: Double        = 5

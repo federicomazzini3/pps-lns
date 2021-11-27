@@ -123,6 +123,9 @@ object Animations {
     val hideTime: Double          = hideFrameTime * 3
     val hideFrameTimeMillis: Long = (hideFrameTime * 1000).toLong
 
+    def getFrame(timer: Double): Int =
+      Math.floor((hideTime - timer) / hideFrameTime).toInt
+
     def generateHidingFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
@@ -158,20 +161,25 @@ object Animations {
     val bodyWidth: Int  = 44
     val bodyHeight: Int = 47
 
-    val hideFrameTime: Double     = 0.80
-    val hideTime: Double          = hideFrameTime * 8
-    val hideFrameTimeMillis: Long = (hideFrameTime * 1000).toLong
+    val hidingFrameTime: Double     = 0.15
+    val hidingTime: Double          = hidingFrameTime * 6
+    val hidingFrameTimeMillis: Long = (hidingFrameTime * 1000).toLong
 
-    val fallingFrameTime: Double     = 0.80
-    val fallingTime: Double          = fallingFrameTime * 8
+    val fallingFrameTime: Double     = 0.15
+    val fallingTime: Double          = fallingFrameTime * 6
     val fallingFrameTimeMillis: Long = (fallingFrameTime * 1000).toLong
+
+    def getHidingFrame(timer: Double): Int =
+      Math.floor((hidingTime - timer) / hidingFrameTime).toInt
+
+    def getFallingFrame(timer: Double): Int =
+      Math.floor((fallingTime - timer) / fallingFrameTime).toInt
 
     def generateAttackFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
-          Frame(Rectangle(2, 0, bodyWidth, bodyHeight), Millis(80)),
-          Frame(Rectangle(50, 0, bodyWidth, bodyHeight), Millis(80)),
-          Frame(Rectangle(98, 0, bodyWidth, bodyHeight), Millis(80))
+          Frame(Rectangle(50, 0, bodyWidth, bodyHeight), Millis(100)),
+          Frame(Rectangle(98, 0, bodyWidth, bodyHeight), Millis(100))
         )
       )
 
@@ -185,22 +193,18 @@ object Animations {
     def generateHidingFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
-          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(193, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis)),
-          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hideFrameTimeMillis))
+          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis)),
+          Frame(Rectangle(146, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis)),
+          Frame(Rectangle(240, 48, bodyWidth, bodyHeight), Millis(hidingFrameTimeMillis))
         )
       )
 
     def generateFallingFrame: NonEmptyList[Frame] =
       generateFramesList(
         List(
-          Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
-          Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
           Frame(Rectangle(146, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
           Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),
           Frame(Rectangle(193, 96, bodyWidth, bodyHeight), Millis(fallingFrameTimeMillis)),

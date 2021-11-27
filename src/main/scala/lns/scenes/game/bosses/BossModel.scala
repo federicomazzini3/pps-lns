@@ -4,11 +4,12 @@ import indigo.*
 import indigo.shared.{ FrameContext, Outcome }
 import indigoextras.geometry.{ BoundingBox, Vertex }
 import lns.StartupData
+import lns.core.Animations.Loki
 import lns.core.{ Assets, PrologClient }
 import lns.core.Macros.copyMacro
 import lns.scenes.game.GameContext
 import lns.scenes.game.anything.{ *, given }
-import lns.scenes.game.enemies.*
+import lns.scenes.game.enemies.{ *, given }
 import lns.scenes.game.elements.*
 import lns.scenes.game.shots.{ ShotRed, SingleShotView }
 import lns.scenes.game.stats.{ *, given }
@@ -89,15 +90,12 @@ case class BossModel(
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withProlog(prologClient: PrologClient): Model                                            = copyMacro
 
-  def posToCell(value: Int): Int       = value / Assets.Rooms.cellSize
-  def cellToPos(value: Double): Double = value * Assets.Rooms.cellSize
-
   /**
    * Builds boss info for goal
    */
   def bossInfo: String =
-    val x: Int = posToCell(getPosition().x)
-    val y: Int = posToCell(getPosition().y)
+    val x: Int = Assets.Rooms.positionToCell(getPosition().x)
+    val y: Int = Assets.Rooms.positionToCell(getPosition().y)
     "boss(" + x + "," + y + "," + life + "," + MaxLife @@ stats + ")"
 
   /**
@@ -105,8 +103,8 @@ case class BossModel(
    * @param [[GameContext]]
    */
   def characterInfo(gameContext: GameContext): String =
-    val x: Int = posToCell(gameContext.character.getPosition().x)
-    val y: Int = posToCell(gameContext.character.getPosition().y)
+    val x: Int = Assets.Rooms.positionToCell(gameContext.character.getPosition().x)
+    val y: Int = Assets.Rooms.positionToCell(gameContext.character.getPosition().y)
     "character(" + x + "," + y + "," + gameContext.character.life + "," + MaxLife @@ gameContext.character.stats + ")"
 
   /**
@@ -122,12 +120,13 @@ case class BossModel(
    */
   def blocksInfo(gameContext: GameContext): String =
     gameContext.room.anythings
-      .foldLeft(List[String]()) {
-        case (list, (id, stone: StoneModel)) =>
-          val x = posToCell(stone.getPosition().x)
-          val y = posToCell(stone.getPosition().y)
-          list :+ "block(" + x + "," + y + ")"
-        case (list, _) => list
+      .collect { case (_, stone: StoneModel) =>
+        stone
+      }
+      .foldLeft(List[String]()) { (list, stone) =>
+        list :+ "block(" +
+          Assets.Rooms.positionToCell(stone.getPosition().x) + "," +
+          Assets.Rooms.positionToCell(stone.getPosition().y) + ")"
       }
       .mkString("[", ",", "]")
 
@@ -143,7 +142,7 @@ case class BossModel(
       blocksInfo(gameContext) + ", Action)."
 
   /**
-   * Set the [[EnemyState]] based on prolog result:
+   * Update single [[EnemyState]] based on prolog result:
    * @param state
    *   [[EnemyState]]
    * @param timer
@@ -178,8 +177,8 @@ case class BossModel(
           this
             .withSolid(true)
             .withStatus(
-              (EnemyState.Hiding, 0.640, Some(DefenceAction(x.toDouble, y.toDouble))) +:
-                (EnemyState.Falling, 0.640, None) +:
+              (EnemyState.Hiding, Loki.hidingTime, Some(DefenceAction(x.toDouble, y.toDouble))) +:
+                (EnemyState.Falling, Loki.fallingTime, None) +:
                 (EnemyState.Idle, 0.0, None) +:
                 status.drop(1)
             )
@@ -208,13 +207,19 @@ case class BossModel(
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
+        case (EnemyState.Attacking, _, _) if superObj.path.length > 0 =>
+          superObj.withStatus((EnemyState.Attacking, 0.0, None) +: status.drop(1)).asInstanceOf[Model]
         case (EnemyState.Attacking, _, Some(MoveAction(x, y))) =>
           superObj
-            .withTraveller(Queue(Vector2(cellToPos(x), cellToPos(y))))
+            .withTraveller(Queue(Vector2(Assets.Rooms.cellToPosition(x), Assets.Rooms.cellToPosition(y))))
             .asInstanceOf[Model]
         case (EnemyState.Hiding, 0, Some(DefenceAction(x, y))) =>
           superObj
-            .withDynamic(boundingBox.moveTo(cellToPos(x), cellToPos(y)), Vector2.zero, false)
+            .withDynamic(
+              boundingBox.moveTo(Assets.Rooms.cellToPosition(x), Assets.Rooms.cellToPosition(y)),
+              Vector2.zero,
+              false
+            )
             .asInstanceOf[Model]
         case (EnemyState.Falling, 0, _) =>
           superObj
