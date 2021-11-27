@@ -19,6 +19,7 @@ import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
 import lns.scenes.game.room.{ ArenaRoom, BossRoom, Boundary, RoomModel, RoomView, * }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
+import lns.scenes.game.enemies.PrologModel
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit, ResetSubsystem }
@@ -70,7 +71,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
               println(GeneratorHelper.rule(room.doors))
               model.prologClient
                 .consult(
-                  context.startUpData.blockingElemGenerator.get,
+                  context.startUpData.getPrologFile("blocking_elements_generator").get,
                   GeneratorHelper.rule(room.doors)
                 )
                 .map(pi => model.copy(prologClient = pi))
@@ -80,7 +81,7 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
         case model @ GameModel.NotStarted(prologClient) if !prologClient.consultDone =>
           prologClient
             .consult(
-              context.startUpData.dungeonGenerator.get,
+              context.startUpData.getPrologFile("dungeon_generator").get,
               "generateDungeon(30,L)."
             )
             .map(pi => model.copy(prologClient = pi))
@@ -109,6 +110,13 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
                 room.addAnythings(Generator.generateElementsFromProlog(substitution))
               )
             case _ => model
+          }
+        case model @ GameModel.Started(_, dungeon, roomIndex, character) =>
+          model.updateEachAnythingsCurrentRoom { anything =>
+            anything match {
+              case anything: PrologModel if anything.prologClient.hasQuery(queryId) => anything.behaviour(substitution)
+              case _                                                                => Outcome(anything)
+            }
           }
         case _ => model
       }

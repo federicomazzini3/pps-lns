@@ -5,6 +5,7 @@ import indigoextras.geometry.BoundingBox
 import lns.StartupData
 import lns.core.Assets
 import lns.scenes.game.anything.{ AnythingId, AnythingModel }
+import lns.scenes.game.bosses.BossModel
 import lns.scenes.game.enemies.boney.BoneyModel
 import lns.scenes.game.enemies.mask.MaskModel
 import lns.scenes.game.enemies.nerve.NerveModel
@@ -45,12 +46,14 @@ object Generator {
           //Map(enemy.id -> enemy, enemy2.id -> enemy2)
         )
       case RoomType.Boss =>
+        val boss = BossModel.initial
         RoomModel.bossRoom(
           positionInGrid,
           generateDoors(grid, positionInGrid),
-          Map.empty
+          Map(boss.id -> boss)
         )
-      case _ => RoomModel.emptyRoom(positionInGrid, generateDoors(grid, positionInGrid))
+      case _ =>
+        RoomModel.emptyRoom(positionInGrid, generateDoors(grid, positionInGrid))
     }
 
   def generateDoors(grid: BasicGrid, position: Position): Set[Location] =

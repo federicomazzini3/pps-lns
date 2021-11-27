@@ -24,12 +24,12 @@ case class MyFiringModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0, None)),
     crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,
     fireRateTimer: Double = 0,
-    shot: Option[Vector2] = None
+    shots: Option[List[Vector2]] = None
 ) extends EnemyModel
     with FireModel
     with FiresContinuously {
@@ -38,11 +38,11 @@ case class MyFiringModel(
   val shotView   = () => new SingleShotView() with ShotBlue
   val shotOffset = 5
 
-  def withStats(stats: Stats): Model                                = copyMacro
-  def withStatus(status: Queue[EnemyStatus]): Model                 = copyMacro
-  def withAlive(life: Double, invincibilityTimer: Double): Model    = copyMacro
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model = copyMacro
-  def withSolid(crossable: Boolean): Model                          = copyMacro
+  def withStats(stats: Stats): Model                                       = copyMacro
+  def withStatus(status: Queue[EnemyStatus]): Model                        = copyMacro
+  def withAlive(life: Double, invincibilityTimer: Double): Model           = copyMacro
+  def withFire(fireRateTimer: Double, shots: Option[List[Vector2]]): Model = copyMacro
+  def withSolid(crossable: Boolean): Model                                 = copyMacro
 }
 
 trait FiringModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

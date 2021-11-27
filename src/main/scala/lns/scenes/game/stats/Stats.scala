@@ -1,7 +1,8 @@
 package lns.scenes.game.stats
 
 enum PropertyName:
-  case MaxLife, Invincibility, MaxSpeed, Range, Damage, FireDamage, FireRange, FireRate, FireSpeed
+  case MaxLife, Invincibility, MaxSpeed, Range, KeepAwayMin, KeepAwayMax, Damage, FireDamage, FireRange, FireRate,
+  FireSpeed
 
 import PropertyName.*
 
@@ -21,7 +22,7 @@ given Conversion[PropertyValue, String] with
 extension (p: PropertyValue) {
   def |+|(v: PropertyValue): PropertyValue = p match {
     case p if (v + p) < 0 => 0
-    case _                => v + p
+    case _                => BigDecimal(v + p).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 }
 
@@ -43,7 +44,7 @@ extension (stats: Stats) {
 /**
  * Companion object to create Stats, a Map of tuples StatProperty (PropertyName, PropertyValue)
  */
-object Stats extends Characters with Enemies with Items {
+object Stats extends Characters with Bosses with Enemies with Items {
 
   def apply(args: StatProperty*): Stats = Map(args*)
 

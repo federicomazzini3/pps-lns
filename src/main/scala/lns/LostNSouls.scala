@@ -21,16 +21,14 @@ final case class BootData(screenDimensions: Rectangle)
 /**
  * Game startup data built from boot data
  */
-final case class StartupData(
-    screenDimensions: Rectangle,
-    dungeonGenerator: Option[String] = None,
-    blockingElemGenerator: Option[String] = None
-) {
+final case class StartupData(screenDimensions: Rectangle, prologFiles: Map[String, Option[String]] = Map()) {
   def scale(edge: Int): Double =
     Math.min(
       1.0 / edge * screenDimensions.width,
       1.0 / edge * screenDimensions.height
     )
+
+  def getPrologFile(name: String): Option[String] = prologFiles.getOrElse(name, None)
 }
 
 @JSExportTopLevel("IndigoGame")
@@ -72,8 +70,13 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
         .Success(
           StartupData(
             bootData.screenDimensions,
-            assetCollection.findTextDataByName(AssetName("dungeon_generator")),
-            assetCollection.findTextDataByName(AssetName("blocking_elements_generator"))
+            Map(
+              "dungeon_generator" -> assetCollection.findTextDataByName(AssetName("dungeon_generator")),
+              "blocking_elements_generator" -> assetCollection.findTextDataByName(
+                AssetName("blocking_elements_generator")
+              ),
+              "loki" -> assetCollection.findTextDataByName(AssetName("loki"))
+            )
           )
         )
         .addAnimations(Animations())

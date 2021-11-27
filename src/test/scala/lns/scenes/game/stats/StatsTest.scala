@@ -43,5 +43,12 @@ class StatsTest extends AnyFreeSpec with StatsFixture {
       val updatedStats = stats +++ (MaxLife, -20)
       assert(MaxLife @@ updatedStats == 0)
     }
+    "adding double values should maintain precision to two decimal places (rounding half up)" in {
+      val updatedStats = stats +++ (Invincibility, -0.12345)
+      assert(Invincibility @@ updatedStats == 1.38)
+
+      val updatedStats2 = stats +++ (Invincibility, -0.12845)
+      assert(Invincibility @@ updatedStats2 == 1.37)
+    }
   }
 }

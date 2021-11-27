@@ -6,7 +6,6 @@ import indigo.shared.time.GameTime
 import lns.scenes.game.anything.AnythingModel
 import lns.scenes.game.characters.CharacterModel
 import indigo.*
-import jdk.incubator.vector.VectorOperators.Conversion
 
 case class BattleModel(bc: Set[BattleConsequence], state: GameState) {
   def update(f: BattleModel => Outcome[BattleModel]): Outcome[BattleModel] = f(this)

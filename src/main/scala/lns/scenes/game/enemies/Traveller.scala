@@ -27,7 +27,7 @@ trait Traveller extends DynamicModel { this: EnemyModel =>
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     status.head match {
-      case (EnemyState.Attacking | EnemyState.Defending, _) if path.nonEmpty =>
+      case (EnemyState.Attacking | EnemyState.Defending, _, _) if path.nonEmpty =>
         (path.head - getPosition()).normalise * MaxSpeed @@ stats
       case _ => Vector2.zero
     }
@@ -43,7 +43,7 @@ trait Traveller extends DynamicModel { this: EnemyModel =>
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Attacking | EnemyState.Defending, _)
+        case (EnemyState.Attacking | EnemyState.Defending, _, _)
             if path.nonEmpty &&
               (getPosition().distanceTo(path.head) < 1.0 || collisionDetected || superObj.movedBy(this) == 0) =>
           superObj.withTraveller(path.dequeue._2).asInstanceOf[Model]

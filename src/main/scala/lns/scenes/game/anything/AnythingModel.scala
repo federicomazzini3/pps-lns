@@ -317,7 +317,7 @@ trait DamageModel extends AnythingModel with StatsModel {
 }
 
 enum FireState:
-  case NO_FIRE, FIRE_LEFT, FIRE_RIGHT, FIRE_DOWN, FIRE_UP
+  case NO_FIRE, MULTIPLE_FIRE, FIRE_LEFT, FIRE_RIGHT, FIRE_DOWN, FIRE_UP
 
 import FireState.*
 
@@ -328,12 +328,12 @@ import FireState.*
 trait FireModel extends AnythingModel with StatsModel {
   type Model >: this.type <: FireModel
 
-  val shot: Option[Vector2]
+  val shots: Option[List[Vector2]]
   val fireRateTimer: Double
   val shotOffset: Int
   val shotView: () => ShotView[_]
 
-  def withFire(fireRateTimer: Timer, shot: Option[Vector2]): Model
+  def withFire(fireRateTimer: Timer, shots: Option[List[Vector2]]): Model
 
   /**
    * @return
@@ -348,21 +348,24 @@ trait FireModel extends AnythingModel with StatsModel {
    * @return
    *   the [[FireState]] based on the current optional shot direction
    */
-  def getFireState(): FireState = shot match {
-    case Some(Vector2(x, y)) if x < 0 && Math.abs(x) >= Math.abs(y) => FIRE_LEFT
-    case Some(Vector2(x, y)) if x > 0 && Math.abs(x) >= Math.abs(y) => FIRE_RIGHT
-    case Some(Vector2(_, y)) if y < 0                               => FIRE_UP
-    case Some(Vector2(_, y)) if y > 0                               => FIRE_DOWN
-    case _                                                          => NO_FIRE
+  def getFireState(): FireState = shots match {
+    case Some(Vector2(x, y) :: Nil) if x < 0 && Math.abs(x) >= Math.abs(y) => FIRE_LEFT
+    case Some(Vector2(x, y) :: Nil) if x > 0 && Math.abs(x) >= Math.abs(y) => FIRE_RIGHT
+    case Some(Vector2(_, y) :: Nil) if y < 0                               => FIRE_UP
+    case Some(Vector2(_, y) :: Nil) if y > 0                               => FIRE_DOWN
+    case Some(_)                                                           => MULTIPLE_FIRE
+    case _                                                                 => NO_FIRE
   }
 
   /**
    * @param context
-   *   indigo frame context data
+   *   indigo frame context data * @param gameContext
+   * @param gameContext
+   *   current [[GameContext]] containing the current room in which the Anything is placed and the character model
    * @return
    *   Optional direction vector
    */
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2]
+  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]]
 
   /**
    * Create a new ShotEvent capable of being captured by the game model during game loop on every frame
@@ -383,8 +386,8 @@ trait FireModel extends AnythingModel with StatsModel {
 
   /**
    * Update request called during game loop on every frame. Check if there is a firing computation, if there is no timer
-   * that limits the firing rate, a global event is created and intercepted by the [[GameView]] Otherwise, if only the
-   * timer is present, it is decreased to 0
+   * that limits the firing rate, a global event is created for each computed shot and intercepted by the [[GameView]]
+   * Otherwise, if only the timer is present, it is decreased to 0
    * @param context
    *   indigo frame context data
    * @param gameContext
@@ -405,8 +408,8 @@ trait FireModel extends AnythingModel with StatsModel {
     } yield newObj
 
     (newFireRateTimer, newShot) match {
-      case (0, Some(direction)) => retObj.addGlobalEvents(createEvent(direction))
-      case _                    => retObj
+      case (0, Some(list)) => list.foldLeft(retObj)((obj, direction) => obj.addGlobalEvents(createEvent(direction)))
+      case _               => retObj
     }
 }
 

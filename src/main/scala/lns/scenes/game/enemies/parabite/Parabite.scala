@@ -41,16 +41,6 @@ trait Parabite extends ParabiteAsset {
   }
 
   /**
-   * Calculates current animation frame for the hiding animation
-   * @param timer
-   *   current animation timer from X to 0
-   * @return
-   *   anim frame
-   */
-  def getFrame(timer: Double): Int =
-    Math.floor((Parabite.hideTime - timer) / Parabite.hideFrameTime).toInt
-
-  /**
    * Plays the animation cycle if the character is moving
    * @param model
    *   the [[BoneyModel]]
@@ -59,22 +49,22 @@ trait Parabite extends ParabiteAsset {
    */
   def bodyAnimation(model: ParabiteModel, viewModel: ParabiteViewModel): Sprite[Material.Bitmap] =
     model.status.head match {
-      case (EnemyState.Attacking, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
-      case (EnemyState.Hiding, _) =>
+      case (EnemyState.Attacking, _, _) => bodySprite.changeCycle(CycleLabel("walking")).play()
+      case (EnemyState.Hiding, _, _) =>
         viewModel.animationTimer match {
           case 0 => bodySprite.changeCycle(CycleLabel("hiding")).jumpToLastFrame()
           case t =>
             bodySprite
               .changeCycle(CycleLabel("hiding"))
-              .jumpToFrame(getFrame(t))
+              .jumpToFrame(Parabite.getFrame(t))
         }
-      case (EnemyState.Idle, _) =>
+      case (EnemyState.Idle, _, _) =>
         viewModel.animationTimer match {
           case 0 => bodySprite.changeCycle(CycleLabel("wakeup")).jumpToLastFrame()
           case t =>
             bodySprite
               .changeCycle(CycleLabel("wakeup"))
-              .jumpToFrame(getFrame(t))
+              .jumpToFrame(Parabite.getFrame(t))
         }
       case _ => bodySprite.changeCycle(CycleLabel("idle")).jumpToFirstFrame()
     }

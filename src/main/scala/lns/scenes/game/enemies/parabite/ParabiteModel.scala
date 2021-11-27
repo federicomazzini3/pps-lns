@@ -51,7 +51,7 @@ case class ParabiteModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Idle, 0, None)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     collisionDetected: Boolean = false,
@@ -75,16 +75,19 @@ case class ParabiteModel(
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Idle, 0) if getPosition().distanceTo(gameContext.character.getPosition()) >= 10 =>
+        case (EnemyState.Idle, 0, _) if getPosition().distanceTo(gameContext.character.getPosition()) >= 10 =>
           superObj
             .withTraveller(
               Queue(gameContext.character.getPosition().clamp(0, Assets.Rooms.floorSize - boundingBox.height))
             )
-            .withStatus((EnemyState.Attacking, 0.0))
+            .withStatus((EnemyState.Attacking, 0.0, None))
             .asInstanceOf[Model]
-        case (EnemyState.Idle, _) if crossable == true => superObj.withSolid(false)
-        case (EnemyState.Attacking, _) if superObj.path.isEmpty == true =>
-          superObj.withSolid(true).withStatus((EnemyState.Hiding, 2.0) :+ (EnemyState.Idle, 1.0)).asInstanceOf[Model]
+        case (EnemyState.Idle, _, _) if crossable == true => superObj.withSolid(false)
+        case (EnemyState.Attacking, _, _) if superObj.path.isEmpty == true =>
+          superObj
+            .withSolid(true)
+            .withStatus((EnemyState.Hiding, 2.0, None) :+ (EnemyState.Idle, 1.0, None))
+            .asInstanceOf[Model]
         case _ => superObj
 
       }

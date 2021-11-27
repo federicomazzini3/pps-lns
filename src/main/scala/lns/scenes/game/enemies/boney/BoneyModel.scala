@@ -47,7 +47,7 @@ case class BoneyModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0, None)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     collisionDetected: Boolean = false,

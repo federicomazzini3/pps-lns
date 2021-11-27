@@ -24,8 +24,7 @@ case class MyKeepsAwayModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    range: (Int, Int),
-    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0, None)),
     crossable: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Double = 0,
@@ -33,7 +32,7 @@ case class MyKeepsAwayModel(
     collisionDetected: Boolean = false
 ) extends EnemyModel
     with DynamicModel
-    with KeepsAway(range) {
+    with KeepsAway {
   type Model = MyKeepsAwayModel
 
   def withStats(stats: Stats): Model                                                                      = copyMacro
@@ -49,9 +48,8 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
   var modelInMiddle: MyKeepsAwayModel = _
   var modelAway: MyKeepsAwayModel     = _
 
-  val stats              = Stats(MaxSpeed -> 300)
+  val stats              = Stats(MaxSpeed -> 300, KeepAwayMin -> 300, KeepAwayMax -> 600)
   val maxSpeed           = MaxSpeed @@ stats
-  val range              = (300, 600)
   val initialPos         = 100
   val initialPosInMiddle = 400
   val initialPosAway     = 700
@@ -67,24 +65,21 @@ trait KeepsAwayModelFixture extends ContextFixture with BeforeAndAfterEach { thi
       () => new ViewMock[MyKeepsAwayModel],
       BoundingBox(initialPos, initialPos, 10, 10),
       10,
-      stats,
-      range
+      stats
     )
     modelInMiddle = new MyKeepsAwayModel(
       AnythingId.generate,
       () => new ViewMock[MyKeepsAwayModel],
       BoundingBox(initialPosInMiddle, initialPosInMiddle, 10, 10),
       10,
-      stats,
-      range
+      stats
     )
     modelAway = new MyKeepsAwayModel(
       AnythingId.generate,
       () => new ViewMock[MyKeepsAwayModel],
       BoundingBox(initialPosAway, initialPosAway, 10, 10),
       10,
-      stats,
-      range
+      stats
     )
 
     super.beforeEach()

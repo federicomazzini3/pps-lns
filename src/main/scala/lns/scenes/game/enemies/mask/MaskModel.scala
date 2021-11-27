@@ -45,8 +45,8 @@ import scala.collection.immutable.Queue
  *   [[AliveModel]] invincibilityTimer, default 0
  * @param fireRateTimer
  *   [[FireModel]] fireRateTimer, default 0
- * @param shot
- *   [[FireModel]] shot, default None
+ * @param shots
+ *   [[FireModel]] shots, default None
  */
 case class MaskModel(
     id: AnythingId,
@@ -54,18 +54,18 @@ case class MaskModel(
     boundingBox: BoundingBox,
     shotAreaOffset: Int,
     stats: Stats,
-    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0)),
+    status: Queue[EnemyStatus] = Queue((EnemyState.Attacking, 0, None)),
     crossable: Boolean = false,
     speed: Vector2 = Vector2(0, 0),
     collisionDetected: Boolean = false,
     life: Double = 0,
     invincibilityTimer: Timer = 0,
     fireRateTimer: Timer = 0,
-    shot: Option[Vector2] = None
+    shots: Option[List[Vector2]] = None
 ) extends EnemyModel
     with DynamicModel
     with FireModel
-    with KeepsAway((600, 900))
+    with KeepsAway
     with FiresContinuously {
 
   type Model = MaskModel
@@ -77,7 +77,7 @@ case class MaskModel(
   def withStatus(status: Queue[EnemyStatus]): Model                                            = copyMacro
   def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
+  def withFire(fireRateTimer: Double, shots: Option[List[Vector2]]): Model                     = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
 }
 

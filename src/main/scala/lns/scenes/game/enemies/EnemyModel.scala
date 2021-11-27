@@ -19,18 +19,20 @@ import scala.language.implicitConversions
 import scala.util.Random
 
 enum EnemyState:
-  case Idle, Attacking, Defending, Hiding
+  case Idle, Attacking, Defending, Hiding, Falling
 
-type EnemyStatus = (EnemyState, Timer)
+trait EnemyAction
+
+type EnemyStatus = (EnemyState, Timer, Option[EnemyAction])
 extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
 
 given Conversion[EnemyStatus, Queue[EnemyStatus]] with
   def apply(s: EnemyStatus): Queue[EnemyStatus] = Queue(s)
 
 /**
- * Enemy model trait that is alive and make damage. An Enemy has a status to represent a timed queue of its intentions.
- * If there is a sequence of EnemyStatus enqued in status, then the first one will be dropped once its timer reaches
- * zero.
+ * Enemy model trait that is alive and make damage. An Enemy has a status to represent a timed queue of its intentions
+ * with optionally the type of action definable by implementing the EnemyAction trait. If there is a sequence of
+ * EnemyStatus enqued in status, then the first one will be dropped once its timer reaches zero.
  */
 trait EnemyModel extends AliveModel with DamageModel with SolidModel {
   type Model >: this.type <: EnemyModel
@@ -43,12 +45,12 @@ trait EnemyModel extends AliveModel with DamageModel with SolidModel {
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (state, timer) if timer > 0 =>
+        case (state, timer, opt) if timer > 0 =>
           superObj
-            .withStatus((state, timer.elapsed(context.gameTime.delta.toDouble)) +: status.drop(1))
+            .withStatus((state, timer.elapsed(context.gameTime.delta.toDouble), opt) +: status.drop(1))
             .asInstanceOf[Model]
-        case (_, 0) if status.length > 1 => superObj.withStatus(status.drop(1)).asInstanceOf[Model]
-        case _                           => superObj
+        case (_, 0, _) if status.length > 1 => superObj.withStatus(status.drop(1)).asInstanceOf[Model]
+        case _                              => superObj
       }
     } yield newObj
 }

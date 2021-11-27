@@ -37,8 +37,8 @@ import lns.scenes.game.stats.PropertyName.*
  *   [[DynamicModel]] collisionDetected, true if the Anything is collided with some other Anything. Default false
  * @param fireRateTimer
  *   [[FireModel]] fireRateTimer, default 0
- * @param shot
- *   [[FireModel]] shot, default None
+ * @param shots
+ *   [[FireModel]] shots, default None
  */
 case class CharacterModel(
     id: AnythingId,
@@ -52,7 +52,7 @@ case class CharacterModel(
     speed: Vector2 = Vector2(0, 0),
     collisionDetected: Boolean = false,
     fireRateTimer: Double = 0,
-    shot: Option[Vector2] = None
+    shots: Option[List[Vector2]] = None
 ) extends AliveModel
     with DynamicModel
     with FireModel
@@ -82,22 +82,22 @@ case class CharacterModel(
 
   def withAlive(life: Double, invincibilityTimer: Double): Model                               = copyMacro
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model = copyMacro
-  def withFire(fireRateTimer: Double, shot: Option[Vector2]): Model                            = copyMacro
+  def withFire(fireRateTimer: Double, shots: Option[List[Vector2]]): Model                     = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withStats(stats: Stats): Model                                                           = copyMacro
 
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
 
-  val fireInputMappings: InputMapping[Vector2] =
+  val fireInputMappings: InputMapping[List[Vector2]] =
     InputMapping(
-      Combo.withKeyInputs(Key.UP_ARROW)    -> Vector2(0, -1),
-      Combo.withKeyInputs(Key.RIGHT_ARROW) -> Vector2(1, 0),
-      Combo.withKeyInputs(Key.DOWN_ARROW)  -> Vector2(0, 1),
-      Combo.withKeyInputs(Key.LEFT_ARROW)  -> Vector2(-1, 0)
+      Combo.withKeyInputs(Key.UP_ARROW)    -> List(Vector2(0, -1)),
+      Combo.withKeyInputs(Key.RIGHT_ARROW) -> List(Vector2(1, 0)),
+      Combo.withKeyInputs(Key.DOWN_ARROW)  -> List(Vector2(0, 1)),
+      Combo.withKeyInputs(Key.LEFT_ARROW)  -> List(Vector2(-1, 0))
     )
 
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[Vector2] =
+  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
     context.inputState.mapInputsOption(fireInputMappings)
 }
 
