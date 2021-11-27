@@ -3,7 +3,7 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \begin{itemize}
     \item AnythingModel con alcuni suoi sottotipi come DynamicModel e AliveModel e sperimentazione del workflow per consentire mixin/estensione e l'update del Model immutabile 
     \item Macro per ridurre il boilerplate code quando si estende un AnythingModel
-    \item Adapter per semplificare l'update di un insieme di AnythingModel
+    \item Adapter per semplificare l'update di un insieme di Anything
     \item AnythingView e AnythingViewModel di base e sperimentazione del workflow derivante
     \item Nemici per quanto concerne Model ed i loro comportamenti riutilizzabili
     \item Servizio Prolog come sottosistema di Indigo, integrazione di TauProlog e intefacciamento grazie a Scala.js, ed infine client per consultazioni da parte del gioco
@@ -17,7 +17,7 @@ Una tecnica che potrebbe sembrare idonea è l'utilizzo di un self-type richieden
 
 Sebbene una soluzione consigliata è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile.
 
-La soluzione trovata è quindi quella di applicare il pattern \textbf{F-Bounded Polimorphism} con type-member.
+La soluzione trovata è quindi quella di applicare il pattern \textbf{F-Bounded Polymorphism} con type-member.
 
 \begin{lstlisting}[basicstyle=\tiny]
 trait AnythingModel {
@@ -58,6 +58,25 @@ trait DynamicModel extends AnythingModel with StatsModel {
 
 Da notare la necessità di un cast a Model in quanto il compilatore Scala non riconosce che il type member di ritorno è lo stesso definito poco sopra: questo cast comunque è legittimo e sicuro. 
 
+Cambiando argomento, per concludere la descrizione dei AnythingModel ho applicato il pattern \textbf{Pimp My Library} al fine di estendere le funzionalità di Double in modo da ottenere un Timer, utilizzato poi in diversi Model 
+\begin{lstlisting}[basicstyle=\tiny]
+type Timer = Double
+extension (timer: Timer)
+    def elapsed(time: Double): Timer = timer match {
+        case 0                 => 0
+        case x if x - time > 0 => x - time
+        case _                 => 0
+    }
+\end{lstlisting}
+
+Infine ho utilizzato il \textbf{pattern Adapter} per trasformare implicitamente Vector2 in Vertex, due modi di Indigo per gestire i vettori secondo me ridondanti e per questo abbiamo deciso di utilizzarne uno solo nei nostri Model
+\begin{lstlisting}[basicstyle=\tiny]
+given Conversion[Vector2, Vertex] with
+    def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
+\end{lstlisting}
+
+Design
+
 Per concludere la descrizione di Anything: ogni Model viene creato specificando la sua View (factories as functions in linea con il \textbf{pattern strategy}) in modo tale che, quando una collezione di oggetti viene renderizzata, non è necessario fare type-match e indicare la corretta View da utilizzare in base al Model.
 
 
@@ -84,7 +103,7 @@ Quando si esegue l'update di una collezione di oggetti AnythingModel o AnythingV
 anythings.map((id, any) => id -> any.update(context)(GameContext(this, character)))
 \end{lstlisting}
 
-Per comodità ho applicato il \textbf{pattern adapter} fornendo un apposito convertitore implicito, di seguito quello per AnythingViewModel.
+Per comodità ho applicato il \textbf{pattern Adapter} fornendo un apposito convertitore implicito, di seguito quello per AnythingViewModel.
 
 \begin{lstlisting}[basicstyle=\tiny]
 given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[AnythingId, AnythingViewModel[_]]]] with
@@ -102,8 +121,8 @@ Come scelta di design stabiliamo che
     \item Una View potrebbe non necessitare di un ViewModel
     \item Un Model potrebbe disporre di diverse View ma sua istanza ne utilizza una
 \end{itemize}
-Per la View abbiamo adottato il pattern \textbf{Family Polimorphism} definendo al suo interno i type member Model e ViewModel che vengono concretizzati dai sottotipi della View.
-Nella versione finale i due tipi interni vengono collegati a degli argomenti generici in quanto abbiamo trovato che questa soluzione
+Per la View abbiamo adottato il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti Model e ViewModel che vengono concretizzati dai sottotipi della View.
+Nella versione finale tuttavia i due tipi interni vengono collegati a dei parametri generici in quanto abbiamo trovato che questa soluzione
 \begin{itemize}
     \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
     \item ci ha dato meno problemi di type inference 
@@ -123,10 +142,10 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
   ...
 
   def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
-  view(contex, model, viewModel)
-    .moveTo(model.getPosition())
-    .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
-    .withDepth(depth(model))
+    view(contex, model, viewModel)
+        .moveTo(model.getPosition())
+        .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+        .withDepth(depth(model))
 
   @targetName("anyDraw")
   def draw(contex: FrameContext[StartupData], model: AnythingModel, viewModel: AnythingViewModel[_] | Unit): Group =
@@ -137,12 +156,11 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
 }
 \end{lstlisting}
 
-context parameter
-context bound
-Da notare il type context Typeable che abilita l'implicito TypeTest[] che ci permette in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non tipato.
-Il problema che avevamo nella visualizzazione degli Anything era che, data una loro collezione, non è possibile ottenere un elemento tipato correttamente in modo automatico, quindi l'unica soluzione trovata prevedeva di fare pericolosi type cast.
-Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita una Draw: il Model passato alla Draw non veniva riconosciuto dal compilatore del tipo richiesto e soprattutto il ViewModel cercato nell'altra collezione viene ovviamente tipato in modo generico. 
-Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un type check del tipo a runtime verificando che questo corrisponda ai type member specificati.
+Da notare il context bound \textbf{Typeable} (alias di TypeTest[Any,T]) che importa ed abilita gli impliciti TypeTest[Any,M] e TypeTest[Any,VM] i quali ci permettono in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non correttamente tipati.
+Il problema che avevamo nella visualizzazione degli Anything era che, data una loro collezione, non è possibile ottenere un suo singolo elemento tipato correttamente in modo automatico, quindi l'unica soluzione trovata prevedeva di fare pericolosi type cast.
+Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita una draw: il Model passato alla draw non veniva riconosciuto dal compilatore del tipo richiesto e soprattutto il ViewModel cercato nell'altra collezione viene ovviamente tipato in modo generico. 
+Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un \textbf{type check del tipo a runtime} verificando che questo corrisponda ai type member specificati.
+Il TypeTest interviene implicitamente durante il match con i type Member della View.
 
 \begin{lstlisting}[basicstyle=\tiny]
 def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
@@ -161,4 +179,37 @@ def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel
     )
 \end{lstlisting}   
 
-Lo stesso pattern è stato utilizzato anche per il ViewModel che al suo interno definisce il type member Model
+Lo stesso pattern \textbf{Family Polymorphism} e l'utilizzo di \textbf{Typeable} sono presenti anche in \textbf{AnythingViewModel} che al suo interno definisce il type member Model e dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
+
+\subsubsection{Nemici e comportamenti come mixin puri}
+Design
+
+Per quanto riguarda i nemici abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
+A tale scopo un EnemyModel dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
+Sono stati definiti dei comportamenti mixabili elementari come:
+\begin{itemize}
+    \item Follower: un nemico che insegue il character
+    \item FiresContinuosly: un nemico che spara in continuazione nella direzione del character
+    \item KeepsAway: un nemico che si mantiene a distanza dal giocatore
+    \item Traveller: un nemico che segue un percorso indicato da una sequenza di punti
+\end{itemize}
+
+Implementazione
+
+Per quanto riguarda il mini framework per lo sviluppo di nemici ho applicato il pattern \textbf{Pimp My Library} al fine di creare un \textbf{mini DSL} per generare la coda di stati a partire da due di essi 
+
+\begin{lstlisting}[basicstyle=\tiny]
+extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
+\end{lstlisting} 
+
+Circa i comportomenti dei nemici, ho impiegato i \textbf{Self-types} anzichè ereditare realizzando così dei mixin "puri" in modo da esprimere il concetto che sono delle strategie "aggiuntive" da utilizzare durante lo sviluppo di un nemico
+\begin{lstlisting}[basicstyle=\tiny]
+trait Follower { this: EnemyModel with DynamicModel =>
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
+    status.head match {
+      case (EnemyState.Attacking, _) =>
+        (gameContext.character.getPosition() - getPosition()).normalise * MaxSpeed @@ stats
+      case _ => Vector2.zero
+    }
+}
+\end{lstlisting} 
