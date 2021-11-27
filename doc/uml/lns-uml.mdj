@@ -532,7 +532,7 @@
 											"top": 238,
 											"width": 153,
 											"height": 13,
-											"text": "Dungeon"
+											"text": "DungeonModel"
 										},
 										{
 											"_type": "LabelView",
@@ -709,7 +709,7 @@
 											"top": 380,
 											"width": 153,
 											"height": 13,
-											"text": "Room"
+											"text": "RoomModel"
 										},
 										{
 											"_type": "LabelView",
@@ -886,7 +886,7 @@
 											"top": 526,
 											"width": 153,
 											"height": 13,
-											"text": "Anything"
+											"text": "AnythingModel"
 										},
 										{
 											"_type": "LabelView",
@@ -1063,7 +1063,7 @@
 											"top": 236,
 											"width": 147,
 											"height": 13,
-											"text": "Character"
+											"text": "CharacterModel"
 										},
 										{
 											"_type": "LabelView",
@@ -2572,7 +2572,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Dungeon",
+					"name": "DungeonModel",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -2641,7 +2641,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Room",
+					"name": "RoomModel",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -2682,7 +2682,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Anything",
+					"name": "AnythingModel",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -2723,7 +2723,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Character",
+					"name": "CharacterModel",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",

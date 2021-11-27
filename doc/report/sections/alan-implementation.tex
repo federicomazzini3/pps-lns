@@ -3,7 +3,7 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \begin{itemize}
     \item AnythingModel con alcuni suoi sottotipi come DynamicModel e AliveModel e sperimentazione del workflow per consentire mixin/estensione e l'update del Model immutabile 
     \item Macro per ridurre il boilerplate code quando si estende un AnythingModel
-    \item Utilities per semplificare l'update di un insieme di AnythingModel
+    \item Adapter per semplificare l'update di un insieme di AnythingModel
     \item AnythingView e AnythingViewModel di base e sperimentazione del workflow derivante
     \item Nemici per quanto concerne Model ed i loro comportamenti riutilizzabili
     \item Servizio Prolog come sottosistema di Indigo, integrazione di TauProlog e intefacciamento grazie a Scala.js, ed infine client per consultazioni da parte del gioco
@@ -76,7 +76,7 @@ Quindi ho implementato la \textbf{copyMacro} che consente di eseguire il metodo 
 def withDynamic(x,y,z) = copyMacro
 \end{lstlisting}
 
-\subsubsection{Utilities per update di collection di Anything}
+\subsubsection{Adapter per update di collection di Anything}
 
 Quando si esegue l'update di una collezione di oggetti AnythingModel o AnythingViewModel ad esempio Map[AnythingId, AnythingModel] si ottiene una Map[AnythingId, Outcome[AnythingModel]] ma quello che occorre è ottenere la Map originale unendo le Outcome e gli eventi contenuti da ciascuna.
 
@@ -93,3 +93,5 @@ given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[Any
       acc.merge[AnythingViewModel[_], Map[AnythingId, AnythingViewModel[_]]](el._2)((set, el2) => set + (el._1 -> el2))
     )
 \end{lstlisting}
+
+\subsubsection{AnythingView e AnythingViewModel}
