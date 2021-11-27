@@ -95,3 +95,70 @@ given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[Any
 \end{lstlisting}
 
 \subsubsection{AnythingView e AnythingViewModel}
+Come scelta di design stabiliamo che 
+\begin{itemize}
+    \item Una View e un ViewModel devono essere progettati per uno specifico Model. 
+    \item Un ViewModel potrebbe essere usato da diverse View
+    \item Una View potrebbe non necessitare di un ViewModel
+    \item Un Model potrebbe disporre di diverse View ma sua istanza ne utilizza una
+\end{itemize}
+Per la View abbiamo adottato il pattern \textbf{Family Polimorphism} definendo al suo interno i type member Model e ViewModel che vengono concretizzati dai sottotipi della View.
+Nella versione finale i due tipi interni vengono collegati a degli argomenti generici in quanto abbiamo trovato che questa soluzione
+\begin{itemize}
+    \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
+    \item ci ha dato meno problemi di type inference 
+    \item ci consente di risolvere il problema di type test runtime su tipi astratti (descritto di seguito)
+    \item a nostro avviso è più espressiva per indicare cosa richiede una View
+\end{itemize}
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
+  type Model     = M
+  type ViewModel = VM
+
+  def viewModel: (id: AnythingId) => ViewModel
+
+  protected def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View
+  
+  ...
+
+  def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
+  view(contex, model, viewModel)
+    .moveTo(model.getPosition())
+    .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+    .withDepth(depth(model))
+
+  @targetName("anyDraw")
+  def draw(contex: FrameContext[StartupData], model: AnythingModel, viewModel: AnythingViewModel[_] | Unit): Group =
+    (model, viewModel) match {
+      case (m: Model, vm: ViewModel) => draw(contex, m, vm)
+      case _                         => Group()
+    }
+}
+\end{lstlisting}
+
+context parameter
+context bound
+Da notare il type context Typeable che abilita l'implicito TypeTest[] che ci permette in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non tipato.
+Il problema che avevamo nella visualizzazione degli Anything era che, data una loro collezione, non è possibile ottenere un elemento tipato correttamente in modo automatico, quindi l'unica soluzione trovata prevedeva di fare pericolosi type cast.
+Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita una Draw: il Model passato alla Draw non veniva riconosciuto dal compilatore del tipo richiesto e soprattutto il ViewModel cercato nell'altra collezione viene ovviamente tipato in modo generico. 
+Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un type check del tipo a runtime verificando che questo corrisponda ai type member specificati.
+
+\begin{lstlisting}[basicstyle=\tiny]
+def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
+    model.anythings.foldLeft(Group())((s1, s2) =>
+      s1.addChild(
+        s2._2
+          .view()
+          .draw(
+            context,
+            s2._2,
+            viewModel.anythings
+              .get(s2._2.id)
+              .getOrElse[AnythingViewModel[_] | Unit](())
+          )
+      )
+    )
+\end{lstlisting}   
+
+Lo stesso pattern è stato utilizzato anche per il ViewModel che al suo interno definisce il type member Model
