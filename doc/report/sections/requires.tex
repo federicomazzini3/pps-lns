@@ -130,9 +130,12 @@ Da qui l'idea di crearne uno nuovo per lui.
         \item Il personaggio è caratterizzato da
             \begin{enumerate}
                 \item Punti vita
+                \item Tempo invulnerabilità dopo essere stato colpito
                 \item Velocità di movimento
-                \item Danno
-                \item Rate di fuoco
+                \item Rate dello sparo
+                \item Danno dei proiettili
+                \item Velocità dei proiettili
+                \item Range dei proiettili
             \end{enumerate}
         \item Il personaggio è controllato dall'utente con la tastiera
         \begin{enumerate}
@@ -166,8 +169,10 @@ Da qui l'idea di crearne uno nuovo per lui.
                 \item Danno da contatto
                 \item Se il nemico spara
                 \begin{enumerate}
-                    \item Danno da fuoco
-                    \item Rate di fuoco
+					\item Rate dello sparo
+					\item Danno dei proiettili
+					\item Velocità dei proiettili
+					\item Range dei proiettili
                 \end{enumerate}
             \end{enumerate}
         \item Un nemico infligge danno al personaggio quando vi entra in collisione
@@ -206,16 +211,30 @@ Da qui l'idea di crearne uno nuovo per lui.
         \item Boss
         \begin{enumerate}
             \item E' un nemico speciale che se viene sconfitto la partita termina visualizzando al giocatore il messaggio "hai vinto"
-            \item Il suo comportamento è determinato da ...
-            \item Costituito da un corpo ...
+            \item Il suo comportamento è determinato da 5 diverse azioni scelte casualmente con una certa probabilità in base al suo stato di vita e quello del personaggio.
+            \begin{enumerate}
+				\item Attacco con singolo proiettile in direzione del personaggio se questo si trova sullo stesso asse x o y all'interno della stanza
+				\item Attacco che spara 4 proiettili in contemporanea: sopra, sotto, destra e sinistra
+				\item Attacco che spara 4 proiettili in contemporanea in diagonale: sopra, sotto, destra e sinistra
+				\item Si sposta verso il personaggio per aggredirlo
+				\item Si teletrasporta in un punto della stanza specchiato rispetto a quello attuale. Se il punto è occupato da un elemento bloccante, trova il primo posto libero nel suo intorno
+			\end{enumerate}
+            \item Costituito da un corpo
         \end{enumerate}
     \end{enumerate}
     
-    \item Oggetti che il personaggio può raccogliere con diversi comportamenti
+    \item 10 Oggetti che il personaggio può raccogliere per incrementare le proprie caratteristiche
     \begin{enumerate}
-        \item A (nome dell'oggetto - cosa fa)
-        \item B
-        \item C
+        \item Arrow: incermenta il rate dello sparo 
+        \item Drop: incermenta il danno dei proiettili
+        \item Eye: incrementa il danno dei proiettili ed il rate dello sparo
+        \item Fireball: incrementa il danno e la velocità dei proiettili
+        \item Glasses: incrementa il range dei proiettili
+        \item Heart: incrementa la vita massima di 1
+        \item Juice: incrementa la velocità di spostamento e danno del fuoco
+        \item Mushroom: incrementa la vita massima di 2
+		\item Syringe: incrementa la velocità di spostamento, il rate dell sparo e la velocità dei proiettili
+		\item Tail: incrementa il danno ed il range dei proiettili
     \end{enumerate}
          
 \end{enumerate}
