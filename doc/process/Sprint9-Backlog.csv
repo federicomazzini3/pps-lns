@@ -1,0 +1,7 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+Come utente voglio che le stanze abbiano degli elementi bloccanti,,1,,,1,0,,,,,
+,Integrazione Prolog Scala,,Federico,1h,,,,,,,
+Come utente voglio che il personaggio possa morire e la partita termini,,2,,,2,2,0,,,,
+,Messaggio di GameOver,,Federico,1h,,,,,,,
+Stats per il range di Mask,,1,Matteo,1h,,,,,,,
+Come utente voglio poter affrontare un boss finale e poter vincere la partita,,20,Matteo,20h,20,12,12,7,3,0,
