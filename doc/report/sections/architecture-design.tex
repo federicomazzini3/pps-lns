@@ -104,7 +104,7 @@ Tradizionalmente molto usato nel game development è il pattern Entities-Compone
 Alcune implementazioni di ECS definiscono i componenti come solo strutture dati mentre il comportamento è specificato nel sistema che li gestisce, quindi in stile funzionale. 
 Questo pattern è nato per diversi motivi ma quello più banale è che, quando i linguaggi non supportano l'ereditarietà multipla, è impossibile specificare una precisa gerarchia di oggetti che soddisfi i requisiti di un gioco di una certa complessità, o comunque questa gerarchia sarebbe molto profonda e poco flessibile a future estensioni.
 
-Quello vogliamo fare in questo progetto è sfruttare appieno le potenzialità in ambito \textbf{OOP} che ci offre Scala, il quale ci permette tramite i \textbf{mix-ins} di appiattire la gerarchia ed ottenere la flessibilità richiesta dal problema.
+Quello che vogliamo fare in questo progetto è sfruttare appieno le potenzialità in ambito \textbf{OOP} che ci offre Scala, il quale ci permette tramite i \textbf{mix-ins} di appiattire la gerarchia ed ottenere la flessibilità richiesta dal problema.
 Quindi abbiamo appositamente scelto il nome Anything in sostituzione al classico Entity per specificare che non stiamo applicando il pattern ECS, un sottotipo di Anything rappresenta una nostra entità che può essere mixata con altri tratti per ottenere nuove proprietà e comportamenti. 
 
 Visto l'impiego del pattern MVVM, occorre inoltre tenere ben presente che un Anything deve essere in realtà codificato in tre parti ben distinte Model-ViewModel-View ciascuna sottotipo rispettivamente di \textbf{AnythingModel}, \textbf{AnythingViewModel} e \textbf{AnythingView} e ciascuna eventualmente mixata come descritto precedentemente. 
@@ -114,3 +114,23 @@ Il Model di un oggetto come comportamento base deve reagire alle richieste di ag
 Sebbene gran parte del comportamento e della logica di gioco è così incapsulata nei Model degli oggetti, dovremmo comunque elaborare dei sistemi che avranno una visione globale gestendo l'interazione tra diversi Model, come un sistema per controllare le collisioni tra oggetti.
 
 Per concludere, la nostra soluzione OO non è la migliore soluzione possibile per lo sviluppo di un gioco. Il pattern ECS ha vantaggi prestazionali riconosciuti sia in termini di utilizzo CPU (meno calls per l'aggiornamento degli oggetti) che di ottimizzazione dell'utilizzo della memoria (data-oriented design), tuttavia a fini didattici vogliamo sperimentare elementi di Scala OOP avanzati.
+
+\subsection{Prolog Engine}
+Il motore Prolog da utilizzare per la generazione del dungeon, delle stanze combattimento e del comportamento del Boss deve potersi integrare ed interagire con Indigo.
+Poichè Indigo compila con Scala.js e per evitare possibili problemi con engine scritti in Java/Scala, la scelta di quale motore Prolog usare ricade su TauProlog, un engine scritto in Javascript e quindi facilmente integrabile nel nostro contesto.
+
+Tuttavia per comunicare con questo motore occorre utilizzare la programmazione asincrona in quanto è strutturato in modo da rispondere alle interrogazioni mediante una callback che deve essere fornita.
+Questa modalità di interazione non è supportata direttamente da Indigo, il quale con il suo gameloop supporta come input eventi/messaggi che però possono essere generati solo internamente durante le fasi di update del Model: l'attivazione di una callback asyncrona fuori dal game loop non può ne modificare lo stato del Model che è immutabile ne generare un evento.
+
+Per questo si rende necessario lo sviluppo di un componente separato che faccia da proxy per l'engine TauProlog e risponda alle richieste del gioco con opportuni eventi customizzati.
+
+Indigo dispone dei SubSystems, servizi con un proprio Model ed esterni alla logica di gioco ma che vengono attivati nel game loop per intercettare eventi ed eseguire azioni: occorre quindi predispore un PrologService subsystem.
+
+In figura sotto è mostrata l'interazione tra i sistemi: da notare che la callback chiamata da TauProlog necessita di scrivere il Model del PrologService invalidando così il concetto di immutabilità, ma solo per quel servizio esterno al gioco ed il tutto senza introdurre alcun problema di concorrenza in quanto ogni azione è atomica nel contesto dell'event loop di Javascript.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.7]{prolog.jpg}
+    \caption{\textit{Diagramma dell'interazione con TauProlog}} 
+\end{figure}
+
