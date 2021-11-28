@@ -85,3 +85,31 @@ for {
       withMovements    <- withStats.updateMovementAfterCollision
     } yield withMovements
 \end{lstlisting}
+
+\subsubsection{Collisioni}
+Il sistema delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
+Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e 
+e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
+Ad esempio, un oggetto in movimento che collide con una roccia verrà spostato il tanto che basta per non intersecarsi, ma non ha ripercussioni dopo il contatto. 
+Se invece un oggetto in movimento collide con uno shot, questo oggetto perderà punti vita, a seconda del tipo di shot. 
+
+Per via del grande numero di combinazioni di collisioni possibili, il sistema delle collisioni fa largo uso di \textbf{strategy} per evitare la duplicazione del codice. 
+
+Il sistema agisce in due momenti distinti: 
+\begin{enumerate}
+  \item In un primo momento viene verificata la collisione tra un elemento e tutti gli altri interni alla stanza. Per ogni collisione viene applicata una funzione all'elemento che corrisponde al side effect.
+  \item In un secondo momento vengono ricontrollate le collisioni e spostati gli elementi di conseguenza. 
+\end{enumerate}
+
+Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
+Questo aspetto, in termini di prestazioni, è largamente migliorabile. 
+
+\subsubsection{Verifica vittoria/sconfitta}
+\begin{itemize}
+  \item Un giocatore vince se sconfigge il boss
+  \item Un giocatore perde quando il personaggio controllato finisce i punti vita
+\end{itemize}
+
+Il controllo viene effettuato tramite due eventi \textit{Win} e \textit{GameOver}. 
+Uno dei due eventi viene lanciato quando, durante l'update del Character o del Boss, la life raggiunge lo zero. 
+Gli eventi vengono intercettati dalla Scena di gioco la quale mostra un messaggio di vittoria/sconfitta e rimanda alla scena finale, dove è possibile, eventualmente, iniziare una nuova partita. 
