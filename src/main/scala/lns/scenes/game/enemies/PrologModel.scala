@@ -5,8 +5,10 @@ import indigo.shared.*
 import lns.StartupData
 import lns.core.PrologClient
 import lns.scenes.game.GameContext
-import lns.scenes.game.enemies.*
+import lns.scenes.game.enemies.{ *, given }
 import lns.subsystems.prolog.Substitution
+
+import scala.language.implicitConversions
 
 /**
  * Prolog mixin for EnemyModel to manage artificial intelligence behaviors in prolog
@@ -73,7 +75,7 @@ trait PrologModel(name: String) extends EnemyModel {
       newObj <- status.head match {
         case (EnemyState.Idle, 0, None) =>
           superObj
-            .withStatus((EnemyState.Idle, -1.0, Some(ConsultingAction())) +: status)
+            .withStatus((EnemyState.Idle, 0.0, Some(ConsultingAction())))
             .consult(context)(gameContext)
             .asInstanceOf[Outcome[Model]]
         case _ => Outcome(superObj)

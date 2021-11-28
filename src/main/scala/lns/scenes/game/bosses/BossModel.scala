@@ -153,7 +153,7 @@ case class BossModel(
    *   the Outcome of the updated model
    */
   def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[EnemyAction]): Outcome[Model] =
-    Outcome(this.withStatus((state, timer, option) +: status.drop(1)))
+    Outcome(this.withStatus((state, timer, option) +: (EnemyState.Idle, 0.0, None)))
 
   /**
    * Implements model behaviour
@@ -171,7 +171,7 @@ case class BossModel(
       case Atom("attack3") =>
         behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack3", None)))
       case Struct(Atom("move"), Num(x, _), Num(y, _)) =>
-        behaviourOutcome(EnemyState.Attacking, 0.0, Some(MoveAction(x.toDouble, y.toDouble)))
+        Outcome(this.withStatus(EnemyState.Attacking, 0.0, Some(MoveAction(x.toDouble, y.toDouble))))
       case Struct(Atom("defence"), Num(x, _), Num(y, _)) =>
         Outcome(
           this
@@ -179,8 +179,7 @@ case class BossModel(
             .withStatus(
               (EnemyState.Hiding, Loki.hidingTime, Some(DefenceAction(x.toDouble, y.toDouble))) +:
                 (EnemyState.Falling, Loki.fallingTime, None) +:
-                (EnemyState.Idle, 0.0, None) +:
-                status.drop(1)
+                (EnemyState.Idle, 0.0, None)
             )
         )
       case _ => Outcome(this)
@@ -207,11 +206,12 @@ case class BossModel(
     for {
       superObj <- super.update(context)(gameContext)
       newObj = status.head match {
-        case (EnemyState.Attacking, _, _) if superObj.path.length > 0 =>
-          superObj.withStatus((EnemyState.Attacking, 0.0, None) +: status.drop(1)).asInstanceOf[Model]
+        case (EnemyState.Attacking, _, Some(MovingAction())) if superObj.path.length == 0 =>
+          superObj.withStatus((EnemyState.Idle, 0.0, None)).asInstanceOf[Model]
         case (EnemyState.Attacking, _, Some(MoveAction(x, y))) =>
           superObj
             .withTraveller(Queue(Vector2(Assets.Rooms.cellToPosition(x), Assets.Rooms.cellToPosition(y))))
+            .withStatus((EnemyState.Attacking, 0.0, Some(MovingAction())))
             .asInstanceOf[Model]
         case (EnemyState.Hiding, 0, Some(DefenceAction(x, y))) =>
           superObj
@@ -237,6 +237,7 @@ case class BossModel(
  */
 case class AttackAction(val name: String, direction: Option[String]) extends EnemyAction
 case class MoveAction(x: Double, y: Double)                          extends EnemyAction
+case class MovingAction()                                            extends EnemyAction
 case class DefenceAction(x: Double, y: Double)                       extends EnemyAction
 
 /**
