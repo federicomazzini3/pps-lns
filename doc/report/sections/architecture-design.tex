@@ -115,22 +115,23 @@ Sebbene gran parte del comportamento e della logica di gioco è così incapsulat
 
 Per concludere, la nostra soluzione OO non è la migliore soluzione possibile per lo sviluppo di un gioco. Il pattern ECS ha vantaggi prestazionali riconosciuti sia in termini di utilizzo CPU (meno calls per l'aggiornamento degli oggetti) che di ottimizzazione dell'utilizzo della memoria (data-oriented design), tuttavia a fini didattici vogliamo sperimentare elementi di Scala OOP avanzati.
 
-\subsection{Prolog Engine}
+\subsection{Prolog engine e PrologService}
 Il motore Prolog da utilizzare per la generazione del dungeon, delle stanze combattimento e del comportamento del Boss deve potersi integrare ed interagire con Indigo.
-Poichè Indigo compila con Scala.js e per evitare possibili problemi con engine scritti in Java/Scala, la scelta di quale motore Prolog usare ricade su TauProlog, un engine scritto in Javascript e quindi facilmente integrabile nel nostro contesto.
+Poichè Indigo compila con Scala.js e per evitare possibili problemi con engine scritti in Java/Scala, la scelta di quale motore Prolog usare ricade su \textbf{TauProlog}, un engine scritto in Javascript e quindi facilmente integrabile nel nostro contesto.
 
-Tuttavia per comunicare con questo motore occorre utilizzare la programmazione asincrona in quanto è strutturato in modo da rispondere alle interrogazioni mediante una callback che deve essere fornita.
-Questa modalità di interazione non è supportata direttamente da Indigo, il quale con il suo gameloop supporta come input eventi/messaggi che però possono essere generati solo internamente durante le fasi di update del Model: l'attivazione di una callback asyncrona fuori dal game loop non può ne modificare lo stato del Model che è immutabile ne generare un evento.
+Tuttavia per comunicare con questo motore occorre utilizzare la \textbf{programmazione asincrona} in quanto è strutturato in modo da rispondere alle interrogazioni mediante una \textbf{callback} che deve essere fornita.
+Questa modalità di interazione non è supportata direttamente da Indigo, il quale con il suo game loop supporta come input eventi/messaggi che però possono essere generati solo internamente durante le fasi di update del Model: l'attivazione di una callback asyncrona fuori dal game loop non può ne modificare lo stato del Model che è immutabile ne generare un evento.
 
 Per questo si rende necessario lo sviluppo di un componente separato che faccia da proxy per l'engine TauProlog e risponda alle richieste del gioco con opportuni eventi customizzati.
 
-Indigo dispone dei SubSystems, servizi con un proprio Model ed esterni alla logica di gioco ma che vengono attivati nel game loop per intercettare eventi ed eseguire azioni: occorre quindi predispore un PrologService subsystem.
-
-In figura sotto è mostrata l'interazione tra i sistemi: da notare che la callback chiamata da TauProlog necessita di scrivere il Model del PrologService invalidando così il concetto di immutabilità, ma solo per quel servizio esterno al gioco ed il tutto senza introdurre alcun problema di concorrenza in quanto ogni azione è atomica nel contesto dell'event loop di Javascript.
+Indigo dispone dei \textbf{SubSystems}, servizi con un proprio Model ed esterni alla logica di gioco ma che vengono attivati nel game loop per intercettare eventi ed eseguire azioni: occorre quindi predispore un \textbf{PrologService} subsystem.
 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.7]{prolog.jpg}
     \caption{\textit{Diagramma dell'interazione con TauProlog}} 
 \end{figure}
+
+In figura sotto è mostrata l'interazione tra i sistemi: da notare che la callback chiamata da TauProlog necessita di scrivere dati nel Model del PrologService invalidando così il concetto di immutabilità, ma solo per quel servizio esterno al gioco ed il tutto senza introdurre alcun problema di concorrenza in quanto ogni esecuzione di procedura è atomica nel contesto dell'\textbf{event loop} di Javascript.
+
 
