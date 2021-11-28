@@ -1,16 +1,16 @@
-package lns.scenes.game.updater
+package lns.scenes.game.collisions
 
 import indigo.shared.{ FrameContext, Outcome }
 import lns.StartupData
-import lns.scenes.game.anything.{ SolidModel, * }
+import lns.scenes.game.anything.{ AliveModel, SolidModel, * }
 import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.items.ItemModel
 import lns.scenes.game.room.*
+import lns.scenes.game.room.door.Location
 import lns.scenes.game.shots.*
 import lns.scenes.game.stats.*
 import lns.scenes.game.stats
-
 import scala.language.implicitConversions
 
 object CollisionUpdater {
@@ -45,9 +45,9 @@ object CollisionUpdater {
           )
           .foldLeft(Outcome(anything)) { (anything, against) =>
             for {
-              an  <- anything
-              all <- f(an, against)
-            } yield all //f(an, against)
+              any               <- anything
+              anyUpdatedWithAll <- f(any, against)
+            } yield anyUpdatedWithAll
           }
       case _ => Outcome(anything)
     }
@@ -100,44 +100,56 @@ object CollisionUpdater {
   def updateStats(
       context: FrameContext[StartupData]
   )(anything: AnythingModel, against: AnythingModel): Outcome[AnythingModel] =
+    import Utils.checkCollisionAndUpdate
+
     (anything, against) match {
-      case (anything: SolidModel with AliveModel, against: SolidModel with DamageModel) =>
-        (anything, against) match {
-          case (_, s: ShotModel) =>
-            Collision.withElement(against.boundingBox, anything.shotArea)
-          case (s: ShotModel, _) =>
-            Collision.withElement(against.shotArea, anything.boundingBox)
-          case (e1: EnemyModel, e2: EnemyModel) =>
-            None
-          case _ =>
-            Collision.withElement(against.boundingBox, anything.boundingBox)
-        } match {
-          case Some(_, _) =>
-            anything.hit(
-              context,
-              anything match {
-                case s: ShotModel => s.life
-                case _            => PropertyName.Damage @@ against.stats
-              }
-            )
-          case _ => Outcome(anything)
-        }
+
+      case (e1: EnemyModel, e2: EnemyModel) => Outcome(anything)
+
       case (character: CharacterModel, item: ItemModel) if !item.pickedup =>
-        Collision.withElement(against.boundingBox, anything.boundingBox) match {
-          case Some(_, _) =>
-            item.stats.foldLeft(Outcome(character))((character, stat) =>
-              for {
-                c                <- character
-                updatedCharacter <- c.sumStat(context, stat)
-              } yield updatedCharacter
-            )
-          case _ => Outcome(character)
-        }
+        checkCollisionAndUpdate(character, item)(character =>
+          item.stats.foldLeft(Outcome(character))((character, stat) =>
+            for {
+              c                <- character
+              updatedCharacter <- c.sumStat(context, stat)
+            } yield updatedCharacter
+          )
+        )
+
       case (item: ItemModel, character: CharacterModel) if !item.pickedup =>
-        Collision.withElement(against.boundingBox, anything.boundingBox) match {
-          case Some(_, _) => Outcome(item.withPick(true))
-          case _          => Outcome(item)
-        }
+        checkCollisionAndUpdate(item, character)(item => Outcome(item.withPick(true)))
+
+      case (anything: SolidModel with AliveModel, against: SolidModel with DamageModel) =>
+        checkCollisionAndUpdate(anything, against)(anything =>
+          anything.hit(
+            context,
+            anything match {
+              case s: ShotModel => s.life
+              case _            => PropertyName.Damage @@ against.stats
+            }
+          )
+        )
+
+      case _ => Outcome(anything)
+    }
+}
+
+object Utils {
+  def checkCollisionAndUpdate[T <: AnythingModel](anything: T, against: AnythingModel)(f: T => Outcome[T]): Outcome[T] =
+    (anything, against) match {
+      case (solid: SolidModel, shot: ShotModel) =>
+        Collision.withElement(shot.boundingBox, solid.shotArea)
+
+      case (shot: ShotModel, solid: SolidModel) =>
+        Collision.withElement(solid.shotArea, shot.boundingBox)
+
+      case _ =>
+        Collision.withElement(against.boundingBox, anything.boundingBox)
+
+    } match {
+
+      case Some(_, _) =>
+        f(anything)
       case _ => Outcome(anything)
     }
 }

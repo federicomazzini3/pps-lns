@@ -16,14 +16,14 @@ import lns.scenes.game.characters.*
 import lns.scenes.game.dungeon.*
 import lns.scenes.game.dungeon.{ DungeonLoadingView, Generator, Position, RoomType }
 import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
-import lns.scenes.game.room.{ ArenaRoom, BossRoom, Boundary, RoomModel, RoomView, * }
+import lns.scenes.game.room.{ ArenaRoom, BossRoom, RoomModel, RoomView, * }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
 import lns.scenes.game.enemies.PrologModel
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit, ResetSubsystem }
-import lns.scenes.game.updater.CollisionUpdater.*
+import lns.scenes.game.collisions.CollisionUpdater.*
 
 import scala.collection.immutable.HashMap
 import scala.language.implicitConversions

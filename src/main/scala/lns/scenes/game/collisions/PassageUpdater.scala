@@ -1,4 +1,4 @@
-package lns.scenes.game.updater
+package lns.scenes.game.collisions
 
 import indigoextras.geometry.Vertex
 import lns.scenes.game.anything.DynamicState.{ MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, MOVE_UP }

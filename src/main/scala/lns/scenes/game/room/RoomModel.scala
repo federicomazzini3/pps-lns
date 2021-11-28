@@ -17,7 +17,10 @@ import lns.scenes.game.room.door.LocationImplicit.given_Conversion_Location_Set
 import lns.scenes.game.characters.CharacterModel
 import lns.scenes.game.enemies.EnemyModel
 import lns.scenes.game.enemies.nerve.NerveModel
+import lns.scenes.game.anything
 import lns.scenes.game.anything.given
+import lns.scenes.game.collisions.Boundary
+
 import java.util.UUID
 import scala.language.implicitConversions
 

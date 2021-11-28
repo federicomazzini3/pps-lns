@@ -1,6 +1,7 @@
 package lns.scenes.game.room
 
 import indigoextras.geometry.BoundingBox
+import lns.scenes.game.collisions.Collision
 import org.scalatest.freespec.AnyFreeSpec
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*

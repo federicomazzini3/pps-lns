@@ -12,9 +12,9 @@ import dungeon.*
 import dungeon.RoomType.*
 import room.*
 import shots.*
-import updater.*
-import updater.CollisionUpdater.*
-import updater.PassageUpdater.*
+import collisions.*
+import collisions.CollisionUpdater.*
+import collisions.PassageUpdater.*
 
 sealed trait GameModel
 

@@ -1,4 +1,4 @@
-package lns.scenes.game.updater
+package lns.scenes.game.collisions
 
 import lns.scenes.game.dungeon.DungeonModel
 import lns.scenes.game.room.*

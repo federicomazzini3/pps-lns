@@ -1,11 +1,7 @@
-package lns.scenes.game.room
+package lns.scenes.game.collisions
 
 import indigoextras.geometry.{ BoundingBox, Vertex }
-import lns.scenes.game.anything.DynamicState
-import lns.scenes.game.characters.CharacterModel
-import lns.scenes.game.room.door.Location
-import lns.scenes.game.room.door.Location.*
-import org.scalajs.dom.raw.Position
+import lns.scenes.game.room.door.Location.{ Above, Below, Left, Right }
 
 object Boundary {
 

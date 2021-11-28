@@ -1,6 +1,7 @@
 package lns.scenes.game.room
 import org.scalatest.freespec.AnyFreeSpec
 import indigoextras.geometry.{ BoundingBox, Vertex }
+import lns.scenes.game.collisions.Boundary
 import lns.scenes.game.room.door.Location.*
 
 class BoundaryTest extends AnyFreeSpec {

@@ -1,11 +1,8 @@
-package lns.scenes.game.room
+package lns.scenes.game.collisions
 
 import indigoextras.geometry.BoundingBox
-import lns.scenes.game.anything.DynamicState
-import DynamicState.*
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.{ Above, Below, Left, Right }
-import lns.scenes.game.room.door.LocationImplicit.opposite
 
 object Collision {
 
