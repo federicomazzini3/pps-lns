@@ -16,7 +16,7 @@ Per quanto riguarda il Dungeon, ho cercato di fornire un'implementazione basilar
 In particolare ho immaginato la mappa come una griglia, composta da una collezione di elementi in posizioni [X,Y]. Questi elementi sarebbero poi diventate le stanze all'interno del Dungeon effettivo, 
 ma per la generazione, è stato utile ridurli a semplici "tipi", da definire successivamente, perciò ho messo in pratica il pattern \textbf{Family Polimorphism}.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 type Position = (Int, Int)
 trait Grid {
     type Room
@@ -33,7 +33,7 @@ La seconda volta invece, è stato definito per il vero Dungeon, già generato e 
 Come già descritto, le stanze sono di diverso tipo, Empty, Arena, Item e Boss. Per modellare questi concetti ho definito un trait base il quale contiene la maggior parte dei comportamenti ma lascia il resto alle classi specializzate. 
 Una room qualsiasi è caratterizzata da un insieme di porte, una collezione di Anything e un area di gioco in cui gli elementi si muovono. 
 Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi possibili per la modifica di una Room, intesa come creazione di un nuovo modello con la modifica specificata. Per evitare ripetizioni di codice, la funzione generale sfrutta le \textbf{Higher Order Function} e mette in campo il pattern \textbf{strategy}. 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
     def updateAnythings
     (updateFunc: Map[AnythingId, AnythingModel] => Outcome[Map[AnythingId, AnythingModel]])
     : Outcome[RoomModel] =
@@ -52,7 +52,7 @@ Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi
 \end{lstlisting}
 
 Ho sfruttato questa funzione in molte altre adibite alla modifica degli Anything interni di una room, come ad esempio 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
   def addShot(shot: ShotModel): Outcome[RoomModel] =
     updateAnythings(anythings => 
         Outcome(anythings + (shot.id -> shot)))
@@ -62,7 +62,7 @@ Ho sfruttato questa funzione in molte altre adibite alla modifica degli Anything
 Per quanto riguarda le porte, ho cercato di rimanere il più fedele possibile allo stile funzionale. Ho perciò definito un tipo Location e un tipo State, i quali insieme vanno a comporre una porta.
 Ho creato un object per permettermi di definire e modificare una Door, ma ciò che nella pratica ho utilizzato sono le \textbf{Extension} e le \textbf{Conversion} di scala 3 (impliciti precedentemente).
 In questo modo, è possibile definire una collezione di porte per una stanza nel seguente modo: 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
     (Left -> Open) :+ (Right -> Open) :+ (Above -> Lock)
 \end{lstlisting}
 
@@ -76,7 +76,7 @@ Utilizzare il Prolog in questa situazione è stato molto utile per la natura "es
 All'interno del progetto è stata utilizzata la struttura monadica Outcome propria di Indigo. 
 Attraverso essa è stato possibile wrappare l'intero modello o sottoparti di esso, concatenando diverse modifiche al modello senza avere side effect. Per lavorare con questa monade, ho utilizzato spesso la \textbf{for comprehension} di Scala. 
 Di seguito un esempio, riguardante l'intera catena di update del modello di gioco. 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 for {
       updatedCharacter <- model.updateCharacter(c => character.update(gameContext))
       updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(character))
