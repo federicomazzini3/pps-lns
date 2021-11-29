@@ -88,7 +88,23 @@ Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma 
 
 \subsubsection{Nemici}
 
+Per quanto riguarda i nemici abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
+A tale scopo un EnemyModel dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
+Sono stati definiti dei comportamenti mixabili elementari come:
+\begin{itemize}
+    \item Follower: un nemico che insegue il character
+    \item FiresContinuosly: un nemico che spara in continuazione nella direzione del character
+    \item KeepsAway: un nemico che si mantiene a distanza dal giocatore
+    \item Traveller: un nemico che segue un percorso indicato da una sequenza di punti
+\end{itemize}
+
 Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{Enemies.jpg}
+    \caption{\textit{Gerarchia Enemies}} 
+\end{figure}
 
 \subsection{AnythingView e AnythingViewModel}
 
@@ -96,11 +112,11 @@ Come scelta di design stabiliamo che
 \begin{itemize}
     \item Una View e un ViewModel devono essere progettati per uno specifico Model. 
     \item Un ViewModel potrebbe essere usato da diverse View
-    \item Una View potrebbe non necessitare di un ViewModel
+    \item Una View potrebbe non necessitare di un ViewModel: in generale quando non ha animazioni complesse
     \item Un ViewModel viene istanziato con lo stesso identificativo univoco usato per l'oggetto Model a cui si riferisce
-    \item Un Model potrebbe disporre di diverse View ma sua istanza ne utilizza una
+    \item Un Model potrebbe disporre di diverse versioni di View ma la sua istanza ne utilizza una
 \end{itemize}
-Per la View abbiamo pensato di adottare il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti Model e ViewModel che vengono concretizzati dai sottotipi della View.
+Per la View abbiamo pensato di adottare il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti \textbf{Model} e \textbf{ViewModel} che vengono concretizzati dai sottotipi della View.
 Nella versione finale tuttavia i due tipi interni vengono collegati a dei parametri generici in quanto abbiamo trovato che questa soluzione
 \begin{itemize}
     \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
@@ -108,6 +124,8 @@ Nella versione finale tuttavia i due tipi interni vengono collegati a dei parame
     \item ci consente di risolvere il problema di type test runtime su tipi astratti \textit{(vedi approfondimento su implementazione)}
     \item a nostro avviso è più espressiva per indicare cosa richiede una View
 \end{itemize}
+
+Il pattern \textbf{Family Polymorphism} è stato applicato definendo il tipo astratto \textbf{View} che rappresenta il contenuto grafico da visualizzare attraverso il metodo \textbf{draw}, quest'ultimo richiama il template method \textbf{view} per ottenerlo.
 
 \begin{figure}[!hbt]
     \centering
@@ -117,11 +135,9 @@ Nella versione finale tuttavia i due tipi interni vengono collegati a dei parame
 
 In figura mostriamo l'utilizzo degli \textbf{Union Types} per definire che un ViewModel può non essere richiesto da una View.
 Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il Model di immutabilità e polimorfismo F-Bounded.
-L'esempio concreto di utilizzo in figura riguarda il Character ma è definito almeno un singleton object View per ciascun Model.
+L'esempio concreto di utilizzo in figura riguarda il Character, ma è definito almeno un singleton object View per ciascun Model.
 
-\subsubsection{Nemici}
-
-
+\subsubsection{Asset e animazioni}
 
 
 \subsection{Pattern di progettazione}

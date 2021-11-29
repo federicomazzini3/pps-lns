@@ -116,6 +116,7 @@ Nel codice che segue da notare è il context bound \textbf{Typeable} (alias di T
 trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
   type Model     = M
   type ViewModel = VM
+  type View <: Group
 
   def viewModel: (id: AnythingId) => ViewModel
 
@@ -163,19 +164,6 @@ def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel
 L'utilizzo di \textbf{Typeable} è presente anche in \textbf{AnythingViewModel} dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
 
 \subsubsection{Nemici e comportamenti come mixin puri}
-Design
-
-Per quanto riguarda i nemici abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
-A tale scopo un EnemyModel dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
-Sono stati definiti dei comportamenti mixabili elementari come:
-\begin{itemize}
-    \item Follower: un nemico che insegue il character
-    \item FiresContinuosly: un nemico che spara in continuazione nella direzione del character
-    \item KeepsAway: un nemico che si mantiene a distanza dal giocatore
-    \item Traveller: un nemico che segue un percorso indicato da una sequenza di punti
-\end{itemize}
-
-Implementazione
 
 Per quanto riguarda il mini framework per lo sviluppo di nemici ho applicato il pattern \textbf{Pimp My Library} al fine di creare un \textbf{mini DSL} per generare la coda di stati a partire da due di essi 
 
