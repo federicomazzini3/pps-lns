@@ -90,6 +90,40 @@ Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma 
 
 Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model
 
+\subsection{AnythingView e AnythingViewModel}
+
+Come scelta di design stabiliamo che 
+\begin{itemize}
+    \item Una View e un ViewModel devono essere progettati per uno specifico Model. 
+    \item Un ViewModel potrebbe essere usato da diverse View
+    \item Una View potrebbe non necessitare di un ViewModel
+    \item Un ViewModel viene istanziato con lo stesso identificativo univoco usato per l'oggetto Model a cui si riferisce
+    \item Un Model potrebbe disporre di diverse View ma sua istanza ne utilizza una
+\end{itemize}
+Per la View abbiamo pensato di adottare il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti Model e ViewModel che vengono concretizzati dai sottotipi della View.
+Nella versione finale tuttavia i due tipi interni vengono collegati a dei parametri generici in quanto abbiamo trovato che questa soluzione
+\begin{itemize}
+    \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
+    \item ci ha dato meno problemi di type inference 
+    \item ci consente di risolvere il problema di type test runtime su tipi astratti \textit{(vedi approfondimento su implementazione)}
+    \item a nostro avviso è più espressiva per indicare cosa richiede una View
+\end{itemize}
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.45]{AnythingViewModel.jpg}
+    \caption{\textit{Gerarchia AnythingView e AnythingViewModel}} 
+\end{figure}
+
+In figura mostriamo l'utilizzo degli \textbf{Union Types} per definire che un ViewModel può non essere richiesto da una View.
+Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il Model di immutabilità e polimorfismo F-Bounded.
+L'esempio concreto di utilizzo in figura riguarda il Character ma è definito almeno un singleton object View per ciascun Model.
+
+\subsubsection{Nemici}
+
+
+
+
 \subsection{Pattern di progettazione}
 Di seguito si elencano brevemente i pattern di progettazione utilizzati. 
 \subsubsection{Family polimorphism}

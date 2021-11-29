@@ -108,21 +108,9 @@ given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[Any
 \end{lstlisting}
 
 \subsubsection{AnythingView e AnythingViewModel}
-Come scelta di design stabiliamo che 
-\begin{itemize}
-    \item Una View e un ViewModel devono essere progettati per uno specifico Model. 
-    \item Un ViewModel potrebbe essere usato da diverse View
-    \item Una View potrebbe non necessitare di un ViewModel
-    \item Un Model potrebbe disporre di diverse View ma sua istanza ne utilizza una
-\end{itemize}
-Per la View abbiamo adottato il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti Model e ViewModel che vengono concretizzati dai sottotipi della View.
-Nella versione finale tuttavia i due tipi interni vengono collegati a dei parametri generici in quanto abbiamo trovato che questa soluzione
-\begin{itemize}
-    \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
-    \item ci ha dato meno problemi di type inference 
-    \item ci consente di risolvere il problema di type test runtime su tipi astratti (descritto di seguito)
-    \item a nostro avviso è più espressiva per indicare cosa richiede una View
-\end{itemize}
+
+Nel codice che segue da notare è il context bound \textbf{Typeable} (alias di TypeTest[Any,T]) che importa ed abilita gli impliciti TypeTest[Any,M] e TypeTest[Any,VM] i quali ci permettono in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non correttamente tipati.
+
 
 \begin{lstlisting}[language=Scala]
 trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
@@ -150,7 +138,6 @@ trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Un
 }
 \end{lstlisting}
 
-Da notare il context bound \textbf{Typeable} (alias di TypeTest[Any,T]) che importa ed abilita gli impliciti TypeTest[Any,M] e TypeTest[Any,VM] i quali ci permettono in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non correttamente tipati.
 Il problema che avevamo nella visualizzazione degli Anything era che, data una loro collezione, non è possibile ottenere un suo singolo elemento tipato correttamente in modo automatico, quindi l'unica soluzione trovata prevedeva di fare pericolosi type cast.
 Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita una draw: il Model passato alla draw non veniva riconosciuto dal compilatore del tipo richiesto e soprattutto il ViewModel cercato nell'altra collezione viene ovviamente tipato in modo generico. 
 Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un \textbf{type check del tipo a runtime} verificando che questo corrisponda ai type member specificati.
@@ -173,7 +160,7 @@ def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel
     )
 \end{lstlisting}   
 
-Lo stesso pattern \textbf{Family Polymorphism} e l'utilizzo di \textbf{Typeable} sono presenti anche in \textbf{AnythingViewModel} che al suo interno definisce il type member Model e dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
+L'utilizzo di \textbf{Typeable} è presente anche in \textbf{AnythingViewModel} dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
 
 \subsubsection{Nemici e comportamenti come mixin puri}
 Design
