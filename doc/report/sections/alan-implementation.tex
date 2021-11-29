@@ -12,7 +12,7 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \end{itemize}
 \subsubsection{AnythingModel e immutabilità}
 Per quanto riguarda l'applicazione del pattern \textbf{F-Bounded Polymorphism} la soluzione che ho adottato con type-member anzichè l'utilizzo di argomenti generici garantisce un buon livello di type-safety: sembra difficile se non impossibile rompere i vincoli di tipo imposti.  
-
+Impongo che il tipo di \textit{this} sia sottotipo di Model e quest'ultimo sottotipo del tratto in cui è definito: tutto questo permette anche di implementare un metodo update di base che ritorni proprio \textit{this} di tipo Model.
 \begin{lstlisting}[basicstyle=\tiny]
 trait AnythingModel {
     type Model >: this.type <: AnythingModel
@@ -26,9 +26,7 @@ trait AnythingModel {
         Outcome(this)
     }
 }  
-\end{lstlisting}
 
-\begin{lstlisting}[basicstyle=\tiny]
 trait DynamicModel extends AnythingModel with StatsModel {
   type Model >: this.type <: DynamicModel
 
@@ -36,6 +34,8 @@ trait DynamicModel extends AnythingModel with StatsModel {
   val collisionDetected: Boolean
 
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model
+
+  ...
 
   override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     for {
@@ -52,7 +52,9 @@ trait DynamicModel extends AnythingModel with StatsModel {
 
 Da notare la necessità di un cast a Model in quanto il compilatore Scala non riconosce che il type member di ritorno è lo stesso definito poco sopra: questo cast comunque è legittimo e sicuro. 
 
-Cambiando argomento, per concludere la descrizione dei AnythingModel ho applicato il pattern \textbf{Pimp My Library} al fine di estendere le funzionalità di Double in modo da ottenere un Timer, utilizzato poi in diversi Model 
+Per concludere AnythingModel: la factory per la view è richiesta come funzione in linea con il \textbf{pattern strategy} applicato in modo funzionale con Scala.
+
+Cambiando argomento, ho applicato il pattern \textbf{Pimp My Library} al fine di estendere le funzionalità di Double in modo da ottenere un Timer, utilizzato poi in diversi Model 
 \begin{lstlisting}[basicstyle=\tiny]
 type Timer = Double
 extension (timer: Timer)
@@ -69,11 +71,10 @@ given Conversion[Vector2, Vertex] with
     def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 \end{lstlisting}
 
-Per concludere la descrizione di Anything: la factory per la view è richiesta come funzione in linea con il \textbf{pattern strategy} applicato in modo funzionale con Scala.
 
 
 \subsubsection{Macro per ridurre boilerplate code}
-Quando si definisce il Model di un oggetto di gioco che mixa diversi comportamenti è necessario implementare altrettanti metodi del tipo with-Comportamento in modo da permettere la sua copia aggiornata. 
+Quando si definisce il Model di un oggetto di gioco che mixa diversi comportamenti è necessario implementare altrettanti template method  del tipo with*Comportamento*(...) in modo da permettere la sua copia aggiornata. 
 
 \begin{lstlisting}[basicstyle=\tiny]
 def withDynamic(x,y,z) = copy(x=x,y=y,z=z); 
