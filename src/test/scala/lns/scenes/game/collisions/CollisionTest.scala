@@ -1,10 +1,10 @@
-package lns.scenes.game.room
+package lns.scenes.game.collisions
 
 import indigoextras.geometry.BoundingBox
 import lns.scenes.game.collisions.Collision
-import org.scalatest.freespec.AnyFreeSpec
 import lns.scenes.game.room.door.Location
 import lns.scenes.game.room.door.Location.*
+import org.scalatest.freespec.AnyFreeSpec
 
 class CollisionTest extends AnyFreeSpec {
 

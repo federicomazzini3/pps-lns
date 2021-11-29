@@ -37,16 +37,19 @@ case class BattleEventSubSystems(screenDimensions: Rectangle) extends SubSystem:
 
     case Dead(a) =>
       a match {
+
         case c: CharacterModel =>
           for {
             gameOver <- model.gameOver
             bc       <- gameOver.addBattleConsequence(Rip(a, context.gameTime))
           } yield bc
+
         case b: BossModel =>
           for {
             win <- model.win
             bc  <- win.addBattleConsequence(Rip(a, context.gameTime))
           } yield bc
+
         case _ =>
           model.addBattleConsequence(Rip(a, context.gameTime))
       }

@@ -4,7 +4,7 @@
 %Requirement di alto livello stabiliscono perché si sta facendo 
 %il sistema e quali siano i suoi vantaggi. 
 \begin{itemize}
-    \item Creazione di un gioco di genere Roguelike
+    \item Creazione di un gioco di genere Roguelike single player con la possibilità per un utente di comandare un personaggio all'interno di una mappa composta da stanze, affrontare nemici, raccogliere oggetti e sconfiggere un nemico finale.
     \item Possibilità di gioco su browser
 \end{itemize}
 
@@ -247,20 +247,7 @@ Da qui l'idea di crearne uno nuovo per lui.
 \begin{enumerate}
     \item Fluidità di gioco
     \begin{enumerate}
-        \item Il gioco non deve presentare lag o inestetismi marcati che rendano la user experience non ottimale
-    \end{enumerate}
-    \item Bilanciare numero e caratteristiche dei nemici per ottenere un livello di difficoltà di gioco medio
-    \begin{enumerate}
-        \item Il gioco non deve essere troppo facile 
-        \begin{enumerate}
-            \item Presenza di pochi nemici all'interno di una stanza
-            \item Presenza di oggetti che potenzino le caratteristiche del giocatore rendendo il conflitto giocatore-nemici impari
-        \end{enumerate}
-        \item Il gioco non deve essere troppo difficile
-        \begin{enumerate}
-            \item Presenza di troppi nemici all'interno di una stanza
-            \item Presenza di oggetti che non potenzino o riducano le caratteristiche del giocatore rendendo il conflitto giocatore-nemici impari
-        \end{enumerate}
+        \item Deve essere garantita una velocita di almeno 30 FPS su processore Apple M1 in situazioni di gioco "caotiche", dove per caotico si intende la presenza all'interno di una stanza del Character comandato dal giocatore, 5 nemici, 10 shot e 10 elementi bloccanti.
     \end{enumerate}
 \end{enumerate}
 
