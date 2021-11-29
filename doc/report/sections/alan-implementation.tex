@@ -13,7 +13,8 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \subsubsection{AnythingModel e immutabilità}
 Per quanto riguarda l'applicazione del pattern \textbf{F-Bounded Polymorphism} la soluzione che ho adottato con type-member anzichè l'utilizzo di argomenti generici garantisce un buon livello di type-safety: sembra difficile se non impossibile rompere i vincoli di tipo imposti.  
 Impongo che il tipo di \textit{this} sia sottotipo di Model e quest'ultimo sottotipo del tratto in cui è definito: tutto questo permette anche di implementare un metodo update di base che ritorni proprio \textit{this} di tipo Model.
-\begin{lstlisting}[basicstyle=\tiny]
+
+\begin{lstlisting}[language=Scala]
 trait AnythingModel {
     type Model >: this.type <: AnythingModel
     
@@ -55,7 +56,7 @@ Da notare la necessità di un cast a Model in quanto il compilatore Scala non ri
 Per concludere AnythingModel: la factory per la view è richiesta come funzione in linea con il \textbf{pattern strategy} applicato in modo funzionale con Scala.
 
 Cambiando argomento, ho applicato il pattern \textbf{Pimp My Library} al fine di estendere le funzionalità di Double in modo da ottenere un Timer, utilizzato poi in diversi Model 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 type Timer = Double
 extension (timer: Timer)
     def elapsed(time: Double): Timer = timer match {
@@ -66,7 +67,7 @@ extension (timer: Timer)
 \end{lstlisting}
 
 Infine ho utilizzato il \textbf{pattern Adapter} per trasformare implicitamente Vector2 in Vertex, due modi di Indigo per gestire i vettori secondo me ridondanti e per questo abbiamo deciso di utilizzarne uno solo nei nostri Model
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 given Conversion[Vector2, Vertex] with
     def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 \end{lstlisting}
@@ -76,7 +77,7 @@ given Conversion[Vector2, Vertex] with
 \subsubsection{Macro per ridurre boilerplate code}
 Quando si definisce il Model di un oggetto di gioco che mixa diversi comportamenti è necessario implementare altrettanti template method  del tipo with*Comportamento*(...) in modo da permettere la sua copia aggiornata. 
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 def withDynamic(x,y,z) = copy(x=x,y=y,z=z); 
 \end{lstlisting}
 
@@ -84,7 +85,7 @@ Per questo ho cercato un modo per generare in automatico questi metodi per una c
 
 Quindi ho implementato la \textbf{copyMacro} che consente di eseguire il metodo copy con come argomenti quelli dello scope dove viene attivata la macro, sfruttando le potenzialita della ancora non documentata Scala Reflection API. 
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 def withDynamic(x,y,z) = copyMacro
 \end{lstlisting}
 
@@ -92,13 +93,13 @@ def withDynamic(x,y,z) = copyMacro
 
 Quando si esegue l'update di una collezione di oggetti AnythingModel o AnythingViewModel ad esempio Map[AnythingId, AnythingModel] si ottiene una Map[AnythingId, Outcome[AnythingModel]] ma quello che occorre è ottenere la Map originale unendo le Outcome e gli eventi contenuti da ciascuna.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 anythings.map((id, any) => id -> any.update(context)(GameContext(this, character)))
 \end{lstlisting}
 
 Per comodità ho applicato il \textbf{pattern Adapter} fornendo un apposito convertitore implicito, di seguito quello per AnythingViewModel.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[AnythingId, AnythingViewModel[_]]]] with
   def apply(set: Map[AnythingId, Outcome[AnythingViewModel[_]]]): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
     set.foldLeft(Outcome(Map[AnythingId, AnythingViewModel[_]]().empty))((acc, el) =>
@@ -123,7 +124,7 @@ Nella versione finale tuttavia i due tipi interni vengono collegati a dei parame
     \item a nostro avviso è più espressiva per indicare cosa richiede una View
 \end{itemize}
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
   type Model     = M
   type ViewModel = VM
@@ -155,7 +156,7 @@ Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita u
 Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un \textbf{type check del tipo a runtime} verificando che questo corrisponda ai type member specificati.
 Il TypeTest interviene implicitamente durante il match con i type Member della View.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
     model.anythings.foldLeft(Group())((s1, s2) =>
       s1.addChild(
@@ -191,12 +192,12 @@ Implementazione
 
 Per quanto riguarda il mini framework per lo sviluppo di nemici ho applicato il pattern \textbf{Pimp My Library} al fine di creare un \textbf{mini DSL} per generare la coda di stati a partire da due di essi 
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
 \end{lstlisting} 
 
 Circa i comportomenti dei nemici, ho impiegato i \textbf{Self-types} anzichè ereditare realizzando così dei mixin "puri" in modo da esprimere il concetto che sono delle strategie "aggiuntive" da utilizzare durante lo sviluppo di un nemico
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait Follower { this: EnemyModel with DynamicModel =>
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     status.head match {
@@ -209,7 +210,7 @@ trait Follower { this: EnemyModel with DynamicModel =>
 
 \subsubsection{PrologService}
 Riguardo l'implementazione dei Term prolog ho proceduto secondo la modalita \textbf{Mixed OOP/FP} separando la definizione dei dati dal comportamento. Si è poi reso utile l'impiego del pattern \textbf{Adapter} per convertire implicitamente all'occorrenza i termini Tau in nostri Term.
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 given Conversion[TauTerm, Term] with
   def apply(t: TauTerm): Term = t.args.length match {
     case 0 => Atom(t.id)
