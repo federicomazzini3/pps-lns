@@ -75,9 +75,7 @@ given Conversion[Vector2, Vertex] with
     def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
 \end{lstlisting}
 
-Design
-
-Per concludere la descrizione di Anything: ogni Model viene creato specificando la sua View (factories as functions in linea con il \textbf{pattern strategy}) in modo tale che, quando una collezione di oggetti viene renderizzata, non è necessario fare type-match e indicare la corretta View da utilizzare in base al Model.
+Per concludere la descrizione di Anything: la factory per la view è richiesta come funzione in linea con il \textbf{pattern strategy} applicato in modo funzionale con Scala.
 
 
 \subsubsection{Macro per ridurre boilerplate code}

@@ -50,6 +50,35 @@ Una porta è quindi l'associazione di un lato della stanza con lo stato della st
     \caption{\textit{Door class diagram(da modificare con versione pro di staruml)}} 
 \end{figure}
 
+\subsection{AnythingModel}
+In generale ogni oggetto in gioco contiene un identificativo univoco e una bounding box che ne determina posizione e dimensioni 2D, inoltre ad ogni istanza è associata la factory per la sua View in modo tale che, quando una collezione di AnythingModel viene renderizzata, è sufficiente creare la View e chiamare il metodo draw. 
+
+Ogni oggetto inoltre reagisce alla richiesta di update che avviene ad ogni iterazione del game loop, ma il modo con cui lo fa dipende da specifici comportamenti definiti come sottotipi mixabili di AnythingModel.
+
+I sottotipi principali sono:
+\begin{itemize}
+    \item \textbf{DynamicModel} un oggetto in grado di spostarsi autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing
+    \item \textbf{AliveModel} un oggetto vivo che può essere colpito perdendo vita. Non ha comportamento autonomo.
+    \item \textbf{DamageModel} un oggetto che provoca danno di contatto. Non ha comportamento autonomo.
+    \item \textbf{FireModel} un oggetto in grado di sparare autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing. Durante l'update può emettere uno ShotEvent contenente ShotModel
+    \item \textbf{SolidModel} un oggetto solido che non può essere fisicamente attraversato da un altro. Non ha comportamento autonomo.
+\end{itemize}
+
+Questi tratti possono richiedere delle Stats per ottenere dei parametri al loro funzionamento (ad esempio la velocità massima da applicare ad uno spostamento): le Stats se richieste sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
+
+
+
+Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.35]{AnythingModel.jpg}
+    \caption{\textit{Gerarchia AnythingModel}} 
+\end{figure}
+
+Ogni metodo che aggiorna il Model, a partire da update che viene richiamata ad ogni iterazione del game loop, deve ritornare una copia aggiornata dello stesso. 
+
+
 \subsection{Pattern di progettazione}
 Di seguito si elencano brevemente i pattern di progettazione utilizzati. 
 \subsubsection{Family polimorphism}
