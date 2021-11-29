@@ -57,16 +57,14 @@ Ogni oggetto inoltre reagisce alla richiesta di update che avviene ad ogni itera
 
 I sottotipi principali sono:
 \begin{itemize}
-    \item \textbf{DynamicModel} un oggetto in grado di spostarsi autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing
+    \item \textbf{DynamicModel} un oggetto in grado di spostarsi autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing attraverso l'implementazione di alcuni template-method predisposti
     \item \textbf{AliveModel} un oggetto vivo che può essere colpito perdendo vita. Non ha comportamento autonomo.
     \item \textbf{DamageModel} un oggetto che provoca danno di contatto. Non ha comportamento autonomo.
-    \item \textbf{FireModel} un oggetto in grado di sparare autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing. Durante l'update può emettere uno ShotEvent contenente ShotModel
+    \item \textbf{FireModel} un oggetto in grado di sparare autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing attraverso l'implementazione di alcuni template-method predisposti. Durante l'update può emettere uno ShotEvent contenente ShotModel
     \item \textbf{SolidModel} un oggetto solido che non può essere fisicamente attraversato da un altro. Non ha comportamento autonomo.
 \end{itemize}
 
 Questi tratti possono richiedere delle Stats per ottenere dei parametri al loro funzionamento (ad esempio la velocità massima da applicare ad uno spostamento): le Stats se richieste sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
-
-
 
 Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale.
 
@@ -76,8 +74,21 @@ Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel c
     \caption{\textit{Gerarchia AnythingModel}} 
 \end{figure}
 
-Ogni metodo che aggiorna il Model, a partire da update che viene richiamata ad ogni iterazione del game loop, deve ritornare una copia aggiornata dello stesso. 
+\subsubsection{Update e immutabilità}
 
+Ogni metodo che applica modifica al Model, a partire da update che viene richiamata ad ogni iterazione del game loop, deve ritornare una \textbf{copia aggiornata} dello stesso e del \textbf{tipo corrente}: adottiamo il pattern \textbf{F-Bounded Polymorphism con type-member}. 
+Allo scopo predisponiamo un type member astratto Model e per ogni trait un template method with***(...) che accetta come argomenti quelli da modificare e ritorna un nuovo oggetto aggiornato di tipo Model: entrambi da definire nella classe finale che mixa il trait.
+E' richiesto che il metodo update richiami super.update in modo da propagare l'aggiornamento a tutti i trait mixati.
+\textit{Si rimanda all'implementazione per il dettaglio di come il pattern viene applicato con Scala.}
+
+\paragraph{Nota} Sebbene una soluzione consigliata in sostituzione al polimorfismo F-Bounded è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile e avrebbe generato più boilerplate code.
+
+\paragraph{Nota}
+Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
+
+\subsubsection{Nemici}
+
+Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model
 
 \subsection{Pattern di progettazione}
 Di seguito si elencano brevemente i pattern di progettazione utilizzati. 

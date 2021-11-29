@@ -11,13 +11,7 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
     \item Visualizzazione mini-mappa del dungeon
 \end{itemize}
 \subsubsection{AnythingModel e immutabilità}
-Per quanto riguarda il trait AnythingModel e suoi trait sottotipi/mixins il problema è quello di consentire l'update dello stesso nel contesto dell'immutabilità ritornando quindi una \textbf{copia aggiornata di se stesso e del tipo corrente}. 
-Scala infatti attualmente non dispone di un sistema per copiare un oggetto aggiornando solo alcune sue proprietà, se non riapplicando il costruttore creando un nuovo oggetto o utilizzando il metodo copy di una case class, ma a partire da un trait base non si conosce ancora quale classe/case class lo estenderà.
-Una tecnica che potrebbe sembrare idonea è l'utilizzo di un self-type richiedendo un tipo anonimo che implementi un metodo copy, ma occorrebbe specificare tutti i suoi argomenti e questi non si conoscono in quanto dipendono dalla classe finale e come questa viene mixata.
-
-Sebbene una soluzione consigliata è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile.
-
-La soluzione trovata è quindi quella di applicare il pattern \textbf{F-Bounded Polymorphism} con type-member.
+Per quanto riguarda l'applicazione del pattern \textbf{F-Bounded Polymorphism} la soluzione che ho adottato con type-member anzichè l'utilizzo di argomenti generici garantisce un buon livello di type-safety: sembra difficile se non impossibile rompere i vincoli di tipo imposti.  
 
 \begin{lstlisting}[language=Scala]
 trait AnythingModel {

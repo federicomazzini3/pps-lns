@@ -1,13 +1,437 @@
 \subsection{Matteo Brocca}
 Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \begin{itemize}
-    \item Definizione del FireModel e ShotModel per la gestione degli spari, sia del character che dei nemici
-    \item View, ViewModel e specifici Trait per la rappresentazione grafica degli Anythings tramite Asset e possibili animazioni
+	\item Rappresentazione grafica degli Anythings tramite Asset ed animazioni
+    \item Definizione del FireModel e ShotModel per la gestione dei proiettili
+    \item Gestione delle statistiche degli Anithing
     \item Character controllato dal giocatore
     \item Boss, PrologModel e definizione del suo comportamento tramite Prolog
-    \item Gestione delle statistiche degli Anithing 
-    \item Oggetti che il Character può recuperare per modificare le proprie statistiche
+    \item Item che il Character può raccogliere per modificare le proprie statistiche
     \item HUD per la visualizzazione delle statistiche a schermo
 \end{itemize}
 
+\subsubsection{Rappresentazione grafica degli Anythings tramite Asset ed animazioni}
+Come definito a livello architetturale (3.6), ogni oggetto del gioco è codificato non solo dal Model che ne determina il comportamento,
+ma anche dalla \textbf{View} per la sua rappresentazione a schermo e, quando necessario, da un \textbf{ViewModel}.
 
+Durante l'implementazione si è resa necessaria una buona organizzazione del codice per seguire i principi DRY 
+e definire coerentemente come debba essere realizzata una View, la quale dipende sempre da Asset grafici 
+ed, in alcune situazioni, anche da animazioni, separando il \textit{cosa} disegnare dal \textit{come}, 
+in modo tale da realizzare diversi Tratti per lo stesso oggetto senza mai replicare il codice in comune.
+
+Questa organizzazione ci ha permesso di generare velocemente le specifiche View per Character, Enemies, Bosses, Items and Elements.
+
+È stata creata una libreria per gli \textbf{AnythingAsset}, la quale codifica le informazioni di base necessare  a disegnare a schermo un certo Asset ed implementa metodi condivisi.
+
+Facciamo un esempio:
+Il CharacterModel, viene rappresentato a schermo dalla sua relativa CharacterView e CharacterViewModel.
+
+La CharacterView definisce solo la funzione di "disegno" che sfrutta il metodo drawComponents di AnithingAsset 
+e viene mixata con il tipo di carattere che si vuole disegnare a schermo, in questo caso Isaac.
+Il trait Isaac estende IsaacAsset per definire come disegnare ogni singolo componente a schermo.
+A sua volta il trait IsaacAsset è quello che estende il trait base AnythingAsset 
+e definisce le dimensioni e nome della Sprite che viene caricata durante l'avvio del gioco.
+
+Nel momento in cui si decida di modificare l'estetica del Character (il \textit{"cosa"}), da "Isaac" a "Mario",
+senza dover modificare il \textit{"come"} questo viene rappresentato (da una testa, un corpo, un ombra, ...),
+basterà create un nuovo trait Mario e relativo MarioAsset.
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait AnythingAsset {
+	val name: Option[String]
+	val width: Int
+	val height: Int
+	val offsetY: Int
+	val scale: Double
+	
+	def asset: AssetName = {...}
+	def boundingBox(position: Vertex = {...}
+	def shotAreaOffset: Int = {...}
+	def withScale: Double => Double = {...}
+	
+	def spriteAnimation(name: String): Sprite[Material.Bitmap] = {...}
+	def boudingView: Shape = {...}
+	def shadowView: Shape = {...}
+	
+	def drawComponents(components: List[SceneNode]): Group =
+		Group()
+		.addChild(
+			Group()
+			.withRef(0, offsetY)
+			.addChildren(components)
+		)
+		.withScale(Vector2(scale, scale))
+}
+
+trait IsaacAsset extends AnythingAsset {
+  override val name: Option[String] = Some("isaac")
+  override val width: Int           = 28
+  override val height: Int          = 33
+  override val offsetY: Int         = 18
+  override val scale: Double        = 5
+}
+
+trait Isaac extends IsaacAsset{
+	...
+	def headView(model: CharacterModel, viewModel: CharacterViewModel): Graphic[Material.Bitmap] = {...}
+	def bodyView(model: CharacterModel): Sprite[Material.Bitmap] = = {...}
+}
+
+object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
+	...
+	def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
+		model.life match {
+		case 0 => Group()
+		case _ => drawComponents(List(shadowView, bodyView(model), headView(model, viewModel)))
+		}
+}
+\end{lstlisting}	
+
+
+\subsubsection{Definizione del FireModel e ShotModel per la gestione dei proiettili}
+Il FireModel è un trait progettato per essere mixato con qualsiasi AnithingModel
+che abbia la capacità di sparare proiettili consentendo in automatico di gestire l'update dell'oggetto nel contesto dell'immutabilità.
+
+Quando viene utilizzato questo trait è richiesta la sola implementazione del metodo \textbf{computeFire} per generare lo sparo: 
+una lista opzionale di vettori che identificano la direzione x/y di uno o più proiettili. 
+
+L'effettiva generazione dei proiettili dipende dal rate del fuoco, 
+una delle caratteristiche attribuibili all'anything tramite lo StatsModel di cui si parlerà in seguito.
+
+In automatico l'update del modello verifica se sono stati generati proiettili ed in automatico, 
+solo se il rate del fuoco lo permette, viene generato un evento sull'Outcome di tipo \textbf{ShotEvent}
+che il framework Indigo è in grado di catturare e gestire durante il gameLoop della scena.
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait FireModel extends AnythingModel with StatsModel {
+  type Model >: this.type <: FireModel
+
+  val shots: Option[List[Vector2]]
+  val fireRateTimer: Double
+  val shotOffset: Int
+  val shotView: () => ShotView[_]
+
+  ...
+
+  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]]
+
+  def createEvent(direction: Vector2): ShotEvent =
+    ShotEvent(
+      ShotModel(
+        id,
+        Vector2(boundingBox.horizontalCenter, boundingBox.top + shotOffset),
+        direction,
+        Stats.createShot(stats)
+      )(shotView)
+    )
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    val newFireRateTimer = fireRateTimer.elapsed(context.gameTime.delta.toDouble)
+    val newShot          = computeFire(context)(gameContext)
+
+    val retObj = for {
+      superObj <- super.update(context)(gameContext)
+      newObj = (newFireRateTimer, newShot) match {
+        case (0, Some(_)) => superObj.withFire(FireRate @@ stats, newShot).asInstanceOf[Model]
+        case _            => superObj.withFire(newFireRateTimer, newShot).asInstanceOf[Model]
+      }
+    } yield newObj
+
+    (newFireRateTimer, newShot) match {
+      case (0, Some(list)) => list.foldLeft(retObj)((obj, direction) => obj.addGlobalEvents(createEvent(direction)))
+      case _               => retObj
+    }
+}
+\end{lstlisting}
+
+Ogni proiettile generato è uno ShotModel, a sua volta un AliveModel (un AnythingModel con caratteristiche) mixato con 
+il SolidModel per gestire le collisioni, DynamicModel per gestire il movimento ed il suo range massimo, DamageModel per gestire il danno dopo una collisione.
+Viene creato con le corrette statistiche a partire da chi ha generato lo sparo ed aggiunto agli elementi della Room.
+
+La factory che ne permette la creazione durante la generazione dell'evento ShotEvent 
+richiede anche quale sia la relativa View per la rappresentazione grafica del proiettile.
+Si può infatti notare che il FireModel richiede la definizione della funzione di creazione di questa View di tipo ShotView, 
+un trait che sfrutta il \textbf{Self-Type} per richiedere espressamente di essere mixato 
+con il trait \textbf{ShotAsset} che definisce le informazioni di base che ogni proiettile deve avere ed implementa la funzione \textbf{drawShot}.
+
+\begin{lstlisting}[basicstyle=\tiny]
+class SingleShotView extends ShotView[Unit] with SimpleAnythingView {
+  this: ShotAsset =>
+  type View = Group
+
+  def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
+    drawComponents(List(drawShot))
+
+  ...
+}
+\end{lstlisting}
+
+Un esempio dell'utilizzo del FireModel si può apprezzare all'interno del CharacterModel 
+dove viene definita la shotView come un SingleShotView con il trait ShotBlue
+e viene implementato il computeFire con il mapping dei tasti premuti dall'utente.
+
+\begin{lstlisting}[basicstyle=\tiny]
+...
+
+val shotView        = () => new SingleShotView() with ShotBlue
+val shotOffset: Int = -40
+
+...
+
+val fireInputMappings: InputMapping[List[Vector2]] =
+InputMapping(
+	Combo.withKeyInputs(Key.UP_ARROW)    -> List(Vector2(0, -1)),
+	Combo.withKeyInputs(Key.RIGHT_ARROW) -> List(Vector2(1, 0)),
+	Combo.withKeyInputs(Key.DOWN_ARROW)  -> List(Vector2(0, 1)),
+	Combo.withKeyInputs(Key.LEFT_ARROW)  -> List(Vector2(-1, 0))
+)
+
+def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+	context.inputState.mapInputsOption(fireInputMappings)
+	
+...
+\end{lstlisting}
+
+\subsubsection{Gestione delle statistiche degli Anithing}
+Molti oggetti all'interno del gioco hanno delle caratteristiche che ne influenzano il comportamento: 
+Punti vita, Tempo invulnerabilità dopo essere stato colpito, Velocità di movimento, Rate dello sparo, Danno dei proiettili, Velocità dei proiettili, Range dei proiettili.
+
+Si è realizzato il trait \textbf{StatsModel} da mixare con un qualsiasi Anithing 
+per gestire l'aggiornamento di queste caratteristiche nell'ambito dell'immutabilità.
+
+Il metodo "sumStat" è l'unico utilizzato realmente all'interno del gioco e permette di 
+aggiornare il valore di una determinata caratteristica sommando il valore proveniente da un Item raccolto 
+verificando in automatico che il valore non diventi negativo.
+
+Gli altri metodi "changeStats" e "changeStat" sono solo stati previsti per eventuali sviluppi futuri.  
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait StatsModel {
+  type Model >: this.type <: StatsModel
+
+  val stats: Stats
+
+  def withStats(stats: Stats): Model
+
+  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+
+  def changeStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats + property))
+
+  def sumStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats +++ property))
+}
+\end{lstlisting}
+
+Questo trait usufruisce della libreria \textbf{Stats} la quale è implementata seguendo il pattern \textbf{Pimp My Library} 
+per mettere a disposizione i propri metodi all'interno dello specifico dominio applicativo (\textbf{DSL}).
+
+La libreria definisce che cosa sono le Stats, una mappa di proprietà da nome a valore.
+Sono stati implementate delle \textbf{Conversion} per utilizzare i valori definiti come Double anche in situazioni 
+dove si accettano Int o String.
+Inoltre sono state realizzate delle \textbf{extension} per definire operatori specifici per manipolarle.
+
+\begin{lstlisting}[basicstyle=\tiny]
+package lns.scenes.game.stats
+
+enum PropertyName:
+	case 	MaxLife, Invincibility, MaxSpeed, Range, KeepAwayMin, KeepAwayMax, Damage, 
+		FireDamage, FireRange, FireRate,FireSpeed
+
+type PropertyValue = Double
+type StatProperty  = (PropertyName, PropertyValue)
+type Stats         = Map[PropertyName, PropertyValue]
+
+given Conversion[PropertyValue, Int] with
+	def apply(v: PropertyValue): Int = v.toInt
+
+given Conversion[PropertyValue, String] with
+	def apply(v: PropertyValue): String = v.toString
+
+extension (p: PropertyValue) {
+	def |+|(v: PropertyValue): PropertyValue = p match {
+	case p if (v + p) < 0 => 0
+	case _                => BigDecimal(v + p).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+	}
+}
+
+extension (p: PropertyName) {
+	def @@(s: Stats): PropertyValue = s.getOrElse(p, 0.0)
+}
+
+extension (stats: Stats) {
+	def +++(p: StatProperty): Stats =
+	stats + stats.get(p._1).map(x => p._1 -> (x |+| p._2)).getOrElse(p)
+}
+\end{lstlisting}
+
+\subsubsection{Boss, PrologModel e definizione del suo comportamento tramite Prolog}
+Durante la creazione del Boss di fine Dangeon si è deciso di realizzare il \textbf{PrologModel}, 
+un'altro trait mixabile con EnemyModel quando il comportamento del nemico è complesso e dipendente da goals definiti tramite linguaggio Prolog.
+
+Questo tratto permette di gestire l'update immutabile del modello nel seguente modo:
+se il suo status attuale (tipico degli EnemyModel) è di tipo \textit{Idle} e non è definita nessuna \textit{EnemyAction}, 
+allora viene interrogato il codice Prolog presente del file "\textit{name}" definito in fase di mixin.
+Il \textbf{goal} che viene passato al prolog è una stringa prodotta dal metodo del quale si richiede l'override.
+La risposta del prolog, catturata dal gameLoop, esegue il metodo \textbf{behaviour} del chiamante implementato dalla classe che lo estende. 
+
+\begin{lstlisting}[basicstyle=\tiny]
+trait PrologModel(name: String) extends EnemyModel {
+  type Model >: this.type <: PrologModel
+
+  val prologClient: PrologClient
+
+  def withProlog(prologClient: PrologClient): Model
+
+  def goal(context: FrameContext[StartupData])(gameContext: GameContext): String
+
+  def behaviour(response: Substitution): Outcome[Model]
+
+  def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    prologClient
+      .consult(
+        context.startUpData.getPrologFile(name).get,
+        goal(context)(gameContext)
+      )
+      .map(pi => withProlog(pi))
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    for {
+      superObj <- super.update(context)(gameContext)
+      newObj <- status.head match {
+        case (EnemyState.Idle, 0, None) =>
+          superObj
+            .withStatus((EnemyState.Idle, 0.0, Some(ConsultingAction())))
+            .consult(context)(gameContext)
+            .asInstanceOf[Outcome[Model]]
+        case _ => Outcome(superObj)
+      }
+    } yield newObj
+}
+
+case class ConsultingAction() extends EnemyAction
+\end{lstlisting}
+
+Il boss di nome "Loki" che è stato implementato può eseguire 5 diverse azioni, 3 di attacco, 1 di movimento ed 1 di difesa,
+che hanno una probabilità in base allo stato di vita del boss e del Character. 
+Viene definito \textit{low} il livello di vita se questo è inferiore al 50\% della vita massima, altrimenti \textit{high}
+
+\begin{lstlisting}[basicstyle=\tiny]
+% estratto del file prolog "assets/prolog/loki.pl"
+... 
+% List of probability value for actions based on Boss and Character life level
+% @high|low (Boss)
+% @high|low (Character)
+% -Probability List[Attack, Defense, Move]
+getActionsProbability(high, high, [0.7, 0.0, 1.0]).
+getActionsProbability(high, low,  [0.5, 0.0, 1.0]).
+getActionsProbability(low,  high, [0.7, 1.0, 0.0]).
+getActionsProbability(low,  low,  [0.5, 0.7, 1.0]).
+...
+\end{lstlisting}
+
+Di seguito vengono descritte nel dettaglio le singole azioni:
+\begin{itemize}
+	\item attack1(direction): viene generato un proiettile nella direzione del Character se questo si trova sullo stesso asse x o y.
+	\item attack2: vengono generati 4 proiettili in contemporanea lungo i 2 assi x, y
+	\item attack3: vengono generati 4 proiettili in contemporanea in diagonale lungo i 2 assi x, y
+	\item move(x,y): il boss sposta rapidamente verso il punto x, y occupato dal Character
+	\item defence(x,y): il boss si teletrasporta nel punto x,y se questo non è occupato da una roccia, altrimenti viene cercato il primo posto disponibile nel suo intorno
+\end{itemize}
+
+\begin{lstlisting}[basicstyle=\tiny]
+case class BossModel(...) extends EnemyModel
+    with DynamicModel
+    with FireModel
+    with Traveller
+    with PrologModel("loki") {
+
+  ...
+
+  override def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
+    "behaviour(" +
+      bossInfo + "," +
+      characterInfo(gameContext) + "," +
+      roomInfo + "," +
+      blocksInfo(gameContext) + ", Action)."
+
+  
+  def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[EnemyAction]): Outcome[Model] =
+    Outcome(this.withStatus((state, timer, option) +: (EnemyState.Idle, 0.0, None)))
+
+  override def behaviour(response: Substitution): Outcome[Model] =
+    response.links("Action") match {
+      case Struct(Atom("attack1"), Atom(direction)) =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack1", Some(direction))))
+      case Atom("attack2") =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack2", None)))
+      case Atom("attack3") =>
+        behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack3", None)))
+      case Struct(Atom("move"), Num(x, _), Num(y, _)) =>
+        Outcome(this.withStatus(EnemyState.Attacking, 0.0, Some(MoveAction(x.toDouble, y.toDouble))))
+      case Struct(Atom("defence"), Num(x, _), Num(y, _)) =>
+        Outcome(
+          this
+            .withSolid(true)
+            .withStatus(
+              (EnemyState.Hiding, Loki.hidingTime, Some(DefenceAction(x.toDouble, y.toDouble))) +:
+                (EnemyState.Falling, Loki.fallingTime, None) +:
+                (EnemyState.Idle, 0.0, None)
+            )
+        )
+      case _ => Outcome(this)
+    }
+
+  override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+    status.head match {
+      case (EnemyState.Attacking, _, Some(AttackAction("attack1", Some(direction)))) =>
+        direction match {
+          case "top"   => Some(List(Vector2(0, -1)))
+          case "right" => Some(List(Vector2(1, 0)))
+          case "down"  => Some(List(Vector2(0, 1)))
+          case "left"  => Some(List(Vector2(-1, 0)))
+          case _       => None
+        }
+      case (EnemyState.Attacking, _, Some(AttackAction("attack2", None))) =>
+        Some(List(Vector2(0, -1), Vector2(1, 0), Vector2(0, 1), Vector2(-1, 0)))
+      case (EnemyState.Attacking, _, Some(AttackAction("attack3", None))) =>
+        Some(List(Vector2(-1, -1), Vector2(1, 1), Vector2(1, -1), Vector2(-1, 1)))
+      case _ => None
+    }
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    for {
+      superObj <- super.update(context)(gameContext)
+      newObj = status.head match {
+        case (EnemyState.Attacking, _, Some(MovingAction())) if superObj.path.length == 0 =>
+          superObj.withStatus((EnemyState.Idle, 0.0, None)).asInstanceOf[Model]
+        case (EnemyState.Attacking, _, Some(MoveAction(x, y))) =>
+          superObj
+            .withTraveller(Queue(Vector2(Assets.Rooms.cellToPosition(x), Assets.Rooms.cellToPosition(y))))
+            .withStatus((EnemyState.Attacking, 0.0, Some(MovingAction())))
+            .asInstanceOf[Model]
+        case (EnemyState.Hiding, 0, Some(DefenceAction(x, y))) =>
+          superObj
+            .withDynamic(
+              boundingBox.moveTo(Assets.Rooms.cellToPosition(x), Assets.Rooms.cellToPosition(y)),
+              Vector2.zero,
+              false
+            )
+            .asInstanceOf[Model]
+        case (EnemyState.Falling, 0, _) =>
+          superObj
+            .withSolid(false)
+            .withDynamic(boundingBox, Vector2.zero, true)
+            .asInstanceOf[Model]
+        case _ => superObj
+      }
+    } yield newObj
+
+}
+
+case class AttackAction(val name: String, direction: Option[String]) extends EnemyAction
+case class MoveAction(x: Double, y: Double)                          extends EnemyAction
+case class MovingAction()                                            extends EnemyAction
+case class DefenceAction(x: Double, y: Double)                       extends EnemyAction
+
+\end{lstlisting}
