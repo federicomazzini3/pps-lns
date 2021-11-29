@@ -2,11 +2,11 @@
 Durante il corso del progetto mi sono occupato di differenti parti all'interno di esso, tra cui, in ordine:
 \begin{itemize}
     \item Scena di loading e caricamento degli asset
-    \item Il Dungeon, dal modello alla sua integrazione con le altre componenti (ad eccezione dell'algoritmo Prolog per la sua generazione)
+    \item Il Dungeon, dal modello alla sua integrazione con le altre componenti (ad eccezione dell'algoritmo Prolog per la generazione e all' integrazione con il modello Scala)
     \item Le stanze di gioco, la loro tipologia, i diversi comportamenti e la gestione degli Anything interni
     \item Le porte e il passaggio da una stanza all'altra
     \item Definizione e visualizzazione di elementi bloccanti
-    \item Disposizione, mediante Prolog, di nemici ed elementi bloccanti all'interno delle stanze
+    \item Disposizione, mediante Prolog, di nemici ed elementi bloccanti all'interno delle stanze Arena
     \item Sistema delle collisioni e di Bounding degli elementi interni alla stanza
     \item Scena finale e relativa verifica di avvenuta vittoria/sconfitta
 \end{itemize}
@@ -31,7 +31,7 @@ La seconda volta invece, è stato definito per il vero Dungeon, già generato e 
 
 \subsubsection{Room}
 Come già descritto, le stanze sono di diverso tipo, Empty, Arena, Item e Boss. Per modellare questi concetti ho definito un trait base il quale contiene la maggior parte dei comportamenti ma lascia il resto alle classi specializzate. 
-Una room, qualsiasi, è caratterizzata da un insieme di porte (link ad altre room), una collezione di Anything e un area di gioco in cui gli elementi si muovono. 
+Una room qualsiasi è caratterizzata da un insieme di porte, una collezione di Anything e un area di gioco in cui gli elementi si muovono. 
 Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi possibili per la modifica di una Room, intesa come creazione di un nuovo modello con la modifica specificata. Per evitare ripetizioni di codice, la funzione generale sfrutta le \textbf{Higher Order Function} e mette in campo il pattern \textbf{strategy}. 
 \begin{lstlisting}[basicstyle=\tiny]
     def updateAnythings
@@ -78,8 +78,8 @@ Attraverso essa è stato possibile wrappare l'intero modello o sottoparti di ess
 Di seguito un esempio, riguardante l'intera catena di update del modello di gioco. 
 \begin{lstlisting}[basicstyle=\tiny]
 for {
-      updatedCharacter <- model.updateCharacter(c => character.update(context)(gameContext))
-      updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(context)(character))
+      updatedCharacter <- model.updateCharacter(c => character.update(gameContext))
+      updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(character))
       withPassage      <- updatedRoom.updateWithPassage
       withStats        <- withPassage.updateStatsAfterCollision(context)
       withMovements    <- withStats.updateMovementAfterCollision
@@ -88,8 +88,7 @@ for {
 
 \subsubsection{Collisioni}
 Il sistema delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
-Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e 
-e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
+Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
 Ad esempio, un oggetto in movimento che collide con una roccia verrà spostato il tanto che basta per non intersecarsi, ma non ha ripercussioni dopo il contatto. 
 Se invece un oggetto in movimento collide con uno shot, questo oggetto perderà punti vita, a seconda del tipo di shot. 
 
@@ -102,7 +101,7 @@ Il sistema agisce in due momenti distinti:
 \end{enumerate}
 
 Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
-Questo aspetto, in termini di prestazioni, è largamente migliorabile. 
+Questo aspetto, in termini di prestazioni, è largamente migliorabile, ma si rimanda a eventuali sviluppi futuri.
 
 \subsubsection{Verifica vittoria/sconfitta}
 \begin{itemize}
@@ -112,4 +111,4 @@ Questo aspetto, in termini di prestazioni, è largamente migliorabile.
 
 Il controllo viene effettuato tramite due eventi \textit{Win} e \textit{GameOver}. 
 Uno dei due eventi viene lanciato quando, durante l'update del Character o del Boss, la life raggiunge lo zero. 
-Gli eventi vengono intercettati dalla Scena di gioco la quale mostra un messaggio di vittoria/sconfitta e rimanda alla scena finale, dove è possibile, eventualmente, iniziare una nuova partita. 
+Gli eventi vengono intercettati dalla Scena di gioco la quale mostra un messaggio di vittoria/sconfitta e rimanda alla scena finale, dove è possibile eventualmente iniziare una nuova partita. 
