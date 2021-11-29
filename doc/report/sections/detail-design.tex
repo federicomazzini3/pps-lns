@@ -66,8 +66,6 @@ I sottotipi principali sono:
 
 Questi tratti possono richiedere delle Stats per ottenere dei parametri al loro funzionamento (ad esempio la velocità massima da applicare ad uno spostamento): le Stats se richieste sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
 
-
-
 Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale.
 
 \begin{figure}[!hbt]
@@ -75,6 +73,8 @@ Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel c
     \includegraphics[scale=0.35]{AnythingModel.jpg}
     \caption{\textit{Gerarchia AnythingModel}} 
 \end{figure}
+
+\subsubsection{Update e immutabilità}
 
 Ogni metodo che aggiorna il Model, a partire da update che viene richiamata ad ogni iterazione del game loop, deve ritornare una copia aggiornata dello stesso. 
 
