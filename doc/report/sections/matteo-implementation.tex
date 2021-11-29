@@ -36,7 +36,7 @@ Nel momento in cui si decida di modificare l'estetica del Character (il \textit{
 senza dover modificare il \textit{"come"} questo viene rappresentato (da una testa, un corpo, un ombra, ...),
 basterà create un nuovo trait Mario e relativo MarioAsset.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait AnythingAsset {
 	val name: Option[String]
 	val width: Int
@@ -102,7 +102,7 @@ In automatico l'update del modello verifica se sono stati generati proiettili ed
 solo se il rate del fuoco lo permette, viene generato un evento sull'Outcome di tipo \textbf{ShotEvent}
 che il framework Indigo è in grado di catturare e gestire durante il gameLoop della scena.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait FireModel extends AnythingModel with StatsModel {
   type Model >: this.type <: FireModel
 
@@ -154,7 +154,7 @@ Si può infatti notare che il FireModel richiede la definizione della funzione d
 un trait che sfrutta il \textbf{Self-Type} per richiedere espressamente di essere mixato 
 con il trait \textbf{ShotAsset} che definisce le informazioni di base che ogni proiettile deve avere ed implementa la funzione \textbf{drawShot}.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 class SingleShotView extends ShotView[Unit] with SimpleAnythingView {
   this: ShotAsset =>
   type View = Group
@@ -170,7 +170,7 @@ Un esempio dell'utilizzo del FireModel si può apprezzare all'interno del Charac
 dove viene definita la shotView come un SingleShotView con il trait ShotBlue
 e viene implementato il computeFire con il mapping dei tasti premuti dall'utente.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 ...
 
 val shotView        = () => new SingleShotView() with ShotBlue
@@ -205,7 +205,7 @@ verificando in automatico che il valore non diventi negativo.
 
 Gli altri metodi "changeStats" e "changeStat" sono solo stati previsti per eventuali sviluppi futuri.  
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait StatsModel {
   type Model >: this.type <: StatsModel
 
@@ -231,7 +231,7 @@ Sono stati implementate delle \textbf{Conversion} per utilizzare i valori defini
 dove si accettano Int o String.
 Inoltre sono state realizzate delle \textbf{extension} per definire operatori specifici per manipolarle.
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 package lns.scenes.game.stats
 
 enum PropertyName:
@@ -275,7 +275,7 @@ allora viene interrogato il codice Prolog presente del file "\textit{name}" defi
 Il \textbf{goal} che viene passato al prolog è una stringa prodotta dal metodo del quale si richiede l'override.
 La risposta del prolog, catturata dal gameLoop, esegue il metodo \textbf{behaviour} del chiamante implementato dalla classe che lo estende. 
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 trait PrologModel(name: String) extends EnemyModel {
   type Model >: this.type <: PrologModel
 
@@ -316,7 +316,7 @@ Il boss di nome "Loki" che è stato implementato può eseguire 5 diverse azioni,
 che hanno una probabilità in base allo stato di vita del boss e del Character. 
 Viene definito \textit{low} il livello di vita se questo è inferiore al 50\% della vita massima, altrimenti \textit{high}
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 % estratto del file prolog "assets/prolog/loki.pl"
 ... 
 % List of probability value for actions based on Boss and Character life level
@@ -339,7 +339,7 @@ Di seguito vengono descritte nel dettaglio le singole azioni:
 	\item defence(x,y): il boss si teletrasporta nel punto x,y se questo non è occupato da una roccia, altrimenti viene cercato il primo posto disponibile nel suo intorno
 \end{itemize}
 
-\begin{lstlisting}[basicstyle=\tiny]
+\begin{lstlisting}[language=Scala]
 case class BossModel(...) extends EnemyModel
     with DynamicModel
     with FireModel
