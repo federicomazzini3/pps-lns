@@ -64,9 +64,6 @@ case class CharacterModel(
   val shotView        = () => new SingleShotView() with ShotBlue
   val shotOffset: Int = -40
 
-  // TODO: Builder pattern -> usare Require qui oppure sui Trait
-  //  require ( life > 0 , " Incorrect life ")
-
   val moveInputMappings: InputMapping[Vector2] =
     val maxSpeed = MaxSpeed @@ stats
     InputMapping(
