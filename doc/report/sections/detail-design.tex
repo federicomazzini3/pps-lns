@@ -115,6 +115,7 @@ Gli ShotModel sono oggetti che a loro volta mixano alcuni dei principali sottoti
 
 Abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
 Al centro abbiamo \textbf{EnemyModel}, il quale dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
+
 Sono stati definiti dei comportamenti mixabili elementari come:
 \begin{itemize}
     \item \textbf{Follower}: un nemico che insegue il character
@@ -123,9 +124,9 @@ Sono stati definiti dei comportamenti mixabili elementari come:
     \item \textbf{Traveller}: un nemico che segue un percorso indicato da una sequenza di punti
 \end{itemize}
 
-Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types} anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti "plugin".
+Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types}, anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti "plugin".
 
-Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model, abbiamo evidenziato i 4 comportamenti base in azzurro e le classi finali che rappresentano i nemici implementati in giallo.
+Di seguito in figura 11 mostriamo come sono stati definiti i nemici a livello di Model, abbiamo evidenziato i 4 comportamenti base in azzurro e le classi finali che rappresentano i nemici implementati in giallo.
 
 \begin{figure}[!hbt]
     \centering
