@@ -13,10 +13,6 @@ import scala.util.Random
 
 trait ElementModel extends SolidModel {
   type Model >: this.type <: ElementModel
-
-  val crossable: Boolean
-
-  def withSolid(crossable: Boolean): Model
 }
 
 object ElementModel {
