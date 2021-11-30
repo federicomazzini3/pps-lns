@@ -90,10 +90,10 @@ Per concludere, il metodo update riceve in input, oltre al FrameContext di Indig
 \paragraph{Nota} Sebbene una soluzione consigliata in sostituzione al polimorfismo F-Bounded è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile e avrebbe generato più boilerplate code.
 
 \paragraph{Nota}
-Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
+Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti, oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
 
 \subsubsection{Gestione degli spari}
-Riguardo a \textbf{FireModel} e agli spari ShotModel occorre specificare che:
+Riguardo a \textbf{FireModel} e agli spari \textbf{ShotModel} occorre specificare che:
 \begin{itemize}
     \item possono essere sparati più colpi ShotModel contemporaneamente in direzioni diverse
     \item tra un colpo e l'altro deve trascorrere del tempo in base alla Stats "rate dello sparo"
@@ -103,7 +103,7 @@ Riguardo a \textbf{FireModel} e agli spari ShotModel occorre specificare che:
 
 FireModel durante un update genera l'evento \textbf{ShotEvent} indicando le proprietà dello ShotModel da istanziare (tra cui velocità e danno) ed inserendolo nella monade Outcome di ritorno: verrà gestito nell'iterazione successiva del game loop e aggiunto al RoomModel.
 
-Gli \textbf{ShotModel} sono oggetti che a loro volta mixano alcuni dei principali sottotipi Anything: 
+Gli ShotModel sono oggetti che a loro volta mixano alcuni dei principali sottotipi Anything: 
 \begin{itemize}
 	\item DynamicModel per gestire il movimento ed il suo range massimo
 	\item AliveModel in quanto ha una vita fittizia che viene azzerata dopo una collisione o se ha termitato il range 
