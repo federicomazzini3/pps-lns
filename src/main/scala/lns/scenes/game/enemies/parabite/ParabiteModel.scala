@@ -59,7 +59,6 @@ case class ParabiteModel(
     invincibilityTimer: Timer = 0,
     path: Queue[Vector2] = Queue.empty
 ) extends EnemyModel
-    with DynamicModel
     with Traveller {
 
   type Model = ParabiteModel

@@ -71,9 +71,8 @@ case class BossModel(
     path: Queue[Vector2] = Queue.empty,
     prologClient: PrologClient = PrologClient()
 ) extends EnemyModel
-    with DynamicModel
-    with FireModel
     with Traveller
+    with FireModel
     with PrologModel("loki") {
 
   type Model = BossModel
