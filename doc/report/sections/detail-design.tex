@@ -16,7 +16,7 @@ Ogni modifica al modello consiste nella creazione di un nuovo modello con il com
 
 Una scelta rilevante ai fini dell'implementazione è il fatto che, a livello di modello, il character controllato dal giocatore è sempre fuori dalla stanza in cui si trova, in questo modo è possibile aggiornare in maniera indipendente le due componenti.
 \subsection{Dungeon}
-Dungeon è il termine con cui viene identificata la mappa di gioco. Esso è composto da stanze disposte in maniera randomica ma collegate tra loro. 
+Il dungeon è composto da stanze disposte in maniera randomica ma collegate tra loro. 
 La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare e geometrica e offre delle operazioni per esplorarlo. 
 \begin{figure}[!hbt]
     \centering
@@ -24,7 +24,10 @@ La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare 
     \caption{\textit{Dungeon class diagram(da modificare con versione pro di staruml)}} 
 \end{figure}
 
-Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}. All'interno di una griglia, un elemento potrebbe o non potrebbe essere presente, andando così a definire un dungeon con stanze in posizioni diverse. E' necessario perciò lavorare con strutture dati che consentano l'assenza di un dato.
+Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
+
+All'interno di una griglia, un elemento potrebbe o non potrebbe essere presente, andando così a definire un dungeon con stanze in posizioni diverse. 
+E' necessario perciò lavorare con strutture dati che consentano l'assenza di un dato.
 
 Il Dungeon vero e proprio prende forma quando il tipo Room viene definito con un modello consono a descriverne lo stato e il comportamento. 
 
@@ -152,6 +155,24 @@ Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il
 L'esempio concreto di utilizzo in figura riguarda il Character, ma è definito almeno un singleton object View per ciascun Model.
 
 \subsubsection{Asset e animazioni}
+
+\subsection{Sistema di controllo delle collisioni}
+Il sistema di controllo delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
+Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
+
+Il sistema agisce e controlla solamente gli Anything di tipo Solid all'interno della stanza correntemente visualizzata.
+Essendo il GameModel un'istantanea immutabile, il controllo avviene ad ogni Frame e su una struttura dati statica. 
+
+Il sistema è composto da una serie di funzioni racchiusi in un modulo e sfruttato dal GameModel stesso, il quale va a controllare gli Anything presenti nella Room corrente e ritorna un modello aggiornato, come si può vedere in figura 6.
+
+Il controllo è eseguito in due momenti distinti: 
+\begin{enumerate}
+  \item In un primo momento viene verificata la collisione tra un elemento e tutti gli altri interni alla stanza. Per ogni collisione viene applicata una funzione all'elemento che corrisponde al side effect.
+  \item In un secondo momento vengono ricontrollate le collisioni e spostati gli elementi di conseguenza. 
+\end{enumerate}
+
+Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
+Questo aspetto, in termini di prestazioni, è largamente migliorabile, ma si rimanda a eventuali sviluppi futuri.
 
 
 \subsection{Pattern di progettazione}
