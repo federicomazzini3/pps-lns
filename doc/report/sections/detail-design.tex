@@ -81,7 +81,7 @@ Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel c
 \subsubsection{Update e immutabilità}
 
 Ogni metodo che applica modifiche ad un Model, a partire da \textit{update} che viene richiamata ad ogni iterazione del game loop, deve ritornare una \textbf{copia aggiornata} dello stesso e del \textbf{tipo corrente}: adottiamo il pattern \textbf{F-Bounded Polymorphism con type-member}. 
-Allo scopo predisponiamo un type member astratto \textbf{Model} e, per ogni trait sottotipo di AnythingModel, un template method come with*Comportamento*(...) che accetti come argomenti quelli da modificare e ritorni un nuovo oggetto aggiornato di tipo \textit{Model}: entrambi da definire nella classe finale che mixa il trait.
+Allo scopo predisponiamo un type member astratto \textit{Model} e, per ogni trait sottotipo di AnythingModel, un template method come with*Comportamento*(...) che accetti come argomenti quelli da modificare e ritorni un nuovo oggetto aggiornato di tipo \textit{Model}: entrambi da definire nella classe finale che mixa il trait.
 E' richiesto che il metodo update richiami super.update in modo da propagare l'aggiornamento a tutti i trait mixati.
 \textit{Si rimanda all'implementazione per il dettaglio di come il pattern viene applicato con Scala.}
 
