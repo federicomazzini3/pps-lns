@@ -8,7 +8,7 @@ Nel primo momento, a partita non avviata, è necessario generare il dungeon e le
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.2]{GameModelClassDiagram.jpg}
+    \includegraphics[scale=0.44]{GameModelClassDiagram.jpg}
     \caption{\textit{Game model class diagram (da modificare con versione pro di staruml)}} 
 \end{figure}
 Il modello di gioco rappresenta un'istantanea delle varie componenti che lo compongono in un determinato momento. 
@@ -20,7 +20,7 @@ Il dungeon è composto da stanze disposte in maniera randomica ma collegate tra 
 La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare e geometrica e offre delle operazioni per esplorarlo. 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.2]{DungeonClassDiagram.jpg}
+    \includegraphics[scale=0.49]{DungeonClassDiagram.jpg}
     \caption{\textit{Dungeon class diagram(da modificare con versione pro di staruml)}} 
 \end{figure}
 
@@ -37,7 +37,7 @@ Ogni stanza incapsula al suo interno gli elementi che sono rilegati all'interno 
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.25]{RoomClassDiagram.jpg}
+    \includegraphics[scale=0.5]{RoomClassDiagram.jpg}
     \caption{\textit{Room class diagram(da modificare con versione pro di staruml)}} 
 \end{figure}
 
@@ -49,7 +49,7 @@ Un dettaglio importante di una stanza sono le porte che la collegano con altre s
 Una porta è quindi l'associazione di un lato della stanza con lo stato della stessa. Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestita dal Dungeon. 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.25]{DoorClassDiagram.jpg}
+    \includegraphics[scale=0.5]{DoorClassDiagram.jpg}
     \caption{\textit{Door class diagram(da modificare con versione pro di staruml)}} 
 \end{figure}
 
@@ -75,8 +75,8 @@ Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel c
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.37]{AnythingModel.jpg}
-    \caption{\textit{Gerarchia AnythingModel}} 
+    \includegraphics[scale=0.4]{AnythingModel.jpg}
+    \caption{\textit{Gerarchia AnythingModel - in giallo alcuni utilizzi concreti}} 
 \end{figure}
 
 \subsubsection{Update e immutabilità}
@@ -131,7 +131,7 @@ Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.5]{Enemies.jpg}
-    \caption{\textit{Gerarchia Enemies}}
+    \caption{\textit{Enemies framework - in giallo i nemici concreti}}
 \end{figure}
 
 \subsubsection{Boss}
@@ -228,7 +228,7 @@ Infine per facilitare l'utilizzo del Prolog da parte del gioco abbiamo predispos
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.45]{PrologService.jpg}
+    \includegraphics[scale=0.48]{PrologService.jpg}
     \caption{\textit{PrologService, Gerarchia Term e PrologClient}} 
 \end{figure}
 
@@ -262,6 +262,6 @@ Il package Core invece, contiene le parti basilari a cui il resto del sistema fa
 
 \begin{figure}[!hbt]
     \centering
-    \includegraphics[scale=0.25]{package-diagram.jpg}
+    \includegraphics[scale=0.5]{package-diagram.jpg}
     \caption{\textit{Package Diagram del sistema(da modificare con versione pro di staruml)}} 
 \end{figure}
