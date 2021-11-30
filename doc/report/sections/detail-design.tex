@@ -11,12 +11,12 @@ Nel secondo momento, una volta che è avvenuta la generazione, il modello è cos
     \includegraphics[scale=0.44]{GameModelClassDiagram.jpg}
     \caption{\textit{Diagramma delle classi del Game Model e componenti rilevanti}} 
 \end{figure}
-Il modello di gioco rappresenta un'istantanea delle varie componenti che lo compongono in un determinato momento. 
 Il GameModel, nel caso di partita avviata, è dotato di metodi per aggiornare le sue varie componenti: il character, il dungeon, la stanza corrente e tutti gli Anything interni. 
 Trattandosi di una struttura dati immutabile, aggiornare il modello significa creare un nuovo modello aggiornato. Per situazioni complesse, come il sistema di controllo collisioni e il sistema che verifica e gestisce il passaggio del character da una stanza all'altra, il GameModel sfrutta moduli separati, definiti \textit{PassageUpdater e CollisionUpdater}
 
 Una scelta rilevante ai fini dell'implementazione è il fatto che, a livello di modello, il character controllato dal giocatore è sempre fuori dalla stanza in cui si trova, in questo modo è possibile aggiornare in maniera indipendente le due componenti.
 
+In figura 6 è mostrato il relativo diagramma delle classi.
 \subsection{Dungeon}
 Il dungeon è composto da stanze disposte in maniera randomica ma collegate tra loro. 
 La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare e geometrica e offre delle operazioni per esplorarlo. 
@@ -26,13 +26,14 @@ La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare 
     \caption{\textit{Diagramma delle classi del Dungeon}} 
 \end{figure}
 
-Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
+Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}X\textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
 
-All'interno di una griglia, un elemento potrebbe o non potrebbe essere presente, andando così a definire un dungeon con stanze in posizioni diverse. 
+All'interno della griglia, un elemento potrebbe o non potrebbe essere presente, andando così a definire un dungeon con stanze in posizioni diverse. 
 E' necessario perciò lavorare con strutture dati che consentano l'assenza di un dato.
 
 Il Dungeon vero e proprio prende forma quando il tipo Room viene definito con un modello consono a descriverne lo stato e il comportamento. 
 
+In figura 7 è mostrato il relativo diagramma delle classi.
 \subsection{Room}
 Come da requisiti, una stanza è la componente principale del Dungeon e può essere di diversi tipi: Empty, Arena, Item e Boss. 
 Ogni stanza incapsula una collezione di elementi (Anything), i quali sono propri di essa e non possono muoversi all'interno del Dungeon, come ad esempio i nemici o gli elementi bloccanti. 
