@@ -138,10 +138,10 @@ Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di
 
 Si è deciso di realizzare il comportamento del Boss tramite linguaggio Prolog per usufruire della sua espressività logica.
 
-Per fare questo era necessario ampliare il framework dei nemici aggiungendo il \textbf{PrologEnemyModel}, 
+Per fare questo è necessario ampliare il framework dei nemici aggiungendo il \textbf{PrologEnemyModel}, 
 un tratto in grado di gestire le operazioni necessarie ad interrogare il linguaggio Prolog attraverso uno specifico \textit{goal} 
 e gestire le sue risposte per attivare un certo \textit{comportamento}.
-In questo modo, in ottica di sviluppi futuri, si potrebbero creare rapidamente nuovi nemici, boss compresi, che implementano il comportamento tramite linguaggio Prolog, definendo unicamente la costruzione del goal e del comportamento.
+In questo modo, in ottica di sviluppi futuri, si potrebbero creare rapidamente nuovi nemici, boss compresi, che implementino il comportamento tramite linguaggio Prolog, definendo unicamente la costruzione del goal e del comportamento.
 
 \subsection{AnythingView e AnythingViewModel}
  
@@ -184,10 +184,10 @@ L'obiettivo è quindi separare il \textit{cosa} disegnare dal \textit{come},
 in modo tale da realizzare diversi trait per lo stesso oggetto senza mai replicare il codice in comune.
 
 Sarà quindi necessaria una libreria \textbf{AnythingAssets} per codificare le informazioni di base 
-dalla quale ogni singolo Asset (es IsaacAsset in figura) dovrà ereditare per definire le sue proprietà: 
+dalla quale ogni singolo Asset (es IsaacAsset in figura 13) dovrà ereditare per definire le sue proprietà: 
 nome del file, dimensioni, scala, ecc...
 
-A questo punto si potrà creare un trait (es Isacc) che definisca come viene disegnato lo specifico asset, 
+A questo punto si potrà creare un trait (es Isacc in figura 13) che definisca come viene disegnato lo specifico asset, 
 se questo è composto da una singola Sprite o da più di una, 
 ad esempio il Character dovrà avere un corpo ed una testa con animazioni separate in base all'input dell'utente. 
 La testa sarà animata soltanto durante lo sparo ed in direzione dei proiettili, 
