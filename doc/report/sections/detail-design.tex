@@ -67,7 +67,9 @@ I sottotipi principali sono:
     \item \textbf{SolidModel} un oggetto solido che non può essere fisicamente attraversato da un altro. Non ha comportamento autonomo.
 \end{itemize}
 
-Questi tratti possono richiedere delle Stats per ottenere dei parametri al loro funzionamento (ad esempio la velocità massima da applicare ad uno spostamento): le Stats se richieste sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
+Molti oggetti all'interno del gioco hanno delle caratteristiche che ne influenzano il comportamento: 
+Punti vita, Tempo invulnerabilità dopo essere stato colpito, Velocità di movimento, Rate dello sparo, Danno dei proiettili, Velocità dei proiettili, Range dei proiettili. 
+Di conseguenza tutti i principali sottotipi elencati, tranne il SolidModel, vengono mixati con lo \textbf{StatsModel} al quale è delegata la gestione di queste caratteristiche: le Stats sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
 
 Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale: abbiamo riportato evidenziati in giallo alcuni utilizzatori concreti.
 
@@ -92,14 +94,23 @@ Per concludere, il metodo update riceve in input, oltre al FrameContext di Indig
 Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
 
 \subsubsection{Gestione degli spari}
-Riguardo a FireModel e agli spari \textbf{ShotModel} occorre specificare che:
+Riguardo a \textbf{FireModel} e agli spari ShotModel occorre specificare che:
 \begin{itemize}
     \item possono essere sparati più colpi ShotModel contemporaneamente in direzioni diverse
-    \item tra un colpo e l'altro deve trascorrere del tempo in base alla Stats "rate di fuoco"
+    \item tra un colpo e l'altro deve trascorrere del tempo in base alla Stats "rate dello sparo"
     \item occorre generare il colpo a certo un offset rispetto alla posizione del oggetto che sta separando
     \item occorre specificare una ShotView factory da passare allo ShotModel, infatti in questo caso sono disponibili più View da utilizzare
 \end{itemize}
+
 FireModel durante un update genera l'evento \textbf{ShotEvent} indicando le proprietà dello ShotModel da istanziare (tra cui velocità e danno) ed inserendolo nella monade Outcome di ritorno: verrà gestito nell'iterazione successiva del game loop e aggiunto al RoomModel.
+
+Gli \textbf{ShotModel} sono oggetti che a loro volta mixano alcuni dei principali sottotipi Anything: 
+\begin{itemize}
+	\item DynamicModel per gestire il movimento ed il suo range massimo
+	\item AliveModel in quanto ha una vita fittizia che viene azzerata dopo una collisione o se ha termitato il range 
+	\item SolidModel per gestire le collisioni
+	\item DamageModel per arrecare danno contro cui avviene una eventuale collisione.
+\end{itemize}
 
 \subsubsection{Mini framework per i nemici}
 
@@ -123,11 +134,20 @@ Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di
     \caption{\textit{Gerarchia Enemies}}
 \end{figure}
 
-\subsection{AnythingView e AnythingViewModel}
+\subsubsection{Boss}
 
+Si è deciso di realizzare il comportamento del Boss tramite linguaggio Prolog per usufruire della sua espressività logica.
+
+Per fare questo era necessario ampliare il framework dei nemici aggiungendo il \textbf{PrologEnemyModel}, 
+un tratto in grado di gestire le operazioni necessarie ad interrogare il linguaggio Prolog attraverso uno specifico \textit{goal} 
+e gestire le sue risposte per attivare un certo \textit{comportamento}.
+In questo modo, in ottica di sviluppi futuri, si potrebbero creare rapidamente nuovi nemici, boss compresi, che implementano il comportamento tramite linguaggio Prolog, definendo unicamente la costruzione del goal e del comportamento.
+
+\subsection{AnythingView e AnythingViewModel}
+ 
 Come scelta di design stabiliamo che 
 \begin{itemize}
-    \item Una View e un ViewModel devono essere progettati per uno specifico Model. 
+    \item Una View e un ViewModel devono essere progettati per uno specifico Model.
     \item Un ViewModel potrebbe essere usato da diverse View
     \item Una View potrebbe non necessitare di un ViewModel: in generale quando non ha animazioni complesse
     \item Un ViewModel viene istanziato con lo stesso identificativo univoco usato per l'oggetto Model a cui si riferisce
@@ -155,6 +175,25 @@ Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il
 L'esempio concreto di utilizzo in figura riguarda il Character, ma è definito almeno un singleton object View per ciascun Model.
 
 \subsubsection{Asset e animazioni}
+
+Per realizzare le View dei vari oggetti a schermo, sarà necessaria una buona organizzazione del codice 
+per seguire i principi \textbf{DRY} e definire coerentemente come debba essere realizzata una View, 
+la quale dipende sempre da Asset grafici ed, in alcune situazioni, anche da animazioni. 
+
+L'obiettivo è quindi separare il \textit{cosa} disegnare dal \textit{come}, 
+in modo tale da realizzare diversi trait per lo stesso oggetto senza mai replicare il codice in comune.
+
+Sarà quindi necessaria una libreria \textbf{AnythingAssets} per codificare le informazioni di base 
+dalla quale ogni singolo Asset (es IsaacAsset in figura) dovrà ereditare per definire le sue proprietà: 
+nome del file, dimensioni, scala, ecc...
+
+A questo punto si potrà creare un trait (es Isacc) che definisca come viene disegnato lo specifico asset, 
+se questo è composto da una singola Sprite o da più di una, 
+ad esempio il Character dovrà avere un corpo ed una testa con animazioni separate in base all'input dell'utente. 
+La testa sarà animata soltanto durante lo sparo ed in direzione dei proiettili, 
+mentre il corpo sarà animato durante il movimento e nella direzione di spostamento.
+
+Una volta definito il trait dell'asset, questo può essere mixato con la corretta View del modello che rappresenta l'oggetto a schermo.
 
 \subsection{Sistema di controllo delle collisioni}
 Il sistema di controllo delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
