@@ -81,26 +81,38 @@ Allo scopo predisponiamo un type member astratto Model e per ogni trait un templ
 E' richiesto che il metodo update richiami super.update in modo da propagare l'aggiornamento a tutti i trait mixati.
 \textit{Si rimanda all'implementazione per il dettaglio di come il pattern viene applicato con Scala.}
 
+Per concludere, il metodo update riceve in input, oltre al FrameContext di Indigo, il \textbf{GameContext} che contiene lo stato della stanza corrente e il CharacterModel in modo da permettere all'oggetto in gioco comportamenti che si adattano alla situazione.
+
 \paragraph{Nota} Sebbene una soluzione consigliata in sostituzione al polimorfismo F-Bounded è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile e avrebbe generato più boilerplate code.
 
 \paragraph{Nota}
 Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
 
-\subsubsection{Nemici}
+\subsubsection{Gestione degli spari}
+Riguardo a FireModel e agli spari \textbf{ShotModel} occorre specificare che:
+\begin{itemize}
+    \item possono essere sparati più colpi ShotModel contemporaneamente in direzioni diverse
+    \item tra un colpo e l'altro deve trascorrere del tempo in base alla Stats "rate di fuoco"
+    \item occorre generare il colpo a certo un offset rispetto alla posizione del oggetto che sta separando
+    \item occorre specificare una ShotView factory da passare allo ShotModel, infatti in questo caso sono disponibili più View da utilizzare
+\end{itemize}
+FireModel durante un update genera l'evento \textbf{ShotEvent} indicando le proprietà dello ShotModel da istanziare (tra cui velocità e danno) ed inserendolo nella monade Outcome di ritorno: verrà gestito nell'iterazione successiva del game loop e aggiunto al RoomModel.
+
+\subsubsection{Mini framework per i nemici}
 
 Abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
-A tale scopo un EnemyModel dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
+Al centro abbiamo \textbf{EnemyModel}, il quale dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
 Sono stati definiti dei comportamenti mixabili elementari come:
 \begin{itemize}
-    \item Follower: un nemico che insegue il character
-    \item FiresContinuosly: un nemico che spara in continuazione nella direzione del character
-    \item KeepsAway: un nemico che si mantiene a distanza dal giocatore
-    \item Traveller: un nemico che segue un percorso indicato da una sequenza di punti
+    \item \textbf{Follower}: un nemico che insegue il character
+    \item \textbf{FiresContinuosly}: un nemico che spara in continuazione nella direzione del character
+    \item \textbf{KeepsAway}: un nemico che si mantiene a distanza dal giocatore
+    \item \textbf{Traveller}: un nemico che segue un percorso indicato da una sequenza di punti
 \end{itemize}
 
-Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types} anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti.
+Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types} anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti "plugin".
 
-Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model.
+Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model, abbiamo evidenziato i 4 comportamenti base in azzurro e le classi finali che rappresentano i nemici implementati in giallo.
 
 \begin{figure}[!hbt]
     \centering
