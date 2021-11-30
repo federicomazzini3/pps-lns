@@ -3,24 +3,27 @@ Di seguito verranno analizzate le scelte di design rilevanti per il sistema, i p
 \subsection{GameModel}
 L'intero modello di gioco, dallo stato al comportamento, è incapsulato all'interno della struttura GameModel. E' possibile identificare due diverse accezioni del modello, a seconda del momento di gioco. 
 Un momento in cui la partita non è ancora stata avviata e un momento successivo in cui invece la partita è avviata.
-Nel primo momento, a partita non avviata, è necessario generare il dungeon e le stanze che lo compongono. Nel secondo momento, una volta che è avvenuta la generazione, il modello è costituito da un Dungeon, composto da diverse stanze, e dal character controllato dal giocatore. 
+Nel primo momento, a partita non avviata, è necessario generare il dungeon e le stanze che lo compongono. 
+Nel secondo momento, una volta che è avvenuta la generazione, il modello è costituito da un Dungeon composto da diverse stanze e dal character controllato dal giocatore. 
 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.44]{GameModelClassDiagram.jpg}
-    \caption{\textit{Game model class diagram}} 
+    \caption{\textit{Diagramma delle classi del Game Model e componenti rilevanti}} 
 \end{figure}
 Il modello di gioco rappresenta un'istantanea delle varie componenti che lo compongono in un determinato momento. 
-Ogni modifica al modello consiste nella creazione di un nuovo modello con il componente aggiornato. 
+Il GameModel, nel caso di partita avviata, è dotato di metodi per aggiornare le sue varie componenti: il character, il dungeon, la stanza corrente e tutti gli Anything interni. 
+Trattandosi di una struttura dati immutabile, aggiornare il modello significa creare un nuovo modello aggiornato. Per situazioni complesse, come il sistema di controllo collisioni e il sistema che verifica e gestisce il passaggio del character da una stanza all'altra, il GameModel sfrutta moduli separati, definiti \textit{PassageUpdater e CollisionUpdater}
 
 Una scelta rilevante ai fini dell'implementazione è il fatto che, a livello di modello, il character controllato dal giocatore è sempre fuori dalla stanza in cui si trova, in questo modo è possibile aggiornare in maniera indipendente le due componenti.
+
 \subsection{Dungeon}
 Il dungeon è composto da stanze disposte in maniera randomica ma collegate tra loro. 
 La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare e geometrica e offre delle operazioni per esplorarlo. 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.49]{DungeonClassDiagram.jpg}
-    \caption{\textit{Dungeon class diagram}} 
+    \caption{\textit{Diagramma delle classi del Dungeon}} 
 \end{figure}
 
 Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
@@ -32,24 +35,27 @@ Il Dungeon vero e proprio prende forma quando il tipo Room viene definito con un
 
 \subsection{Room}
 Come da requisiti, una stanza è la componente principale del Dungeon e può essere di diversi tipi: Empty, Arena, Item e Boss. 
-Ogni stanza incapsula al suo interno gli elementi che sono rilegati all'interno e non possono muoversi all'interno del Dungeon, come ad esempio i nemici o gli elementi bloccanti. 
+Ogni stanza incapsula una collezione di elementi (Anything), i quali sono propri di essa e non possono muoversi all'interno del Dungeon, come ad esempio i nemici o gli elementi bloccanti. 
 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.5]{RoomClassDiagram.jpg}
-    \caption{\textit{Room class diagram}} 
+    \caption{\textit{Diagramma delle classi Room}} 
 \end{figure}
 
 Una stanza è anche responsabile dell'aggiornamento di tutto ciò che incapsula. Anche in questo caso si cerca di lavorare con strutture dati immutabili, perciò l'aggiornamento di uno o più componenti consegue una nuova stanza aggiornata. 
 L'aggiornamento viene fatto ad ogni FrameTick ed è comandato dal dungeon, solamente per la stanza correntemente visualizzata, le altre stanze non sono aggiornate o gestite.  
 
 \subsubsection{Door}
-Un dettaglio importante di una stanza sono le porte che la collegano con altre stanze. Si è scelto di definire una porta non tanto come un link, ma come una proprietà statica, lasciando al Dungeon il compito di gestire il collegamento. 
-Una porta è quindi l'associazione di un lato della stanza con lo stato della stessa. Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestita dal Dungeon. 
+Un dettaglio importante di una stanza sono le porte. Una porta, per l'utente, rappresenta il collegamento tra una stanza e un altra, ma a livello di dominio sono semplicemente l'associazione di un lato della stanza con uno stato \textit{open, closed, locked}. 
+
+Una porta è quindi un elemento statico di una stanza e non un link. E' il Dungeon a gestire il collegamento tra le varie stanze in base alla loro posizione occupata in griglia. 
+
+Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestita dal Dungeon. 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.5]{DoorClassDiagram.jpg}
-    \caption{\textit{Door class diagram(da modificare con versione pro di staruml)}} 
+    \caption{\textit{Diagramma delle classi Door}} 
 \end{figure}
 
 \subsection{AnythingModel}
