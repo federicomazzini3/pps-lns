@@ -67,7 +67,7 @@ I sottotipi principali sono:
 \end{itemize}
 
 Molti oggetti all'interno del gioco hanno delle caratteristiche che ne influenzano il comportamento: 
-Punti vita, Tempo invulnerabilità dopo essere stato colpito, Velocità di movimento, Rate dello sparo, Danno dei proiettili, Velocità dei proiettili, Range dei proiettili. 
+punti vita, tempo invulnerabilità dopo essere stato colpito, velocità di movimento, rate dello sparo, danno dei proiettili, velocità dei proiettili, range dei proiettili. 
 Di conseguenza tutti i principali sottotipi elencati, tranne il SolidModel, vengono mixati con lo \textbf{StatsModel} al quale è delegata la gestione di queste caratteristiche: le Stats sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
 
 Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale: abbiamo riportato evidenziati in giallo alcuni utilizzatori concreti.
