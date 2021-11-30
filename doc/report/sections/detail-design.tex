@@ -246,30 +246,6 @@ Infine per facilitare l'utilizzo del Prolog da parte del gioco abbiamo predispos
     \caption{\textit{PrologService, Gerarchia Term e PrologClient}} 
 \end{figure}
 
-\subsection{Pattern di progettazione}
-Di seguito si elencano brevemente i pattern di progettazione utilizzati. 
-\subsubsection{Family polimorphism}
-Il family polimorphism è stato utilizzato in più di un occasione, tra cui
-\begin{itemize}
-    \item Definizione di una struttura per il Dungeon, ancora da tipare, ma che già definisce i comportamenti principali di esso.
-\end{itemize}
-\subsubsection{Bounded F-polimorphism}
-\subsubsection{Pimp my library}
-Il pattern Pimp my library è stato ampiamente utilizzato, soprattuto per quanto riguarda l'estensione di librerie scritte da terze parti, come ad esempio l'engine Indigo. 
-Avendo usato Scala 3 è stato utilizzato il meccanismo degli \textit{extension} method.
-
-In particolare è stata estesa la struttura dati Group di Indigo (rappresentante un gruppo di elementi visualizzabili a schermo), aggiungendo metodi comuni per centrare e scalare gli oggetti in base allo schermo.
-
-Si è sfruttato il pattern anche per modellare le Door come solo struttura dati, per poi modellare i vari comportamenti mediante metodi esterni. Per questa struttura, si è quindi diviso lo stato dal comportamento. 
-
-...andare avanti
-
-\subsubsection{Strategy}
-Il pattern strategy è stato utilizzato all'interno della logica di update delle strutture dati. Avendo lavorato con strutture dati immutabili, è stato molto utile definire una funzione comune di aggiornamento che accettasse una strategia di aggiornamento piuttosto che il vero aggiornamento, per via delle logiche a volte innestate che ci si è trovati ad affrontare. 
-Un altro momento in cui si è rivelato utile questo pattern è stato all'interno del sistema di gestione delle collisioni, in cui, alla scoperta di una collisione, l'update dell'elemento dipendeva appunto da una strategia variabile. 
-\subsubsection{Adapter}
-Conversion
-
 \subsection{Organizzazione del codice}
 Il codice è stato organizzato in packages. Questi seguono la suddivisione in scene dell'applicativo. Al loro interno, si può ritrovare una suddivisione in Model, View, ViewModel e Componenti.
 Il package Core invece, contiene le parti basilari a cui il resto del sistema fa riferimento.
