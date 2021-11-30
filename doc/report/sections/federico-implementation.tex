@@ -84,24 +84,14 @@ for {
       withStats        <- withPassage.updateStatsAfterCollision(context)
       withMovements    <- withStats.updateMovementAfterCollision
     } yield withMovements
-\end{lstlisting}
+\end{lstlisting} 
 
 \subsubsection{Collisioni}
-Il sistema delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
-Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
+Il sistema di controllo delle collisioni deve gestire un gran numero di combinazioni possibili. 
 Ad esempio, un oggetto in movimento che collide con una roccia verrà spostato il tanto che basta per non intersecarsi, ma non ha ripercussioni dopo il contatto. 
 Se invece un oggetto in movimento collide con uno shot, questo oggetto perderà punti vita, a seconda del tipo di shot. 
 
-Per via del grande numero di combinazioni di collisioni possibili, il sistema delle collisioni fa largo uso di \textbf{strategy} per evitare la duplicazione del codice. 
-
-Il sistema agisce in due momenti distinti: 
-\begin{enumerate}
-  \item In un primo momento viene verificata la collisione tra un elemento e tutti gli altri interni alla stanza. Per ogni collisione viene applicata una funzione all'elemento che corrisponde al side effect.
-  \item In un secondo momento vengono ricontrollate le collisioni e spostati gli elementi di conseguenza. 
-\end{enumerate}
-
-Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
-Questo aspetto, in termini di prestazioni, è largamente migliorabile, ma si rimanda a eventuali sviluppi futuri.
+Per via del grande numero di combinazioni, durante lo sviluppo del sistema si è fatto largo uso di \textbf{strategy} per evitare la duplicazione del codice. 
 
 \subsubsection{Verifica vittoria/sconfitta}
 \begin{itemize}
