@@ -162,7 +162,7 @@ Nella versione finale tuttavia i due tipi interni vengono collegati a dei parame
     \item a nostro avviso è più espressiva per indicare cosa richiede una View
 \end{itemize}
 
-Il pattern \textbf{Family Polymorphism} è stato applicato definendo il tipo astratto \textbf{View} che rappresenta il contenuto grafico da visualizzare attraverso il metodo \textbf{draw}, quest'ultimo richiama il template method \textbf{view} per ottenerlo.
+Il pattern \textbf{Family Polymorphism} è stato applicato definendo il tipo astratto \textit{View} che rappresenta il contenuto grafico da visualizzare attraverso il metodo \textbf{draw}, quest'ultimo richiama il template method \textbf{view} per ottenerlo.
 
 \begin{figure}[!hbt]
     \centering
@@ -170,7 +170,7 @@ Il pattern \textbf{Family Polymorphism} è stato applicato definendo il tipo ast
     \caption{\textit{Gerarchia AnythingView e AnythingViewModel}} 
 \end{figure}
 
-In figura mostriamo l'utilizzo degli \textbf{Union Types} per definire che un ViewModel può non essere richiesto da una View.
+In figura 12 mostriamo l'utilizzo degli \textbf{Union Types} per definire che un ViewModel può non essere richiesto da una View.
 Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il Model di immutabilità e polimorfismo F-Bounded.
 L'esempio concreto di utilizzo in figura riguarda il Character, ma è definito almeno un singleton object View per ciascun Model.
 
