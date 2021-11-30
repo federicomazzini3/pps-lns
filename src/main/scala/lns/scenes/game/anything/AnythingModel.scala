@@ -188,7 +188,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * @return
    *   the speed vector
    */
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2
 
   /**
    * Calculates the speed vector for the current frame that represents how many pixels the Anything has to move in
@@ -223,7 +223,7 @@ trait DynamicModel extends AnythingModel with StatsModel {
    * @return
    *   a Tuple2 representing the computed speed and the moved boundingBox
    */
-  def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
+  protected def computeMove(context: FrameContext[StartupData])(gameContext: GameContext): (Vector2, BoundingBox) =
     val speed: Vector2 = computeSpeed(context)(gameContext)
     speed match {
       case Vector2.zero => (speed, boundingBox)
@@ -365,7 +365,7 @@ trait FireModel extends AnythingModel with StatsModel {
    * @return
    *   Optional direction vector
    */
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]]
+  protected def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]]
 
   /**
    * Create a new ShotEvent capable of being captured by the game model during game loop on every frame
@@ -374,7 +374,7 @@ trait FireModel extends AnythingModel with StatsModel {
    * @return
    *   ShotEvent
    */
-  def createEvent(direction: Vector2): ShotEvent =
+  private def createEvent(direction: Vector2): ShotEvent =
     ShotEvent(
       ShotModel(
         id,

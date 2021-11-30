@@ -14,7 +14,7 @@ import lns.scenes.game.stats.PropertyName.*
  *   Tuple to specify the min and max distance from the character to keep
  */
 trait KeepsAway { this: EnemyModel with DynamicModel =>
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     status.head match {
       case (EnemyState.Idle, _, _) => Vector2.zero
       case _ =>

@@ -33,7 +33,7 @@ case class MyFireModel(
   def withFire(fireRateTimer: Double, shots: Option[List[Vector2]]): MyFireModel = copyMacro
   def withStats(stats: Stats): Model                                             = copyMacro
 
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext) = fireDirection
+  protected def computeFire(context: FrameContext[StartupData])(gameContext: GameContext) = fireDirection
 }
 
 trait FireModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>

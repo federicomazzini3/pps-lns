@@ -19,7 +19,7 @@ import lns.scenes.game.dungeon.GeneratorHelper as GenHelper
 import lns.scenes.game.room.{ ArenaRoom, BossRoom, RoomModel, RoomView, * }
 import lns.scenes.game.room.RoomView.*
 import lns.scenes.game.characters.*
-import lns.scenes.game.enemies.PrologModel
+import lns.scenes.game.enemies.PrologEnemyModel
 import lns.scenes.game.shots.*
 import lns.subsystems.prolog.PrologEvent
 import lns.scenes.game.subsystems.{ BattleEventSubSystems, Dead, Hit, ResetSubsystem }
@@ -114,8 +114,9 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
         case model @ GameModel.Started(_, dungeon, roomIndex, character) =>
           model.updateEachAnythings { anything =>
             anything match {
-              case anything: PrologModel if anything.prologClient.hasQuery(queryId) => anything.behaviour(substitution)
-              case _                                                                => Outcome(anything)
+              case anything: PrologEnemyModel if anything.prologClient.hasQuery(queryId) =>
+                anything.behaviour(substitution)
+              case _ => Outcome(anything)
             }
           }
         case _ => model

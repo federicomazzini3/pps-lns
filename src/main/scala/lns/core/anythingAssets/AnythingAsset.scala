@@ -53,16 +53,16 @@ trait AnythingAsset {
    * @return
    *   size of the scaled asset
    */
-  def withScale: Double => Double = (size: Double) => size * scale
+  private def withScale: Double => Double = (size: Double) => size * scale
 
   /**
-   * Method to screate default Sprite animation
+   * Method to create default Sprite animation
    * @param name
    *   the name of animation
    * @return
    *   Sprite
    */
-  def spriteAnimation(name: String): Sprite[Material.Bitmap] =
+  protected def spriteAnimation(name: String): Sprite[Material.Bitmap] =
     Sprite(BindingKey(name + "_sprite"), 0, 0, 1, AnimationKey(name), Material.Bitmap(asset))
 
   /**
@@ -70,7 +70,7 @@ trait AnythingAsset {
    * @return
    *   Shape
    */
-  def boudingView: Shape =
+  protected def boudingView: Shape =
     Shape.Box(
       Rectangle(Point(0, 0), Size(width, height - offsetY)),
       Fill.Color(RGBA(1, 1, 1, 0.5))
@@ -81,7 +81,7 @@ trait AnythingAsset {
    * @return
    *   Shape
    */
-  def shadowView: Shape = Shape
+  protected def shadowView: Shape = Shape
     .Circle(
       center = Point(width / 2, height + width / 4),
       radius = width / 3,
@@ -97,7 +97,7 @@ trait AnythingAsset {
    * @return
    *   Group
    */
-  def drawComponents(components: List[SceneNode]): Group =
+  protected def drawComponents(components: List[SceneNode]): Group =
     Group()
       // .addChild(boudingView)
       .addChild(

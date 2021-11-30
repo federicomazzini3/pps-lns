@@ -15,8 +15,8 @@ import scala.language.implicitConversions
  * @tparam name
  *   of prolog asset file
  */
-trait PrologModel(name: String) extends EnemyModel {
-  type Model >: this.type <: PrologModel
+trait PrologEnemyModel(name: String) extends EnemyModel {
+  type Model >: this.type <: PrologEnemyModel
 
   val prologClient: PrologClient
 
@@ -31,7 +31,7 @@ trait PrologModel(name: String) extends EnemyModel {
    * @return
    *   String: Prolog goal
    */
-  def goal(context: FrameContext[StartupData])(gameContext: GameContext): String
+  protected def goal(context: FrameContext[StartupData])(gameContext: GameContext): String
 
   /**
    * Method must to be overridden to implements model behaviour
@@ -51,7 +51,7 @@ trait PrologModel(name: String) extends EnemyModel {
    * @return
    *   the Outcome of the updated model
    */
-  def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+  protected def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
     prologClient
       .consult(
         context.startUpData.getPrologFile(name).get,

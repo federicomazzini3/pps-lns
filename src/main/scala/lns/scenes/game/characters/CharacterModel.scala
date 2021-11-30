@@ -83,7 +83,7 @@ case class CharacterModel(
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
   def withStats(stats: Stats): Model                                                           = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     context.inputState.mapInputs(moveInputMappings, Vector2.zero)
 
   val fireInputMappings: InputMapping[List[Vector2]] =
@@ -94,7 +94,9 @@ case class CharacterModel(
       Combo.withKeyInputs(Key.LEFT_ARROW)  -> List(Vector2(-1, 0))
     )
 
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+  protected def computeFire(context: FrameContext[StartupData])(
+      gameContext: GameContext
+  ): Option[List[Vector2]] =
     context.inputState.mapInputsOption(fireInputMappings)
 }
 

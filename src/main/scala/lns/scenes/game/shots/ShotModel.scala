@@ -72,12 +72,12 @@ case class ShotModel(
   def withRange(range: Double): Model                                                          = copyMacro
   def withSolid(crossable: Boolean): Model                                                     = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = range match {
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 = range match {
     case 0 => Vector2.zero
     case _ => direction.normalise * MaxSpeed @@ stats
   }
 
-  override def limitMove(move: Vector2): Vector2 = range < move.length match {
+  override protected def limitMove(move: Vector2): Vector2 = range < move.length match {
     case true => move.normalise * range
     case _    => move
   }

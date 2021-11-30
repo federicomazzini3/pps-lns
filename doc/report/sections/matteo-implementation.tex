@@ -3,7 +3,7 @@ Durante il corso del progetto mi sono occupato di studiare ed implementare:
 \begin{itemize}
 	\item Rappresentazione grafica degli Anythings tramite Asset ed animazioni
     \item Definizione del FireModel e ShotModel per la gestione dei proiettili
-    \item Gestione delle statistiche degli Anithing
+    \item Gestione delle statistiche degli Anythings
     \item Character controllato dal giocatore
     \item Boss, PrologModel e definizione del suo comportamento tramite Prolog
     \item Item che il Character può raccogliere per modificare le proprie statistiche
@@ -16,8 +16,8 @@ ma anche dalla \textbf{View} per la sua rappresentazione a schermo e, quando nec
 
 Durante l'implementazione si è resa necessaria una buona organizzazione del codice per seguire i principi DRY 
 e definire coerentemente come debba essere realizzata una View, la quale dipende sempre da Asset grafici 
-ed, in alcune situazioni, anche da animazioni, separando il \textit{cosa} disegnare dal \textit{come}, 
-in modo tale da realizzare diversi Tratti per lo stesso oggetto senza mai replicare il codice in comune.
+ed, in alcune situazioni, anche da animazioni. In questo modo viene separato il \textit{cosa} disegnare dal \textit{come}, 
+in modo tale da realizzare diversi trait per lo stesso oggetto senza mai replicare il codice in comune.
 
 Questa organizzazione ci ha permesso di generare velocemente le specifiche View per Character, Enemies, Bosses, Items and Elements.
 

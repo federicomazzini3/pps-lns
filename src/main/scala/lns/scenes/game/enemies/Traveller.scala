@@ -25,14 +25,14 @@ trait Traveller extends DynamicModel { this: EnemyModel =>
 
   def withTraveller(path: Queue[Vector2]): Model
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
     status.head match {
       case (EnemyState.Attacking | EnemyState.Defending, _, _) if path.nonEmpty =>
         (path.head - getPosition()).normalise * MaxSpeed @@ stats
       case _ => Vector2.zero
     }
 
-  override def limitMove(move: Vector2): Vector2 =
+  override protected def limitMove(move: Vector2): Vector2 =
     val distance = path.head.distanceTo(getPosition());
     distance < move.length match {
       case true => move.normalise * distance

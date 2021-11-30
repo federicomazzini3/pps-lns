@@ -9,7 +9,7 @@ import lns.scenes.game.anything.{ AnythingModel, FireModel }
  * Pure mixin to specify a computeFire mode that continuously shot to the character position
  */
 trait FiresContinuously { this: EnemyModel with FireModel =>
-  def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+  protected def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
     status.head match {
       case (EnemyState.Attacking, _, _) => Some(List((gameContext.character.getPosition() - getPosition()).normalise))
       case _                            => None

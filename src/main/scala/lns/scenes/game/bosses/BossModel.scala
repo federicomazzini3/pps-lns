@@ -52,7 +52,7 @@ import scala.language.implicitConversions
  * @param path
  *   [[Traveller]] path, default Queue.empty
  * @param prologClient
- *   [[PrologModel]] default prologClient
+ *   [[PrologEnemyModel]] default prologClient
  */
 case class BossModel(
     id: AnythingId,
@@ -70,10 +70,9 @@ case class BossModel(
     shots: Option[List[Vector2]] = None,
     path: Queue[Vector2] = Queue.empty,
     prologClient: PrologClient = PrologClient()
-) extends EnemyModel
-    with Traveller
+) extends PrologEnemyModel("loki")
     with FireModel
-    with PrologModel("loki") {
+    with Traveller {
 
   type Model = BossModel
 
@@ -92,7 +91,7 @@ case class BossModel(
   /**
    * Builds boss info for goal
    */
-  def bossInfo: String =
+  private def bossInfo: String =
     val x: Int = Assets.Rooms.positionToCell(getPosition().x)
     val y: Int = Assets.Rooms.positionToCell(getPosition().y)
     "boss(" + x + "," + y + "," + life + "," + MaxLife @@ stats + ")"
@@ -101,7 +100,7 @@ case class BossModel(
    * Builds character info for goal based on current gameContext
    * @param [[GameContext]]
    */
-  def characterInfo(gameContext: GameContext): String =
+  private def characterInfo(gameContext: GameContext): String =
     val x: Int = Assets.Rooms.positionToCell(gameContext.character.getPosition().x)
     val y: Int = Assets.Rooms.positionToCell(gameContext.character.getPosition().y)
     "character(" + x + "," + y + "," + gameContext.character.life + "," + MaxLife @@ gameContext.character.stats + ")"
@@ -109,7 +108,7 @@ case class BossModel(
   /**
    * Builds room size info for goal
    */
-  def roomInfo: String =
+  private def roomInfo: String =
     val size: Int = Assets.Rooms.floorSize / Assets.Rooms.cellSize
     "room(" + size + "," + size + ")"
 
@@ -117,7 +116,7 @@ case class BossModel(
    * Builds blocks info for goal based on current gameContext: a list of all stone insede room
    * @param [[GameContext]]
    */
-  def blocksInfo(gameContext: GameContext): String =
+  private def blocksInfo(gameContext: GameContext): String =
     gameContext.room.anythings
       .collect { case (_, stone: ElementModel) =>
         stone
@@ -133,7 +132,7 @@ case class BossModel(
    * Builds the goal string for the prolog example:
    * behaviour(boss(1,1,4,10),character(1,4,10,10),room(9,9),[block(5,5),block(5,6)], Action).
    */
-  override def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
+  protected def goal(context: FrameContext[StartupData])(gameContext: GameContext): String =
     "behaviour(" +
       bossInfo + "," +
       characterInfo(gameContext) + "," +
@@ -151,7 +150,7 @@ case class BossModel(
    * @return
    *   the Outcome of the updated model
    */
-  def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[EnemyAction]): Outcome[Model] =
+  private def behaviourOutcome(state: EnemyState, timer: Timer, option: Option[EnemyAction]): Outcome[Model] =
     Outcome(this.withStatus((state, timer, option) +: (EnemyState.Idle, 0.0, None)))
 
   /**
@@ -161,7 +160,7 @@ case class BossModel(
    * @return
    *   the Outcome of the updated model
    */
-  override def behaviour(response: Substitution): Outcome[Model] =
+  def behaviour(response: Substitution): Outcome[Model] =
     response.links("Action") match {
       case Struct(Atom("attack1"), Atom(direction)) =>
         behaviourOutcome(EnemyState.Attacking, FireRate @@ stats, Some(AttackAction("attack1", Some(direction))))
@@ -184,7 +183,7 @@ case class BossModel(
       case _ => Outcome(this)
     }
 
-  override def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
+  protected def computeFire(context: FrameContext[StartupData])(gameContext: GameContext): Option[List[Vector2]] =
     status.head match {
       case (EnemyState.Attacking, _, Some(AttackAction("attack1", Some(direction)))) =>
         direction match {

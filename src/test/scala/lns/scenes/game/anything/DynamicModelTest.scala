@@ -27,7 +27,7 @@ case class MyDynamicModel(
   def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): MyDynamicModel = copyMacro
   def withStats(stats: Stats): Model                                                                    = copyMacro
 
-  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext) = nextSpeed
+  protected def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext) = nextSpeed
 }
 
 trait DynamicModelFixture extends ContextFixture with BeforeAndAfterEach { this: Suite =>
