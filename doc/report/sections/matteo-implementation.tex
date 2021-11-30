@@ -20,7 +20,7 @@ Facciamo un esempio:
 Il CharacterModel, viene rappresentato a schermo dalla sua relativa CharacterView e CharacterViewModel 
 che estendono relativamente da AnythingView ed AnythingViewModel
 
-La CharacterView definisce solo la funzione di "disegno" che sfrutta il metodo drawComponents di AnithingAsset 
+La CharacterView definisce solo la funzione di "disegno" che sfrutta il metodo drawComponents di AnythingAsset 
 e viene mixata con il tipo di carattere che si vuole disegnare a schermo, in questo caso Isaac.
 Il trait Isaac estende IsaacAsset per definire come disegnare ogni singolo componente a schermo.
 A sua volta il trait IsaacAsset è quello che estende il trait base AnythingAsset 
@@ -103,8 +103,8 @@ case class CharacterModel(...) extends AliveModel
 }
 \end{lstlisting}
 
-\subsubsection{Gestione delle statistiche degli Anithing}
-Si è realizzato il trait \textbf{StatsModel} da mixare con un qualsiasi Anithing 
+\subsubsection{Gestione delle statistiche degli Anything}
+Si è realizzato il trait \textbf{StatsModel} da mixare con un qualsiasi Anything 
 per gestire l'aggiornamento di queste caratteristiche nell'ambito dell'immutabilità.
 
 Il metodo "sumStat" è l'unico utilizzato realmente all'interno del gioco e permette di 
