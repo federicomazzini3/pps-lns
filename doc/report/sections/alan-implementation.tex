@@ -171,7 +171,7 @@ Per quanto riguarda il mini framework per lo sviluppo di nemici ho applicato il 
 extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
 \end{lstlisting} 
 
-Circa i comportomenti dei nemici, ho impiegato i \textbf{Self-types} anzichè ereditare realizzando così dei mixin "puri" in modo da esprimere il concetto che sono delle strategie "aggiuntive" da utilizzare durante lo sviluppo di un nemico
+Circa i comportomenti dei nemici, mostro qui un esempio dell'impiego dei \textbf{Self-types} per evitare di estendere da EnemyModel
 \begin{lstlisting}[language=Scala]
 trait Follower { this: EnemyModel with DynamicModel =>
   def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =

@@ -88,7 +88,7 @@ Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma 
 
 \subsubsection{Nemici}
 
-Per quanto riguarda i nemici abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
+Abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
 A tale scopo un EnemyModel dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
 Sono stati definiti dei comportamenti mixabili elementari come:
 \begin{itemize}
@@ -98,12 +98,14 @@ Sono stati definiti dei comportamenti mixabili elementari come:
     \item Traveller: un nemico che segue un percorso indicato da una sequenza di punti
 \end{itemize}
 
-Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model
+Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types} anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti.
+
+Di seguito in figura 10 mostriamo come sono stati definiti i nemici a livello di Model.
 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.5]{Enemies.jpg}
-    \caption{\textit{Gerarchia Enemies}} 
+    \caption{\textit{Gerarchia Enemies}}
 \end{figure}
 
 \subsection{AnythingView e AnythingViewModel}

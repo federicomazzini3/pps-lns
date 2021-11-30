@@ -39959,6 +39959,20 @@
 							"propertyLabel": {
 								"$ref": "AAAAAAF9beEcoMcbH/k="
 							}
+						},
+						{
+							"_type": "UMLNoteView",
+							"_id": "AAAAAAF9cBhO/Rq8j9c=",
+							"_parent": {
+								"$ref": "AAAAAAF9bYWJUh0VgdQ="
+							},
+							"fillColor": "#d8f2ff",
+							"font": "Arial;13;0",
+							"left": 600,
+							"top": 900,
+							"width": 295,
+							"height": 51,
+							"text": "In azzurro sono i trait da usare come mixin che richiedono come dipendenza EnemyModel tramite meccanismo dei Self-types"
 						}
 					]
 				},
