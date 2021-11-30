@@ -68,7 +68,7 @@ I sottotipi principali sono:
 
 Molti oggetti all'interno del gioco hanno delle caratteristiche che ne influenzano il comportamento: 
 punti vita, tempo invulnerabilità dopo essere stato colpito, velocità di movimento, rate dello sparo, danno dei proiettili, velocità dei proiettili, range dei proiettili. 
-Di conseguenza tutti i principali sottotipi elencati, tranne il SolidModel, vengono mixati con lo \textbf{StatsModel} al quale è delegata la gestione di queste caratteristiche: le Stats sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
+Di conseguenza tutti i principali sottotipi elencati, tranne il SolidModel, vengono mixati con \textbf{StatsModel} al quale è delegata la gestione di queste caratteristiche: le Stats sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
 
 Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale: abbiamo riportato evidenziati in giallo alcuni utilizzatori concreti.
 
@@ -80,8 +80,8 @@ Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel c
 
 \subsubsection{Update e immutabilità}
 
-Ogni metodo che applica modifica al Model, a partire da update che viene richiamata ad ogni iterazione del game loop, deve ritornare una \textbf{copia aggiornata} dello stesso e del \textbf{tipo corrente}: adottiamo il pattern \textbf{F-Bounded Polymorphism con type-member}. 
-Allo scopo predisponiamo un type member astratto Model e per ogni trait un template method with***(...) che accetta come argomenti quelli da modificare e ritorna un nuovo oggetto aggiornato di tipo Model: entrambi da definire nella classe finale che mixa il trait.
+Ogni metodo che applica modifiche ad un Model, a partire da \textit{update} che viene richiamata ad ogni iterazione del game loop, deve ritornare una \textbf{copia aggiornata} dello stesso e del \textbf{tipo corrente}: adottiamo il pattern \textbf{F-Bounded Polymorphism con type-member}. 
+Allo scopo predisponiamo un type member astratto \textbf{Model} e, per ogni trait sottotipo di AnythingModel, un template method come with*Comportamento*(...) che accetti come argomenti quelli da modificare e ritorni un nuovo oggetto aggiornato di tipo \textit{Model}: entrambi da definire nella classe finale che mixa il trait.
 E' richiesto che il metodo update richiami super.update in modo da propagare l'aggiornamento a tutti i trait mixati.
 \textit{Si rimanda all'implementazione per il dettaglio di come il pattern viene applicato con Scala.}
 
