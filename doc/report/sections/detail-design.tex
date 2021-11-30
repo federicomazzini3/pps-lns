@@ -1,5 +1,4 @@
 \section{Design di dettaglio}
-Design di dettaglio (scelte rilevanti, pattern di progettazione, organizzazione del codice -- corredato da pochi ma efficaci diagrammi)
 Di seguito verranno analizzate le scelte di design rilevanti per il sistema, i pattern di progettazione utilizzati e l'organizzazione del codice. 
 \subsection{GameModel}
 L'intero modello di gioco, dallo stato al comportamento, è incapsulato all'interno della struttura GameModel. E' possibile identificare due diverse accezioni del modello, a seconda del momento di gioco. 
@@ -9,7 +8,7 @@ Nel primo momento, a partita non avviata, è necessario generare il dungeon e le
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.44]{GameModelClassDiagram.jpg}
-    \caption{\textit{Game model class diagram (da modificare con versione pro di staruml)}} 
+    \caption{\textit{Game model class diagram}} 
 \end{figure}
 Il modello di gioco rappresenta un'istantanea delle varie componenti che lo compongono in un determinato momento. 
 Ogni modifica al modello consiste nella creazione di un nuovo modello con il componente aggiornato. 
@@ -21,7 +20,7 @@ La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.49]{DungeonClassDiagram.jpg}
-    \caption{\textit{Dungeon class diagram(da modificare con versione pro di staruml)}} 
+    \caption{\textit{Dungeon class diagram}} 
 \end{figure}
 
 Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
@@ -38,7 +37,7 @@ Ogni stanza incapsula al suo interno gli elementi che sono rilegati all'interno 
 \begin{figure}[!hbt]
     \centering
     \includegraphics[scale=0.5]{RoomClassDiagram.jpg}
-    \caption{\textit{Room class diagram(da modificare con versione pro di staruml)}} 
+    \caption{\textit{Room class diagram}} 
 \end{figure}
 
 Una stanza è anche responsabile dell'aggiornamento di tutto ciò che incapsula. Anche in questo caso si cerca di lavorare con strutture dati immutabili, perciò l'aggiornamento di uno o più componenti consegue una nuova stanza aggiornata. 
