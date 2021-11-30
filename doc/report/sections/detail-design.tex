@@ -69,7 +69,7 @@ I sottotipi principali sono:
 
 Questi tratti possono richiedere delle Stats per ottenere dei parametri al loro funzionamento (ad esempio la velocità massima da applicare ad uno spostamento): le Stats se richieste sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
 
-Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale.
+Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale: abbiamo riportato evidenziati in giallo alcuni utilizzatori concreti.
 
 \begin{figure}[!hbt]
     \centering
@@ -174,6 +174,24 @@ Il controllo è eseguito in due momenti distinti:
 Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
 Questo aspetto, in termini di prestazioni, è largamente migliorabile, ma si rimanda a eventuali sviluppi futuri.
 
+\subsection{PrologService e Client}
+Nel progettare il PrologService abbiamo considerato che:
+\begin{itemize}
+    \item come servizio prolog deve accettare richieste dal gioco e restituire risposte sotto forma di eventi con payload
+    \item deve comunicare con TauProlog in modo asincrono
+    \item deve fornire al gioco un livello di astrazione da TauProlog: non vogliamo che il gioco riceva risposte con termini Tau
+    \item non deve essere concepito specificamente per TauProlog ma per un qualsiasi altro engine asincrono.
+\end{itemize}   
+
+Da queste considerazioni abbiamo definito un nostro insieme di Prolog Term ed abbiamo pensato PrologService in modo da interfacciarsi con un oggetto di tipo AsyncSession di cui TauClient è sottotipo concreto: quest'ultimo è il punto di contatto con TauProlog e si occupa di tradurre i TauTerm in Term.
+
+Infine per facilitare l'utilizzo del Prolog da parte del gioco abbiamo predisposto PrologClient che emette comandi intercettati per il PrologService: questo è predisposto per essere memorizzato nei Model e quindi ad ogni comando produce una copia di se stesso wrappata nella monade Outcome.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.45]{PrologService.jpg}
+    \caption{\textit{PrologService, Gerarchia Term e PrologClient}} 
+\end{figure}
 
 \subsection{Pattern di progettazione}
 Di seguito si elencano brevemente i pattern di progettazione utilizzati. 
