@@ -54,5 +54,5 @@ jobs:
         server: meblabs.com
         username: ${{ secrets.ftp_admin }}
         password: ${{ secrets.ftp_psw }}
-        local-dir: ./target/indigoBuild/
+        local-dir: ./target/indigoBuildFull/
         dangerous-clean-slate: true
