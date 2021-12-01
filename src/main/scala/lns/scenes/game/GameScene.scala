@@ -179,8 +179,8 @@ final case class GameScene(screenDimensions: Rectangle) extends EmptyScene {
               List(HUDView.draw(context, character), MapView.draw(context, dungeon, room))
             )
           )
-
-      case _ => DungeonLoadingView(context.startUpData)
+      case (model @ GameModel.Started(_, dungeon, _, _), _) => DungeonLoadingView(context.startUpData, model.dungeon)
+      case _                                                => DungeonLoadingView(context.startUpData)
     }
 }
 
