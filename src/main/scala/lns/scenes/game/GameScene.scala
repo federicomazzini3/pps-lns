@@ -196,23 +196,3 @@ extension (group: Group) {
       .withRef(edge / 2, edge / 2)
       .moveTo(context.startUpData.screenDimensions.center)
 }
-
-/*object EndView {
-
-  def draw(context: FrameContext[StartupData], model: GameModel.Started): Group =
-    def message = model match {
-      case m if model.character.life == 0 => "GAME OVER"
-    }
-    Group()
-      .addChild(
-        Text(
-          message,
-          context.startUpData.screenDimensions.horizontalCenter,
-          context.startUpData.screenDimensions.verticalCenter,
-          1,
-          Assets.Fonts.fontKey,
-          Assets.Fonts.fontMaterial
-        ).alignCenter
-      )
-
-}*/

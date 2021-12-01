@@ -4,9 +4,12 @@ import indigo.*
 import indigo.scenes.*
 import indigo.scenes.SceneEvent.JumpTo
 import indigo.shared.events.FrameTick
+import indigo.shared.scenegraph.Text
 import lns.StartupData
-import lns.core.{ EmptyScene, Model, ViewModel }
+import lns.core.{ Assets, EmptyScene, Model, ViewModel }
 import lns.scenes.loading.LoadingScene
+import lns.scenes.game.|+|
+
 import scala.language.implicitConversions
 
 case object StartEvent extends GlobalEvent
@@ -50,5 +53,25 @@ final case class MenuScene() extends EmptyScene {
       model: SceneModel,
       viewModel: SceneViewModel
   ): Outcome[SceneUpdateFragment] =
-    SceneUpdateFragment(viewModel.button.draw)
+    SceneUpdateFragment(
+      Group(viewModel.button.draw) |+| Group(
+        Text(
+          "use A-W-S-D to move and arrow keys to shot",
+          context.startUpData.screenDimensions.horizontalCenter,
+          context.startUpData.screenDimensions.height / 4 * 3,
+          1,
+          Assets.Fonts.fontKey,
+          Assets.Fonts.fontMaterial
+        ).alignCenter.withScale(Vector2(2, 2))
+      ) |+| Group(
+        Text(
+          "Lost n Souls",
+          context.startUpData.screenDimensions.horizontalCenter,
+          context.startUpData.screenDimensions.height / 5,
+          1,
+          Assets.Fonts.fontKey,
+          Assets.Fonts.fontMaterial
+        ).alignCenter.withScale(Vector2(8, 8))
+      )
+    )
 }
