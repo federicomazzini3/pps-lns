@@ -1,2 +1,261 @@
 \section{Design di dettaglio}
-Design di dettaglio (scelte rilevanti, pattern di progettazione, organizzazione del codice -- corredato da pochi ma efficaci diagrammi)
+Di seguito verranno analizzate le scelte di design rilevanti per il sistema, i pattern di progettazione utilizzati e l'organizzazione del codice. 
+\subsection{GameModel}
+L'intero modello di gioco, dallo stato al comportamento, è incapsulato all'interno della struttura GameModel. E' possibile identificare due diverse accezioni del modello, a seconda del momento di gioco. 
+Un momento in cui la partita non è ancora stata avviata e un momento successivo in cui invece la partita è avviata.
+Nel primo momento, a partita non avviata, è necessario generare il dungeon e le stanze che lo compongono. 
+Nel secondo momento, una volta che è avvenuta la generazione, il modello è costituito da un Dungeon composto da diverse stanze e dal character controllato dal giocatore. 
+
+Il GameModel, nel caso di partita avviata, è dotato di metodi per aggiornare le sue varie componenti: il character, il dungeon, la stanza corrente e tutti gli Anything interni. 
+Trattandosi di una struttura dati immutabile, aggiornare il modello significa creare un nuovo modello aggiornato. Per situazioni complesse, come il sistema di controllo collisioni e il sistema che verifica e gestisce il passaggio del character da una stanza all'altra, il GameModel sfrutta moduli separati, definiti \textit{PassageUpdater e CollisionUpdater}
+
+Una scelta rilevante ai fini dell'implementazione è il fatto che, a livello di modello, il character controllato dal giocatore è sempre fuori dalla stanza in cui si trova, in questo modo è possibile aggiornare in maniera indipendente le due componenti.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.56]{GameModelClassDiagram.jpg}
+    \caption{\textit{Diagramma delle classi del Game Model e componenti rilevanti}} 
+\end{figure}
+
+\newpage
+\subsection{Dungeon}
+Il dungeon è composto da stanze disposte in maniera randomica ma collegate tra loro. 
+La struttura Grid è ciò che descrive un Dungeon nella sua forma più basilare e geometrica e offre delle operazioni per esplorarlo. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.49]{DungeonClassDiagram.jpg}
+    \caption{\textit{Diagramma delle classi del Dungeon}} 
+\end{figure}
+
+Grid definisce quindi una collezione di stanze, di tipo ancora non definito, in una specifica posizione all'interno di una griglia di dimensioni \textit{n}X\textit{n}. La definizione del tipo Room è lasciato alle specializzazioni di Grid, si mette quindi in pratica il pattern \textbf{Family Polimorfism}.
+
+All'interno della griglia, un elemento potrebbe o non potrebbe essere presente, andando così a definire un dungeon con stanze in posizioni diverse. 
+E' necessario perciò lavorare con strutture dati che consentano l'assenza di un dato.
+
+Il Dungeon vero e proprio prende forma quando il tipo Room viene definito con un modello consono a descriverne lo stato e il comportamento. 
+
+\subsection{Room}
+Come da requisiti, una stanza è la componente principale del Dungeon e può essere di diversi tipi: Empty, Arena, Item e Boss. 
+Ogni stanza incapsula una collezione di elementi (Anything), i quali sono propri di essa e non possono muoversi all'interno del Dungeon, come ad esempio i nemici o gli elementi bloccanti. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{RoomClassDiagram.jpg}
+    \caption{\textit{Diagramma delle classi Room}} 
+\end{figure}
+
+Una stanza è anche responsabile dell'aggiornamento di tutto ciò che incapsula. Anche in questo caso si cerca di lavorare con strutture dati immutabili, perciò l'aggiornamento di uno o più componenti consegue una nuova stanza aggiornata. 
+L'aggiornamento viene fatto ad ogni FrameTick ed è comandato dal dungeon, solamente per la stanza correntemente visualizzata, le altre stanze non sono aggiornate o gestite.  
+
+\newpage
+\subsubsection{Door}
+Un dettaglio importante di una stanza sono le porte. Una porta, per l'utente, rappresenta il collegamento tra una stanza e un altra, ma a livello di dominio sono semplicemente l'associazione di un lato della stanza con uno stato \textit{open, closed, locked}. 
+
+Una porta è quindi un elemento statico di una stanza e non un link. E' il Dungeon a gestire il collegamento tra le varie stanze in base alla loro posizione occupata in griglia. 
+
+Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestito dal Dungeon. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{DoorClassDiagram.jpg}
+    \caption{\textit{Diagramma delle classi Door}} 
+\end{figure}
+
+\newpage
+\subsection{AnythingModel}
+In generale ogni oggetto in gioco contiene un identificativo univoco e una bounding box che ne determina posizione e dimensioni 2D, inoltre ad ogni istanza è associata la factory per la sua View in modo tale che, quando una collezione di AnythingModel viene renderizzata, è sufficiente creare la View e chiamare il metodo draw. 
+
+Ogni oggetto inoltre reagisce alla richiesta di update che avviene ad ogni iterazione del game loop, ma il modo con cui lo fa dipende da specifici comportamenti definiti come sottotipi mixabili di AnythingModel.
+
+I sottotipi principali sono:
+\begin{itemize}
+    \item \textbf{DynamicModel} un oggetto in grado di spostarsi autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing attraverso l'implementazione di alcuni template-method predisposti
+    \item \textbf{AliveModel} un oggetto vivo che può essere colpito perdendo vita. Non ha comportamento autonomo.
+    \item \textbf{DamageModel} un oggetto che provoca danno di contatto. Non ha comportamento autonomo.
+    \item \textbf{FireModel} un oggetto in grado di sparare autonomamente durante un update, dove e come viene stabilito dalla classe che esegue il mixing attraverso l'implementazione di alcuni template-method predisposti. Durante l'update può emettere uno ShotEvent contenente ShotModel
+    \item \textbf{SolidModel} un oggetto solido che non può essere fisicamente attraversato da un altro. Non ha comportamento autonomo.
+\end{itemize}
+
+Molti oggetti all'interno del gioco hanno delle caratteristiche che ne influenzano il comportamento: 
+punti vita, tempo invulnerabilità dopo essere stato colpito, velocità di movimento, rate dello sparo, danno dei proiettili, velocità dei proiettili, range dei proiettili. 
+Di conseguenza tutti i principali sottotipi elencati, tranne il SolidModel, vengono mixati con \textbf{StatsModel} al quale è delegata la gestione di queste caratteristiche: le Stats sono assegnate durante l'istanzazione di un Model ma possono cambiare durante il gioco.
+
+Di seguito in figura 10 mostriamo un estratto della gerarchia di AnythingModel con tutti i sottotipi che aggiungono proprietà e comportamenti al Model di base e che possono essere estesi o mixati da un Model finale: abbiamo riportato evidenziati in giallo alcuni utilizzatori concreti.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{AnythingModel.jpg}
+    \caption{\textit{Gerarchia AnythingModel - in giallo alcuni utilizzi concreti}} 
+\end{figure}
+
+\subsubsection{Update e immutabilità}
+
+Ogni metodo che applica modifiche ad un Model, a partire da \textit{update} che viene richiamata ad ogni iterazione del game loop, deve ritornare una \textbf{copia aggiornata} dello stesso e del \textbf{tipo corrente}: adottiamo il pattern \textbf{F-Bounded Polymorphism con type-member}. 
+Allo scopo predisponiamo un type member astratto \textit{Model} e, per ogni trait sottotipo di AnythingModel, un template method come with*Comportamento*(...) che accetti come argomenti quelli da modificare e ritorni un nuovo oggetto aggiornato di tipo \textit{Model}: entrambi da definire nella classe finale che mixa il trait.
+E' richiesto che il metodo update richiami super.update in modo da propagare l'aggiornamento a tutti i trait mixati.
+\textit{Si rimanda all'implementazione per il dettaglio di come il pattern viene applicato con Scala.}
+
+Per concludere, il metodo update riceve in input, oltre al FrameContext di Indigo, il \textbf{GameContext} che contiene lo stato della stanza corrente e il CharacterModel in modo da permettere all'oggetto in gioco comportamenti che si adattano alla situazione.
+
+\paragraph{Nota} Sebbene una soluzione consigliata in sostituzione al polimorfismo F-Bounded è quella di impiegare polimorfismo ad-hoc con typeclass, abbiamo riscontrato che nel nostro caso volendo mantenere il mixing degli oggetti questo pattern non è facilmente applicabile e avrebbe generato più boilerplate code.
+
+\paragraph{Nota}
+Abbiamo deciso di inglobare il comportamento nei Model con il metodo update, ma un alternativa forse migliore e più semplice era delegarlo a sistemi esterni, i quali si sarebbero occupati ad esempio di spostare gli oggetti, farli sparare, etc: in questo progetto abbiamo cercato di emulare un modello ad agenti, oltre che garantirci la massima possibilità di personalizzazione del comportamento soprattutto per quanto riguarda i nemici. 
+
+\subsubsection{Gestione degli spari}
+Riguardo a \textbf{FireModel} e agli spari \textbf{ShotModel} occorre specificare che:
+\begin{itemize}
+    \item possono essere sparati più colpi ShotModel contemporaneamente in direzioni diverse
+    \item tra un colpo e l'altro deve trascorrere del tempo in base alla Stats "rate dello sparo"
+    \item occorre generare il colpo a certo un offset rispetto alla posizione del oggetto che sta separando
+    \item occorre specificare una ShotView factory da passare allo ShotModel, infatti in questo caso sono disponibili più View da utilizzare
+\end{itemize}
+
+FireModel durante un update genera l'evento \textbf{ShotEvent} indicando le proprietà dello ShotModel da istanziare (tra cui velocità e danno) ed inserendolo nella monade Outcome di ritorno: verrà gestito nell'iterazione successiva del game loop e aggiunto al RoomModel.
+
+Gli ShotModel sono oggetti che a loro volta mixano alcuni dei principali sottotipi Anything: 
+\begin{itemize}
+	\item DynamicModel per gestire il movimento ed il suo range massimo
+	\item AliveModel in quanto ha una vita fittizia che viene azzerata dopo una collisione o se ha termitato il range 
+	\item SolidModel per gestire le collisioni
+	\item DamageModel per arrecare danno contro cui avviene una eventuale collisione.
+\end{itemize}
+
+\subsubsection{Mini framework per i nemici}
+
+Abbiamo pensato ad un mini framework che consenta la creazione rapida di nuovi nemici in modo da soddisfare i requisiti di possibili future espansioni.
+Al centro abbiamo \textbf{EnemyModel}, il quale dispone di una coda di stati temporizzati che vengono processati uno dopo l'altro: questo permette la realizzazione di nemici che eseguono una sequenza di azioni.
+
+Sono stati definiti dei comportamenti mixabili elementari come:
+\begin{itemize}
+    \item \textbf{Follower}: un nemico che insegue il character
+    \item \textbf{FiresContinuosly}: un nemico che spara in continuazione nella direzione del character
+    \item \textbf{KeepsAway}: un nemico che si mantiene a distanza dal giocatore
+    \item \textbf{Traveller}: un nemico che segue un percorso indicato da una sequenza di punti
+\end{itemize}
+
+Abbiamo pensato di esprimerli come strategie da ri-utilizzare, quindi come mixin puri mediante il meccanismo dei \textbf{Self-types}, anzichè renderli degli EnemyModel ereditando da questo: il concetto è che se si vuole sviluppare un nemico si estende direttamente EnemyModel e non uno di questi comportamenti "plugin".
+
+Di seguito in figura 11 mostriamo come sono stati definiti i nemici a livello di Model, abbiamo evidenziato i 4 comportamenti base in azzurro e le classi finali che rappresentano i nemici implementati in giallo.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.5]{Enemies.jpg}
+    \caption{\textit{Enemies framework - in giallo i nemici concreti}}
+\end{figure}
+
+\subsubsection{Boss}
+
+Realizzare il comportamento del Boss tramite linguaggio Prolog ci permette di usufruire della sua espressività logica.
+
+Per fare questo è necessario ampliare il framework dei nemici aggiungendo il \textbf{PrologEnemyModel}, 
+un tratto in grado di gestire le operazioni necessarie ad interrogare il PrologService attraverso uno specifico \textit{goal} 
+e gestire le sue risposte per attivare un certo \textit{comportamento}.
+In questo modo, in ottica di sviluppi futuri, si potrebbero creare rapidamente nuovi nemici, boss compresi, che implementino il comportamento tramite linguaggio Prolog, definendo unicamente la costruzione del goal e del comportamento.
+
+\subsection{AnythingView e AnythingViewModel}
+ 
+Come scelta di design stabiliamo che 
+\begin{itemize}
+    \item Una View e un ViewModel devono essere progettati per uno specifico Model.
+    \item Un ViewModel potrebbe essere usato da diverse View
+    \item Una View potrebbe non necessitare di un ViewModel: in generale quando non ha animazioni complesse
+    \item Un ViewModel viene istanziato con lo stesso identificativo univoco usato per l'oggetto Model a cui si riferisce
+    \item Un Model potrebbe disporre di diverse versioni di View ma la sua istanza ne utilizza una
+\end{itemize}
+Per la View abbiamo pensato di adottare il pattern \textbf{Family Polymorphism} definendo al suo interno i type member astratti \textbf{Model} e \textbf{ViewModel} che vengono concretizzati dai sottotipi della View.
+Nella versione finale tuttavia i due tipi interni vengono collegati a dei parametri generici in quanto abbiamo trovato che questa soluzione
+\begin{itemize}
+    \item ci offre tutti i vantaggi di avere dei type member come la pulizia del codice o la possibilità di usare path-dependent types
+    \item ci ha dato meno problemi di type inference 
+    \item ci consente di risolvere il problema di type test runtime su tipi astratti \textit{(vedi approfondimento su implementazione)}
+    \item a nostro avviso è più espressiva per indicare cosa richiede una View
+\end{itemize}
+
+Il pattern \textbf{Family Polymorphism} è stato applicato definendo il tipo astratto \textit{View} che rappresenta il contenuto grafico da visualizzare attraverso il metodo \textbf{draw}, quest'ultimo richiama il template method \textbf{view} per ottenerlo.
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.45]{AnythingViewModel.jpg}
+    \caption{\textit{Gerarchia AnythingView e AnythingViewModel}} 
+\end{figure}
+
+In figura 12 mostriamo l'utilizzo degli \textbf{Union Types} per definire che un ViewModel può non essere richiesto da una View.
+Per la gerarchia di ViewModel valgono gli stessi concetti già menzionati per il Model di immutabilità e polimorfismo F-Bounded.
+L'esempio concreto di utilizzo in figura riguarda il Character, ma è definito almeno un singleton object View per ciascun Model.
+
+\subsubsection{Asset e animazioni}
+
+Per realizzare le View dei vari oggetti, è necessaria una buona organizzazione del codice 
+per seguire i principi \textbf{DRY} e definire coerentemente come debba essere realizzata una visualizzazione, 
+la quale dipende sempre da Asset grafici ed, in alcune situazioni, anche da animazioni. 
+
+L'obiettivo è quindi separare il \textit{cosa} disegnare dal \textit{come}, 
+in modo tale da realizzare diversi trait per lo stesso oggetto senza mai replicare il codice in comune.
+
+Sarà quindi necessaria una libreria \textbf{AnythingAssets} per codificare le informazioni di base 
+dalla quale ogni singolo Asset (es IsaacAsset in figura 13) dovrà ereditare per definire le sue proprietà: 
+nome del file, dimensioni, scala, ecc...
+
+A questo punto si potrà creare un trait (es Isacc in figura 13) che definisca come viene disegnato lo specifico asset, 
+se questo è composto da una singola Sprite o da più di una, 
+ad esempio il Character dovrà avere un corpo ed una testa con animazioni separate in base all'input dell'utente. 
+La testa sarà animata soltanto durante lo sparo ed in direzione dei proiettili, 
+mentre il corpo sarà animato durante il movimento e nella direzione di spostamento.
+
+Una volta definito il trait dell'asset, questo può essere mixato con la corretta View del modello che rappresenta l'oggetto a schermo.
+
+
+\begin{figure}[!hbt]
+    \centering
+    \includegraphics[scale=0.48]{Asset.jpg}
+    \caption{\textit{AnythingAssets e utilizzo con Isaac}} 
+\end{figure}
+
+
+\subsection{Sistema di controllo delle collisioni}
+Il sistema di controllo delle collisioni ha l'obbiettivo di verificare se due elementi all'interno di una stanza collidono. 
+Se questo accade, è necessario aggiornare la posizione degli elementi per evitare che gli elementi si intersechino e gestire un side effect che potrebbe o meno esserci durante la collisione (danno). 
+
+Il sistema agisce e controlla solamente gli Anything di tipo Solid all'interno della stanza correntemente visualizzata.
+Essendo il GameModel un'istantanea immutabile, il controllo avviene ad ogni Frame e su una struttura dati statica. 
+
+Il sistema è composto da una serie di funzioni racchiusi in un modulo e sfruttato dal GameModel stesso, il quale va a controllare gli Anything presenti nella Room corrente e ritorna un modello aggiornato, come si può vedere in figura 6.
+
+Il controllo è eseguito in due momenti distinti: 
+\begin{enumerate}
+  \item In un primo momento viene verificata la collisione tra un elemento e tutti gli altri interni alla stanza. Per ogni collisione viene applicata una funzione all'elemento che corrisponde al side effect.
+  \item In un secondo momento vengono ricontrollate le collisioni e spostati gli elementi di conseguenza. 
+\end{enumerate}
+
+Il doppio controllo è dovuto al fatto che non è possibile spostare subito un elemento, perchè si potrebbero perdere collisioni con altri elementi.
+Questo aspetto, in termini di prestazioni, è largamente migliorabile, ma si rimanda a eventuali sviluppi futuri.
+
+\subsection{PrologService e PrologClient}
+Nel progettare il PrologService abbiamo considerato che:
+\begin{itemize}
+    \item come servizio prolog deve accettare richieste dal gioco e restituire risposte sotto forma di eventi con payload
+    \item deve comunicare con TauProlog in modo asincrono
+    \item deve fornire al gioco un livello di astrazione da TauProlog: non vogliamo che il gioco riceva risposte con termini Tau
+    \item non deve essere concepito specificamente per TauProlog ma per un qualsiasi altro engine asincrono.
+\end{itemize}   
+
+Da queste considerazioni abbiamo definito un nostro insieme di Prolog \textbf{Term} ed abbiamo pensato PrologService in modo da interfacciarsi con un oggetto di tipo \textbf{AsyncSession} di cui \textbf{TauClient} è sottotipo concreto: quest'ultimo è il punto di contatto con TauProlog e si occupa di tradurre i TauTerm in Term.
+
+Infine per facilitare l'utilizzo del Prolog da parte del gioco abbiamo predisposto \textbf{PrologClient} che emette comandi per il PrologService: PrologClient è predisposto per essere memorizzato nei Model e quindi ad ogni comando produce una copia di se stesso wrappata nella monade Outcome.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.48]{PrologService.jpg}
+    \caption{\textit{PrologService, Gerarchia Term e PrologClient}} 
+\end{figure}
+
+\newpage
+\subsection{Organizzazione del codice}
+Il codice è stato organizzato in packages. Questi seguono la suddivisione in scene dell'applicativo. Al loro interno, si può ritrovare una suddivisione in Model, View, ViewModel e Componenti.
+Il package Core invece, contiene le parti basilari a cui il resto del sistema fa riferimento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{package-diagram.jpg}
+    \caption{\textit{Package Diagram del sistema}} 
+\end{figure}

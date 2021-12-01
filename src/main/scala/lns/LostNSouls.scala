@@ -2,24 +2,34 @@ package lns
 
 import indigo.*
 import indigo.scenes.*
+import indigo.shared.datatypes.Rectangle
 import indigoextras.subsystems.FPSCounter
-import lns.core.{Model, ViewModel}
+import lns.core.{ Animations, Assets, Model, ViewModel }
 import lns.scenes.end.EndScene
 import lns.scenes.game.GameScene
 import lns.scenes.loading.LoadingScene
 import lns.scenes.menu.MenuScene
+import lns.subsystems.prolog.{ loadTauProlog, PrologService, TauClient }
 
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 /**
  * Game boot data
  */
-final case class BootData()
+final case class BootData(screenDimensions: Rectangle)
 
 /**
  * Game startup data built from boot data
  */
-final case class StartupData()
+final case class StartupData(screenDimensions: Rectangle, prologFiles: Map[String, Option[String]] = Map()) {
+  def scale(edge: Int): Double =
+    Math.min(
+      1.0 / edge * screenDimensions.width,
+      1.0 / edge * screenDimensions.height
+    )
+
+  def getPrologFile(name: String): Option[String] = prologFiles.getOrElse(name, None)
+}
 
 @JSExportTopLevel("IndigoGame")
 object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
@@ -32,27 +42,62 @@ object LostNSouls extends IndigoGame[BootData, StartupData, Model, ViewModel] {
   def scenes(bootData: BootData): NonEmptyList[Scene[StartupData, Model, ViewModel]] = NonEmptyList(
     MenuScene(),
     LoadingScene(),
-    GameScene(),
+    GameScene(bootData.screenDimensions),
     EndScene()
   )
 
-  def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] =
-    Outcome(BootResult(GameConfig.default, BootData()))
+  def boot(flags: Map[String, String]): Outcome[BootResult[BootData]] = {
 
+    loadTauProlog()
+
+    var currentViewport = for {
+      width  <- flags.get("width")
+      height <- flags.get("height")
+    } yield GameViewport(width.toInt, height.toInt)
+
+    val config = GameConfig.default.withViewport(currentViewport.getOrElse(GameViewport.at720p))
+
+    Outcome(
+      BootResult(config, BootData(config.screenDimensions))
+        .withAssets(Assets.initialAssets())
+        .withFonts(Assets.initialFont())
+        .withSubSystems(PrologService(TauClient.apply))
+    )
+  }
   def setup(bootData: BootData, assetCollection: AssetCollection, dice: Dice): Outcome[Startup[StartupData]] =
-    Outcome(Startup.Success(StartupData()))
+    Outcome(
+      Startup
+        .Success(
+          StartupData(
+            bootData.screenDimensions,
+            Map(
+              "dungeon_generator" -> assetCollection.findTextDataByName(AssetName("dungeon_generator")),
+              "blocking_elements_generator" -> assetCollection.findTextDataByName(
+                AssetName("blocking_elements_generator")
+              ),
+              "loki" -> assetCollection.findTextDataByName(AssetName("loki"))
+            )
+          )
+        )
+        .addAnimations(Animations())
+    )
 
   def initialScene(bootData: BootData): Option[SceneName] = None
 
-  def initialModel(startupData: StartupData): Outcome[Model] = Outcome(Model.initial)
+  def initialModel(startupData: StartupData): Outcome[Model] = Outcome(Model.initial(startupData))
 
-  def initialViewModel(startupData: StartupData, model: Model): Outcome[ViewModel] = Outcome(ViewModel.initial)
+  def initialViewModel(startupData: StartupData, model: Model): Outcome[ViewModel] =
+    Outcome(ViewModel.initial(startupData, model))
 
   def present(context: FrameContext[StartupData], model: Model, viewModel: ViewModel): Outcome[SceneUpdateFragment] =
     Outcome(SceneUpdateFragment.empty)
 
   def updateModel(context: FrameContext[StartupData], model: Model): GlobalEvent => Outcome[Model] = _ => Outcome(model)
 
-  def updateViewModel(context: FrameContext[StartupData], model: Model, viewModel: ViewModel): GlobalEvent => Outcome[ViewModel] =
+  def updateViewModel(
+      context: FrameContext[StartupData],
+      model: Model,
+      viewModel: ViewModel
+  ): GlobalEvent => Outcome[ViewModel] =
     _ => Outcome(viewModel)
 }

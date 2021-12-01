@@ -1,0 +1,11 @@
+Product Backlog Story,Sprint task,Story point,Volunteer,Planned Hours,Mon,Tue,Wed,Thu,Fri,Sat,Sun
+General quality refactor,,4,Alan - Federico,,4,4,2,2,0,,
+Come utente voglio passare da una stanza all'altra attraverso porte,,10,Federico,,12,10,8,5,3,0,
+Come utente voglio sparare,,15,,,15,12,10,5,5,0,
+,Improve Character Test,,Matteo,2h,,,,,,,
+,DamageModel,,Matteo,1h,,,,,,,
+,FireModel + ShotModel + ShotView,,Matteo,7h,,,,,,,
+Come utente voglio che il dungeon sia composto da più stanze,,22,,,22,20,15,10,5,2,0
+,Algoritmo Prolog per la disposizione delle stanze del dungeon,,Alan,10h,,,,,,,
+,Interazione Scala Prolog,,Alan,8h,,,,,,,
+,Dungeon Model refactor,,Alan - Federico,4h,,,,,,,

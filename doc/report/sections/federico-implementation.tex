@@ -1,0 +1,104 @@
+\subsection{Federico Mazzini}
+Durante il corso del progetto mi sono occupato di differenti parti all'interno di esso, tra cui, in ordine:
+\begin{itemize}
+    \item Scena di loading e caricamento degli asset
+    \item Il Dungeon, dal modello alla sua integrazione con le altre componenti (ad eccezione dell'algoritmo Prolog per la generazione e all' integrazione con il modello Scala)
+    \item Le stanze di gioco, la loro tipologia, i diversi comportamenti e la gestione degli Anything interni
+    \item Le porte e il passaggio da una stanza all'altra
+    \item Definizione e visualizzazione di elementi bloccanti
+    \item Disposizione, mediante Prolog, di nemici ed elementi bloccanti all'interno delle stanze Arena
+    \item Sistema delle collisioni e di Bounding degli elementi interni alla stanza
+    \item Scena finale e relativa verifica di avvenuta vittoria/sconfitta
+\end{itemize}
+
+\subsubsection{Dungeon}
+Per quanto riguarda il Dungeon, ho cercato di fornire un'implementazione basilare del modello e delle sue funzioni principali. 
+In particolare ho immaginato la mappa come una griglia, composta da una collezione di elementi in posizioni [X,Y]. Questi elementi sarebbero poi diventate le stanze all'interno del Dungeon effettivo, 
+ma per la generazione, è stato utile ridurli a semplici "tipi", da definire successivamente, perciò ho messo in pratica il pattern \textbf{Family Polimorphism}.
+
+\begin{lstlisting}[language=Scala]
+type Position = (Int, Int)
+trait Grid {
+    type Room
+    val content: Map[Position, Room]
+    val initialRoom: Position
+  }   
+\end{lstlisting}
+Il type Room è stato ridefinito in due case class, la prima è stata utilizzata durante la generazione del dungeon, prima di generare gli elementi interni alla stanza. 
+In questo caso Room è stato associato ad un semplice enum descrivente il tipo di room. 
+
+La seconda volta invece, è stato definito per il vero Dungeon, già generato e con elementi all'interno, in cui il type Room è stato effettivamente associato al vero e completo modello della stanza.
+
+\subsubsection{Room}
+Come già descritto, le stanze sono di diverso tipo, Empty, Arena, Item e Boss. Per modellare questi concetti ho definito un trait base il quale contiene la maggior parte dei comportamenti ma lascia il resto alle classi specializzate. 
+Una room qualsiasi è caratterizzata da un insieme di porte, una collezione di Anything e un area di gioco in cui gli elementi si muovono. 
+Avendo lavorato con strutture dati immutabili, ho cercato di fornire più metodi possibili per la modifica di una Room, intesa come creazione di un nuovo modello con la modifica specificata. Per evitare ripetizioni di codice, la funzione generale sfrutta le \textbf{Higher Order Function} e mette in campo il pattern \textbf{strategy}. 
+\begin{lstlisting}[language=Scala]
+    def updateAnythings
+    (updateFunc: Map[AnythingId, AnythingModel] => Outcome[Map[AnythingId, AnythingModel]])
+    : Outcome[RoomModel] =
+    for (updatedAnythings <- updateFunc(anythings))
+      yield this match {
+        case room: EmptyRoom =>
+          room.copy(anythings = updatedAnythings)
+        case room: ItemRoom =>
+          room.copy(anythings = updatedAnythings)
+        case room: ArenaRoom =>
+          room.copy(anythings = updatedAnythings)
+        case room: BossRoom =>
+          room.copy(anythings = updatedAnythings)
+        case _ => this
+      }
+\end{lstlisting}
+
+Ho sfruttato questa funzione in molte altre adibite alla modifica degli Anything interni di una room, come ad esempio 
+\begin{lstlisting}[language=Scala]
+  def addShot(shot: ShotModel): Outcome[RoomModel] =
+    updateAnythings(anythings => 
+        Outcome(anythings + (shot.id -> shot)))
+\end{lstlisting}
+
+\subsubsection{Door}
+Per quanto riguarda le porte, ho cercato di rimanere il più fedele possibile allo stile funzionale. Ho perciò definito un tipo Location e un tipo State, i quali insieme vanno a comporre una porta.
+Ho creato un object per permettermi di definire e modificare una Door, ma ciò che nella pratica ho utilizzato sono le \textbf{Extension} e le \textbf{Conversion} di scala 3 (impliciti precedentemente).
+In questo modo, è possibile definire una collezione di porte per una stanza nel seguente modo: 
+\begin{lstlisting}[language=Scala]
+    (Left -> Open) :+ (Right -> Open) :+ (Above -> Lock)
+\end{lstlisting}
+
+\subsubsection{Prolog}
+Ho utilizzato il prolog per la definizione di un "area di gioco" e un "area elementi" all'interno delle stanze. Ho immaginato come il pavimento di una stanza fosse una griglia. 
+Ho generato, aiutandomi con una findall, la griglia e, in base alle porte della stanza, un'area di gioco di dimensione variabile che comprendesse le porte. 
+Ciò che non rientrava nell'area di gioco è stato classificato come area elementi.
+Utilizzare il Prolog in questa situazione è stato molto utile per la natura "esplorativa" di esso, la quale mi ha permesso di calcolare facilmente le aree. Di contro, l'algoritmo da me sviluppato è relativamente lento considerando il resto del sistema. 
+
+\subsubsection{Monadi}
+All'interno del progetto è stata utilizzata la struttura monadica Outcome propria di Indigo. 
+Attraverso essa è stato possibile wrappare l'intero modello o sottoparti di esso, concatenando diverse modifiche al modello senza avere side effect. Per lavorare con questa monade, ho utilizzato spesso la \textbf{for comprehension} di Scala. 
+Di seguito un esempio, riguardante l'intera catena di update del modello di gioco. 
+\begin{lstlisting}[language=Scala]
+for {
+      updatedCharacter <- model.updateCharacter(c => character.update(gameContext))
+      updatedRoom      <- updatedCharacter.updateCurrentRoom(r => model.currentRoom.update(character))
+      withPassage      <- updatedRoom.updateWithPassage
+      withStats        <- withPassage.updateStatsAfterCollision(context)
+      withMovements    <- withStats.updateMovementAfterCollision
+    } yield withMovements
+\end{lstlisting} 
+
+\subsubsection{Collisioni}
+Il sistema di controllo delle collisioni deve gestire un gran numero di combinazioni possibili. 
+Ad esempio, un oggetto in movimento che collide con una roccia verrà spostato il tanto che basta per non intersecarsi, ma non ha ripercussioni dopo il contatto. 
+Se invece un oggetto in movimento collide con uno shot, questo oggetto perderà punti vita, a seconda del tipo di shot. 
+
+Per via del grande numero di combinazioni, durante lo sviluppo del sistema si è fatto largo uso di \textbf{strategy} per evitare la duplicazione del codice. 
+
+\subsubsection{Verifica vittoria/sconfitta}
+\begin{itemize}
+  \item Un giocatore vince se sconfigge il boss
+  \item Un giocatore perde quando il personaggio controllato finisce i punti vita
+\end{itemize}
+
+Il controllo viene effettuato tramite due eventi \textit{Win} e \textit{GameOver}. 
+Uno dei due eventi viene lanciato quando, durante l'update del Character o del Boss, la life raggiunge lo zero. 
+Gli eventi vengono intercettati dalla Scena di gioco la quale mostra un messaggio di vittoria/sconfitta e rimanda alla scena finale, dove è possibile eventualmente iniziare una nuova partita. 

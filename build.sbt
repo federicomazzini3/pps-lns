@@ -5,7 +5,11 @@ lazy val lns =
       name := "pps-lns",
       version := "0.0.1",
       scalaVersion := "3.0.2",
-      organization := "org.pps-lns"
+      organization := "org.pps-lns",
+      libraryDependencies ++= Seq(
+        "org.scalatest" %%% "scalatest" % "3.2.10" % "test", // Sbt ScalaJS test running
+        "org.scalatest" %% "scalatest" % "3.2.10" % Test // IDE JVM test running
+      )
     )
     .settings( // Indigo specific settings
       showCursor := true,
@@ -16,10 +20,7 @@ lazy val lns =
       libraryDependencies ++= Seq(
         "io.indigoengine" %%% "indigo" % "0.9.2",
         "io.indigoengine" %%% "indigo-extras"     % "0.9.2",
-        "io.indigoengine" %%% "indigo-json-circe" % "0.9.2",
-        "org.junit.jupiter" % "junit-jupiter" % "5.8.0" % Test, // aggregator of junit-jupiter-api and junit-jupiter-engine (runtime)
-        "org.junit.jupiter" % "junit-jupiter-engine" % "5.8.0" % Test, // for org.junit.platform
-        "org.scalatest" %% "scalatest" % "3.2.9" % Test
+        "io.indigoengine" %%% "indigo-json-circe" % "0.9.2"
       )
     )
 

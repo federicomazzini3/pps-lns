@@ -1,0 +1,240 @@
+\subsection{Matteo Brocca}
+Durante il corso del progetto mi sono occupato di studiare ed implementare:
+\begin{itemize}
+	\item Rappresentazione grafica degli Anythings tramite Asset ed animazioni
+    \item Definizione del FireModel e ShotModel per la gestione dei proiettili
+    \item Gestione delle statistiche degli Anythings
+    \item Character controllato dal giocatore
+    \item Boss, PrologEnemyModel e definizione del suo comportamento tramite Prolog
+    \item Item che il Character può raccogliere per modificare le proprie statistiche
+    \item HUD per la visualizzazione delle statistiche a schermo
+\end{itemize}
+
+\subsubsection{Rappresentazione grafica degli Anythings tramite Asset ed animazioni}
+È stata creata una libreria per gli \textbf{AnythingAsset}, 
+la quale codifica le informazioni di base necessare a disegnare a schermo un certo Asset ed implementa metodi condivisi. 
+
+Questa organizzazione ci ha permesso di generare velocemente le specifiche View per Character, Enemies, Bosses, Items and Elements.
+
+Facciamo un esempio:
+Il CharacterModel, viene rappresentato a schermo dalla sua relativa CharacterView e CharacterViewModel 
+che estendono relativamente da AnythingView ed AnythingViewModel
+
+La CharacterView definisce solo la funzione di "disegno" che sfrutta il metodo drawComponents di AnythingAsset 
+e viene mixata con il tipo di carattere che si vuole disegnare a schermo, in questo caso Isaac.
+Il trait Isaac estende IsaacAsset per definire come disegnare ogni singolo componente a schermo.
+A sua volta il trait IsaacAsset è quello che estende il trait base AnythingAsset 
+e definisce le dimensioni e nome della Sprite che viene caricata durante l'avvio del gioco.
+
+Nel momento in cui si decida di modificare l'estetica del Character (il \textit{"cosa"}), da "Isaac" a "Mario",
+senza dover modificare il \textit{"come"} questo viene rappresentato (da una testa, un corpo, un ombra, ...),
+basterà create un nuovo trait Mario e relativo MarioAsset.
+
+\begin{lstlisting}[language=Scala]
+trait AnythingAsset {
+	...
+	protected def drawComponents(components: List[SceneNode]): Group = ...
+}
+
+trait IsaacAsset extends AnythingAsset {
+  	...
+}
+
+trait Isaac extends IsaacAsset{
+	...
+	def headView(model: CharacterModel, viewModel: CharacterViewModel): Graphic[Material.Bitmap] = {...}
+	def bodyView(model: CharacterModel): Sprite[Material.Bitmap] = = {...}
+}
+
+trait CharacterView[VM <: AnythingViewModel[CharacterModel] | Unit] extends AnythingView[CharacterModel, VM] {}
+
+object CharacterView extends CharacterView[CharacterViewModel] with Isaac {
+	...
+	def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
+		...
+		drawComponents(List(shadowView, bodyView(model), headView(model, viewModel)))
+}
+\end{lstlisting}	
+
+\subsubsection{Definizione del FireModel e ShotModel per la gestione dei proiettili}
+Ogni proiettile generato dal FireModel è uno ShotModel.
+
+La factory che ne permette la creazione durante la generazione dell'evento ShotEvent 
+richiede anche quale sia la relativa View per la rappresentazione grafica del proiettile.
+Si può infatti notare che il FireModel richiede la definizione della funzione di creazione di questa View di tipo ShotView (pattern strategy: factory as a function), un trait che sfrutta il \textbf{Self-Type} per richiedere espressamente di essere mixato 
+con il trait \textbf{ShotAsset} che definisce le informazioni di base che ogni proiettile deve avere ed implementa la funzione \textbf{drawShot}
+
+\begin{lstlisting}[language=Scala]
+trait FireModel extends AnythingModel with StatsModel {
+  	type Model >: this.type <: FireModel
+
+	...
+
+  	val shotView: () => ShotView[_]
+
+  	...
+}
+
+class SingleShotView extends ShotView[Unit] with SimpleAnythingView {
+  this: ShotAsset =>
+  type View = Group
+
+  def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View =
+    drawComponents(List(drawShot))
+
+  ...
+}
+\end{lstlisting}
+
+Un esempio dell'utilizzo del FireModel si può apprezzare all'interno del CharacterModel 
+dove viene definita la shotView come un SingleShotView con il trait ShotBlue
+e viene implementato il computeFire con il mapping dei tasti premuti dall'utente.
+
+\begin{lstlisting}[language=Scala]
+case class CharacterModel(...) extends AliveModel
+		with DynamicModel
+		with FireModel
+		with DamageModel
+		with SolidModel {
+
+	val shotView        = () => new SingleShotView() with ShotBlue
+	
+	...
+}
+\end{lstlisting}
+
+\subsubsection{Gestione delle statistiche degli Anything}
+Si è realizzato il trait \textbf{StatsModel} da mixare con un qualsiasi Anything 
+per gestire l'aggiornamento di queste caratteristiche nell'ambito dell'immutabilità.
+
+Il metodo "sumStat" è l'unico utilizzato realmente all'interno del gioco e permette di 
+aggiornare il valore di una determinata caratteristica sommando il valore proveniente da un Item raccolto 
+verificando in automatico che il valore non diventi negativo.
+
+Gli altri metodi "changeStats" e "changeStat" sono solo stati previsti per eventuali sviluppi futuri.  
+
+\begin{lstlisting}[language=Scala]
+trait StatsModel {
+  type Model >: this.type <: StatsModel
+
+  val stats: Stats
+
+  def withStats(stats: Stats): Model
+
+  def changeStats(context: FrameContext[StartupData], newStats: Stats): Outcome[Model] = Outcome(withStats(newStats))
+
+  def changeStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats + property))
+
+  def sumStat(context: FrameContext[StartupData], property: StatProperty): Outcome[Model] =
+    Outcome(withStats(stats +++ property))
+}
+\end{lstlisting}
+
+Questo trait usufruisce della libreria \textbf{Stats} la quale è implementata seguendo il pattern \textbf{Pimp My Library} 
+per mettere a disposizione i propri metodi all'interno dello specifico dominio applicativo (\textbf{DSL}).
+
+La libreria definisce che cosa sono le Stats, una mappa di proprietà da nome a valore.
+Sono stati implementate delle \textbf{Conversion} per utilizzare i valori definiti come Double anche in situazioni 
+dove si accettano Int o String.
+Inoltre sono state realizzate delle \textbf{extension} per definire operatori specifici per manipolarle.
+
+\begin{lstlisting}[language=Scala]
+package lns.scenes.game.stats
+
+enum PropertyName:
+	case 	MaxLife, Invincibility, MaxSpeed, Range, KeepAwayMin, KeepAwayMax, Damage, 
+		FireDamage, FireRange, FireRate,FireSpeed
+
+type PropertyValue = Double
+type StatProperty  = (PropertyName, PropertyValue)
+type Stats         = Map[PropertyName, PropertyValue]
+
+given Conversion[PropertyValue, Int] with
+	def apply(v: PropertyValue): Int = v.toInt
+
+given Conversion[PropertyValue, String] with
+	def apply(v: PropertyValue): String = v.toString
+
+extension (p: PropertyValue) {
+	def |+|(v: PropertyValue): PropertyValue = p match {
+	case p if (v + p) < 0 => 0
+	case _                => BigDecimal(v + p).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
+	}
+}
+
+extension (p: PropertyName) {
+	def @@(s: Stats): PropertyValue = s.getOrElse(p, 0.0)
+}
+
+extension (stats: Stats) {
+	def +++(p: StatProperty): Stats =
+	stats + stats.get(p._1).map(x => p._1 -> (x |+| p._2)).getOrElse(p)
+}
+\end{lstlisting}
+
+\subsubsection{Boss, PrologEnemyModel e definizione del suo comportamento tramite Prolog}
+Per la creazione del boss, il cui comportamento è definito tramite linguaggio Prolog, è stato creato il trait \textbf{PrologEnemyModel}. 
+Grazie a Scala 3, il trait accetta il paramentro "\textit{name}" che definisce il nome del file prolog da interrogare e che sarà stato opportunamente caricato tra gli asset di gioco.
+
+Se il suo EnemyStatus attuale (tipico degli EnemyModel) è di tipo \textit{Idle} e non è definita nessuna \textit{EnemyAction}, 
+allora viene interrogato il codice Prolog. 
+Il \textbf{goal} che viene passato è una stringa prodotta dal metodo del quale si richiede l'override.
+La risposta del prolog, catturata dal gameLoop, esegue il metodo \textbf{behaviour} del chiamante implementato dalla classe che lo estende. 
+
+\begin{lstlisting}[language=Scala]
+trait PrologEnemyModel(name: String) extends EnemyModel {
+  type Model >: this.type <: PrologModel
+
+  val prologClient: PrologClient
+
+  def withProlog(prologClient: PrologClient): Model
+
+  protected def goal(context: FrameContext[StartupData])(gameContext: GameContext): String
+
+  def behaviour(response: Substitution): Outcome[Model]
+
+  protected def consult(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] = ...
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] = ...
+}
+
+case class BossModel(...) ) 
+	extends PrologEnemyModel("loki")
+	with FireModel
+	with Traveller {
+
+	...
+
+	protected def goal(context: FrameContext[StartupData])(gameContext: GameContext): String = ...
+
+	def behaviour(response: Substitution): Outcome[Model] = ...
+}
+\end{lstlisting}
+
+Il boss di nome "Loki" che è stato implementato può eseguire 5 diverse azioni, 3 di attacco, 1 di movimento ed 1 di difesa,
+che hanno una probabilità in base allo stato di vita del Boss e del Character. 
+Viene definito \textit{low} il livello di vita se questo è inferiore al 50\% della vita massima, altrimenti \textit{high}
+
+\begin{lstlisting}[language=Scala]
+% estratto del file prolog "assets/prolog/loki.pl"
+... 
+% List of probability value for actions based on Boss and Character life level
+% @high|low (Boss)
+% @high|low (Character)
+% -Probability List[Attack, Defense, Move]
+getActionsProbability(high, high, [0.7, 0.0, 1.0]).
+getActionsProbability(high, low,  [0.5, 0.0, 1.0]).
+getActionsProbability(low,  high, [0.7, 1.0, 0.0]).
+getActionsProbability(low,  low,  [0.5, 0.7, 1.0]).
+...
+\end{lstlisting}
+
+Di seguito vengono descritte nel dettaglio le singole azioni:
+\begin{itemize}
+	\item attack1(direction): viene generato un proiettile nella direzione del Character se questo si trova sullo stesso asse x o y.
+	\item attack2: vengono generati 4 proiettili in contemporanea lungo i 2 assi x, y
+	\item attack3: vengono generati 4 proiettili in contemporanea in diagonale lungo i 2 assi x, y
+	\item move(x,y): il boss sposta rapidamente verso il punto x, y occupato dal Character
+	\item defence(x,y): il boss si teletrasporta nel punto x,y se questo non è occupato da una roccia, altrimenti viene cercato il primo posto disponibile nel suo intorno
+\end{itemize}

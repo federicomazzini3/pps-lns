@@ -1,0 +1,216 @@
+\section{Implementazione}
+Di seguito vengono analizzati per ogni membro del team gli aspetti implementativi più significativi del sistema.
+
+\subsection{Alan Mancini}
+Durante il corso del progetto mi sono occupato di studiare ed implementare:
+\begin{itemize}
+    \item AnythingModel con alcuni suoi sottotipi come DynamicModel e AliveModel e sperimentazione del workflow per consentire mixin/estensione e l'update del Model immutabile 
+    \item Macro per ridurre il boilerplate code quando si estende un AnythingModel
+    \item Adapter per semplificare l'update di un insieme di Anything
+    \item AnythingView e AnythingViewModel di base e sperimentazione del workflow derivante
+    \item Nemici per quanto concerne Model ed i loro comportamenti riutilizzabili
+    \item PrologService come sottosistema di Indigo, integrazione di TauProlog e intefacciamento grazie a Scala.js, ed infine client per consultazioni da parte del gioco
+    \item Generazione del dungeon randomica con Prolog
+    \item Visualizzazione mini-mappa del dungeon
+\end{itemize}
+\subsubsection{AnythingModel e immutabilità}
+Per quanto riguarda l'applicazione del pattern \textbf{F-Bounded Polymorphism} la soluzione che ho adottato con type-member anzichè l'utilizzo di argomenti generici garantisce un buon livello di type-safety: sembra difficile se non impossibile rompere i vincoli di tipo imposti.  
+Impongo che il tipo di \textit{this} sia sottotipo di Model e quest'ultimo sottotipo del tratto in cui è definito: tutto questo permette anche di implementare un metodo update di base che ritorni proprio \textit{this} di tipo Model.
+
+\begin{lstlisting}[language=Scala]
+trait AnythingModel {
+    type Model >: this.type <: AnythingModel
+    
+    val id: AnythingId
+    val view: () => AnythingView[Model, _]
+
+    ...
+
+    def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+        Outcome(this)
+    }
+}  
+
+trait DynamicModel extends AnythingModel with StatsModel {
+  type Model >: this.type <: DynamicModel
+
+  val speed: Vector2
+  val collisionDetected: Boolean
+
+  def withDynamic(boundingBox: BoundingBox, speed: Vector2, collisionDetected: Boolean): Model
+
+  ...
+
+  override def update(context: FrameContext[StartupData])(gameContext: GameContext): Outcome[Model] =
+    for {
+      superObj <- super.update(context)(gameContext)
+      (newSpeed, newPosition) = computeMove(context)(gameContext)
+      boundLocation           = gameContext.room.boundPosition(newPosition)
+      newObj = superObj
+        .withDynamic(boundLocation, newSpeed, boundLocation.position != newPosition.position)
+        .asInstanceOf[Model]
+    } yield newObj
+
+} 
+\end{lstlisting}
+
+Da notare la necessità di un cast a Model in quanto il compilatore Scala non riconosce che il type member di ritorno è lo stesso definito poco sopra: questo cast comunque è legittimo e sicuro. 
+
+Per concludere AnythingModel: la factory per la view è richiesta come funzione in linea con il \textbf{pattern strategy} applicato in modo funzionale con Scala.
+
+Cambiando argomento, ho applicato il pattern \textbf{Pimp My Library} al fine di estendere le funzionalità di Double in modo da ottenere un Timer, utilizzato poi in diversi Model 
+\begin{lstlisting}[language=Scala]
+type Timer = Double
+extension (timer: Timer)
+    def elapsed(time: Double): Timer = timer match {
+        case 0                 => 0
+        case x if x - time > 0 => x - time
+        case _                 => 0
+    }
+\end{lstlisting}
+
+Infine ho utilizzato il \textbf{pattern Adapter} per trasformare implicitamente Vector2 in Vertex, due modi di Indigo per gestire i vettori secondo me ridondanti e per questo abbiamo deciso di utilizzarne uno solo nei nostri Model
+\begin{lstlisting}[language=Scala]
+given Conversion[Vector2, Vertex] with
+    def apply(v: Vector2): Vertex = Vertex(v.x, v.y)
+\end{lstlisting}
+
+
+
+\subsubsection{Macro per ridurre boilerplate code}
+Quando si definisce il Model di un oggetto di gioco che mixa diversi comportamenti è necessario implementare altrettanti template method  del tipo with*Comportamento*(...) in modo da permettere la sua copia aggiornata. 
+
+\begin{lstlisting}[language=Scala]
+def withDynamic(x,y,z) = copy(x=x,y=y,z=z); 
+\end{lstlisting}
+
+Per questo ho cercato un modo per generare in automatico questi metodi per una case class qualsiasi e l'unico sistema era scrivere una macro attivata da una annotation, ma Scala 3 al momento non supporta questa soluzione possibile su Scala 2.
+
+Quindi ho implementato la \textbf{copyMacro} che consente di eseguire il metodo copy con come argomenti quelli dello scope dove viene attivata la macro, sfruttando le potenzialita della ancora non documentata Scala Reflection API. 
+
+\begin{lstlisting}[language=Scala]
+def withDynamic(x,y,z) = copyMacro
+\end{lstlisting}
+
+\subsubsection{Adapter per update di collection di Anything}
+
+Quando si esegue l'update di una collezione di oggetti AnythingModel o AnythingViewModel ad esempio Map[AnythingId, AnythingModel] si ottiene una Map[AnythingId, Outcome[AnythingModel]] ma quello che occorre è ottenere la Map originale unendo le Outcome e gli eventi contenuti da ciascuna.
+
+\begin{lstlisting}[language=Scala]
+anythings.map((id, any) => id -> any.update(context)(GameContext(this, character)))
+\end{lstlisting}
+
+Per comodità ho applicato il \textbf{pattern Adapter} fornendo un apposito convertitore implicito, di seguito quello per AnythingViewModel.
+
+\begin{lstlisting}[language=Scala]
+given Conversion[Map[AnythingId, Outcome[AnythingViewModel[_]]], Outcome[Map[AnythingId, AnythingViewModel[_]]]] with
+  def apply(set: Map[AnythingId, Outcome[AnythingViewModel[_]]]): Outcome[Map[AnythingId, AnythingViewModel[_]]] =
+    set.foldLeft(Outcome(Map[AnythingId, AnythingViewModel[_]]().empty))((acc, el) =>
+      acc.merge[AnythingViewModel[_], Map[AnythingId, AnythingViewModel[_]]](el._2)((set, el2) => set + (el._1 -> el2))
+    )
+\end{lstlisting}
+
+\subsubsection{AnythingView e AnythingViewModel}
+
+Nel codice che segue da notare è il context bound \textbf{Typeable} (alias di TypeTest[Any,T]) che importa ed abilita gli impliciti TypeTest[Any,M] e TypeTest[Any,VM] i quali ci permettono in modo molto veloce, pulito e sicuro di eseguire una draw dato un Model o ViewModel non correttamente tipati.
+
+
+\begin{lstlisting}[language=Scala]
+trait AnythingView[M <: AnythingModel: Typeable, VM <: AnythingViewModel[M] | Unit: Typeable] {
+  type Model     = M
+  type ViewModel = VM
+  type View <: Group
+
+  def viewModel: (id: AnythingId) => ViewModel
+
+  protected def view(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): View
+  
+  ...
+
+  def draw(contex: FrameContext[StartupData], model: Model, viewModel: ViewModel): Group =
+    view(contex, model, viewModel)
+        .moveTo(model.getPosition())
+        .moveBy(Assets.Rooms.wallSize, Assets.Rooms.wallSize)
+        .withDepth(depth(model))
+
+  @targetName("anyDraw")
+  def draw(contex: FrameContext[StartupData], model: AnythingModel, viewModel: AnythingViewModel[_] | Unit): Group =
+    (model, viewModel) match {
+      case (m: Model, vm: ViewModel) => draw(contex, m, vm)
+      case _                         => Group()
+    }
+}
+\end{lstlisting}
+
+Il problema che avevamo nella visualizzazione degli Anything era che, data una loro collezione, non è possibile ottenere un suo singolo elemento tipato correttamente in modo automatico, quindi l'unica soluzione trovata prevedeva di fare pericolosi type cast.
+Nel codice sotto ad esempio il Model genera la View sulla quale viene eseguita una draw: il Model passato alla draw non veniva riconosciuto dal compilatore del tipo richiesto e soprattutto il ViewModel cercato nell'altra collezione viene ovviamente tipato in modo generico. 
+Ho quindi pensato di invertire il problema permettendo al metodo draw della View di accettare un qualsiasi Model o ViewModel in modo sicuro eseguendo un \textbf{type check del tipo a runtime} verificando che questo corrisponda ai type member specificati.
+Il TypeTest interviene implicitamente durante il match con i type Member della View.
+
+\begin{lstlisting}[language=Scala]
+def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel: RoomViewModel): Group =
+    model.anythings.foldLeft(Group())((s1, s2) =>
+      s1.addChild(
+        s2._2
+          .view()
+          .draw(
+            context,
+            s2._2,
+            viewModel.anythings
+              .get(s2._2.id)
+              .getOrElse[AnythingViewModel[_] | Unit](())
+          )
+      ))
+\end{lstlisting}   
+
+L'utilizzo di \textbf{Typeable} è presente anche in \textbf{AnythingViewModel} dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
+
+\subsubsection{Nemici e comportamenti come mixin puri}
+
+Per quanto riguarda il mini framework per lo sviluppo di nemici ho applicato il pattern \textbf{Pimp My Library} al fine di creare un \textbf{mini DSL} per generare la coda di stati a partire da due di essi 
+
+\begin{lstlisting}[language=Scala]
+extension (s1: EnemyStatus) def :+(s2: EnemyStatus): Queue[EnemyStatus] = Queue(s1, s2)
+\end{lstlisting} 
+
+Circa i comportomenti dei nemici, mostro qui un esempio dell'impiego dei \textbf{Self-types} per evitare di estendere da EnemyModel
+\begin{lstlisting}[language=Scala]
+trait Follower { this: EnemyModel with DynamicModel =>
+  def computeSpeed(context: FrameContext[StartupData])(gameContext: GameContext): Vector2 =
+    status.head match {
+      case (EnemyState.Attacking, _) =>
+        (gameContext.character.getPosition() - getPosition()).normalise * MaxSpeed @@ stats
+      case _ => Vector2.zero
+    }}
+\end{lstlisting} 
+
+\subsubsection{PrologService}
+Riguardo l'implementazione dei Term prolog ho proceduto secondo la modalita \textbf{Mixed OOP/FP} separando la definizione dei dati dal comportamento. Si è poi reso utile l'impiego del pattern \textbf{Adapter} per convertire implicitamente all'occorrenza i termini Tau in nostri Term.
+\begin{lstlisting}[language=Scala]
+given Conversion[TauTerm, Term] with
+  def apply(t: TauTerm): Term = t.args.length match {
+    case 0 => Atom(t.id)
+    case _ =>
+      Struct(
+        Atom(t.id),
+        t.args
+          .map[Term](arg =>
+            arg match {
+              case a: TauNum  => a
+              case a: TauVar  => a
+              case a: TauTerm => a
+            }
+          )
+          .toList: _*
+      )}
+
+given Conversion[TauSubstitution, Substitution] with
+  def apply(t: TauSubstitution): Substitution = Substitution(
+    t.links.foldLeft(HashMap[String, Term]())((hmap, kv) => hmap + (kv._1 -> kv._2)))
+\end{lstlisting} 
+
+\subsubsection{Generazione dungeon con Prolog}
+L'algoritmo Prolog genera il dungeon partendo dalla stanza iniziale posizionata in 0,0 all'interno di una griglia virtualmente infinita. 
+Le successive stanze vengono posizionate selezionando randomicamente una cella libera adiacente a quelle già aggiunte. 
+Per fare questo viene mantenuta una lista di posizioni libere, questa inoltre viene troncata sempre per mantenere una lunghezza di 6 posti in modo che l'algoritmo proceda ad aggiungere stanze con buona probabilità partendo dall'ultima stanza generando così una struttura più "tortuosa" come da requisito.
+La stanza del boss, aggiunta per ultima, viene posizionata in modo da essere adiacente ad una sola stanza.
