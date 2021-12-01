@@ -37,13 +37,10 @@ object Generator {
         RoomModel.itemRoom(positionInGrid, generateDoors(grid, positionInGrid), generateItem(Floor.center))
       case RoomType.Arena =>
         val doorsLocations = generateDoors(grid, positionInGrid)
-        //val enemy          = ParabiteModel.initial(Cell(3, 4))
-        //val enemy2         = ParabiteModel.initial(Cell(5, 4))
         RoomModel.arenaRoom(
           positionInGrid,
           doorsLocations,
           Map.empty
-          //Map(enemy.id -> enemy, enemy2.id -> enemy2)
         )
       case RoomType.Boss =>
         val boss = BossModel.initial
@@ -102,11 +99,3 @@ object Generator {
   }.toMap
 
 }
-
-//inserire client su started
-//flag generate in gamemodel started
-//flag generate in stanze
-//se flag gamemodel generate -> ho generato tutto e posso partire con il gioco
-//se flag gamemodel non è generate -> non ho generato gli elementi e i nemici in tutto, devo farlo:
-//  prendo la prima room non generata e faccio la chiamata al prolog
-//attendo la risposta e aggiungo elementi bloccanti e nemici all'interno della room per cui avevo fatto la chiamata
