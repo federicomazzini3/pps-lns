@@ -11,11 +11,9 @@ Trattandosi di una struttura dati immutabile, aggiornare il modello significa cr
 
 Una scelta rilevante ai fini dell'implementazione è il fatto che, a livello di modello, il character controllato dal giocatore è sempre fuori dalla stanza in cui si trova, in questo modo è possibile aggiornare in maniera indipendente le due componenti.
 
-In figura 6 è mostrato il relativo diagramma delle classi.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.44]{GameModelClassDiagram.jpg}
+    \includegraphics[scale=0.56]{GameModelClassDiagram.jpg}
     \caption{\textit{Diagramma delle classi del Game Model e componenti rilevanti}} 
 \end{figure}
 
@@ -55,7 +53,7 @@ Un dettaglio importante di una stanza sono le porte. Una porta, per l'utente, ra
 
 Una porta è quindi un elemento statico di una stanza e non un link. E' il Dungeon a gestire il collegamento tra le varie stanze in base alla loro posizione occupata in griglia. 
 
-Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestita dal Dungeon. 
+Il fatto che vi sia una porta, presuppone comunque che dalla parte opposta vi sia un'altra stanza, ma questo dettaglio è trasparente alla stanza e gestito dal Dungeon. 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{DoorClassDiagram.jpg}

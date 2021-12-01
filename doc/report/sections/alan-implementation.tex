@@ -160,8 +160,7 @@ def anythingView(context: FrameContext[StartupData], model: RoomModel, viewModel
               .get(s2._2.id)
               .getOrElse[AnythingViewModel[_] | Unit](())
           )
-      )
-    )
+      ))
 \end{lstlisting}   
 
 L'utilizzo di \textbf{Typeable} è presente anche in \textbf{AnythingViewModel} dove il suo metodo update richiede in input un oggetto di tipo Model generalmente ottenuto da una collezione mista.
@@ -182,8 +181,7 @@ trait Follower { this: EnemyModel with DynamicModel =>
       case (EnemyState.Attacking, _) =>
         (gameContext.character.getPosition() - getPosition()).normalise * MaxSpeed @@ stats
       case _ => Vector2.zero
-    }
-}
+    }}
 \end{lstlisting} 
 
 \subsubsection{PrologService}
@@ -204,13 +202,11 @@ given Conversion[TauTerm, Term] with
             }
           )
           .toList: _*
-      )
-  }
+      )}
 
 given Conversion[TauSubstitution, Substitution] with
   def apply(t: TauSubstitution): Substitution = Substitution(
-    t.links.foldLeft(HashMap[String, Term]())((hmap, kv) => hmap + (kv._1 -> kv._2))
-  )
+    t.links.foldLeft(HashMap[String, Term]())((hmap, kv) => hmap + (kv._1 -> kv._2)))
 \end{lstlisting} 
 
 \subsubsection{Generazione dungeon con Prolog}
