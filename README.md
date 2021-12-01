@@ -1,6 +1,8 @@
 # Lost 'n Souls
 A beautiful functional Roguelike game
 
+# [Play now online!](https://www.npmjs.com/package/http-server)
+
 ## Requirements
 - Scala version 3.0.2
 - sbt version 1.5.5
