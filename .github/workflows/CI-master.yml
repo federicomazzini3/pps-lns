@@ -22,9 +22,32 @@ jobs:
     - name: Run tests
       run: sbt test
       
-    - name: Indigo build
-      run: sbt buildGame
+    - name: Build LaTeX report
+      uses: "xu-cheng/latex-action@v2"
+      with:
+        root_file: lostnsouls-report.tex
+        args: '-output-format=pdf -file-line-error -synctex=1 -halt-on-error -interaction=nonstopmode -shell-escape'
+        working_directory: doc/report
       
+    - name: Indigo build
+      run: sbt buildGameFull
+      
+    - name: Zip site folder
+      uses: "montudor/action-zip@v1"
+      with:
+       args: zip -qq -r target.zip target/indigoBuildFull
+    
+    - name: Automatic Releases
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest build" 
+          files: |
+            target.zip
+            doc/report/lostnsouls-report.pdf
+     
     - name: Publish game
       uses: SamKirkland/FTP-Deploy-Action@4.1.0
       with:
