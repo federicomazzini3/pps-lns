@@ -1,7 +1,7 @@
 # Lost 'n Souls
 A beautiful functional Roguelike game
 
-### [Play now online!](https://www.npmjs.com/package/http-server)
+### [Play now online!](https://lns.meblabs.com)
 
 ## Requirements
 - Scala version 3.0.2
